@@ -25,7 +25,7 @@ export default function NameHero() {
         </h2>
       </div>
 
-      <div className="relative z-10 h-[70%] w-[42%] max-w-sm overflow-hidden rounded-2xl border border-paper/20 shadow-2xl sm:h-[78%]">
+      <div className="relative z-10 h-[70%] w-[42%] max-w-sm overflow-hidden rounded-2xl sm:h-[78%]">
         <HeroPortrait src="/sarosh.png" alt="Sarosh Kumar" />
       </div>
     </section>
