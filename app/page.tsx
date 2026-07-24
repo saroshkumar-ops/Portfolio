@@ -1,5 +1,6 @@
 import Nav from "@/components/Nav";
 import PinnedHero from "@/components/PinnedHero";
+import NameHero from "@/components/NameHero";
 import Playbook from "@/components/Playbook";
 import Projects from "@/components/Projects";
 import Gallery from "@/components/Gallery";
@@ -11,6 +12,7 @@ export default function Home() {
       <Nav />
       <main>
         <PinnedHero />
+        <NameHero />
         <Playbook />
         <Projects />
         <Gallery />
