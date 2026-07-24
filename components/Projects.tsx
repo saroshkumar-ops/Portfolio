@@ -11,13 +11,16 @@ import {
 } from "react";
 import gsap from "gsap";
 import { ArrowRight } from "lucide-react";
-import { anton } from "@/lib/fonts";
+import { anton, kanit } from "@/lib/fonts";
 import ScrollReveal from "@/components/ui/scroll-reveal";
+import BorderGlow from "@/components/ui/border-glow";
 
 type Role = "center" | "left" | "right" | "back";
 
 type Project = {
   accent: string;
+  glowColor: string;
+  colors: string[];
   eyebrow: string;
   title: string;
   description: string;
@@ -26,6 +29,8 @@ type Project = {
 const PROJECTS: Project[] = [
   {
     accent: "var(--accent-amber)",
+    glowColor: "37 91 55",
+    colors: ["var(--accent-amber)", "var(--grad-gold)", "var(--grad-red)"],
     eyebrow: "AI Desktop Assistant",
     title: "Victor — AI Desktop Copilot",
     description:
@@ -33,6 +38,8 @@ const PROJECTS: Project[] = [
   },
   {
     accent: "var(--accent-mint)",
+    glowColor: "167 80 56",
+    colors: ["var(--accent-mint)", "var(--grad-teal)", "var(--accent-amber)"],
     eyebrow: "Autonomous SRE",
     title: "Persistent Context Engine",
     description:
@@ -40,6 +47,8 @@ const PROJECTS: Project[] = [
   },
   {
     accent: "var(--grad-purple)",
+    glowColor: "266 81 54",
+    colors: ["var(--grad-purple)", "var(--accent-mint)", "var(--grad-teal)"],
     eyebrow: "Computer Vision",
     title: "GestureScroll",
     description:
@@ -47,6 +56,8 @@ const PROJECTS: Project[] = [
   },
   {
     accent: "var(--grad-teal)",
+    glowColor: "169 79 44",
+    colors: ["var(--grad-teal)", "var(--accent-mint)", "var(--grad-purple)"],
     eyebrow: "Smart Manufacturing",
     title: "BharatAuto",
     description:
@@ -54,6 +65,8 @@ const PROJECTS: Project[] = [
   },
   {
     accent: "var(--grad-gold)",
+    glowColor: "39 88 58",
+    colors: ["var(--grad-gold)", "var(--accent-amber)", "var(--grad-red)"],
     eyebrow: "Linux Utility",
     title: "Listny",
     description:
@@ -275,7 +288,9 @@ export default function Projects() {
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-paper/60">
             Selected Work
           </p>
-          <h2 className="max-w-xl text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
+          <h2
+            className={`${kanit.className} gradient-heading max-w-xl text-3xl font-black uppercase leading-tight tracking-tight sm:text-4xl md:text-5xl`}
+          >
             Featured projects
           </h2>
           <ScrollReveal
@@ -332,35 +347,41 @@ export default function Projects() {
               willChange: "transform, filter, opacity",
             }}
           >
-            <div
-              className="flex h-full w-full flex-col justify-between rounded-2xl border border-paper/10 bg-ink-soft/90 p-6 shadow-2xl backdrop-blur-sm sm:p-8"
-              style={{
-                boxShadow: `0 0 0 1px ${project.accent}22, 0 30px 60px -25px ${project.accent}55`,
-              }}
+            <BorderGlow
+              className="h-full w-full"
+              backgroundColor="var(--ink-soft)"
+              borderRadius={16}
+              colors={project.colors}
+              glowColor={project.glowColor}
+              edgeSensitivity={35}
+              glowRadius={30}
+              glowIntensity={1.1}
             >
-              <div>
-                <span
-                  className="text-xs font-semibold uppercase tracking-[0.18em]"
+              <div className="flex h-full w-full flex-col justify-between p-6 sm:p-8">
+                <div>
+                  <span
+                    className="text-xs font-semibold uppercase tracking-[0.18em]"
+                    style={{ color: project.accent }}
+                  >
+                    {project.eyebrow}
+                  </span>
+                  <h3 className="mt-4 text-xl font-bold sm:text-2xl">
+                    {project.title}
+                  </h3>
+                  <p className="mt-3 text-sm text-paper/60">
+                    {project.description}
+                  </p>
+                </div>
+
+                <div
+                  className="mt-6 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em]"
                   style={{ color: project.accent }}
                 >
-                  {project.eyebrow}
-                </span>
-                <h3 className="mt-4 text-xl font-bold sm:text-2xl">
-                  {project.title}
-                </h3>
-                <p className="mt-3 text-sm text-paper/60">
-                  {project.description}
-                </p>
+                  View project
+                  <ArrowRight size={14} strokeWidth={2.25} />
+                </div>
               </div>
-
-              <div
-                className="mt-6 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em]"
-                style={{ color: project.accent }}
-              >
-                View project
-                <ArrowRight size={14} strokeWidth={2.25} />
-              </div>
-            </div>
+            </BorderGlow>
           </div>
         ))}
       </div>

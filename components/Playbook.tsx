@@ -1,6 +1,47 @@
+import {
+  SiPython,
+  SiC,
+  SiCplusplus,
+  SiJavascript,
+  SiHtml5,
+  SiCss,
+  SiReact,
+  SiFastapi,
+  SiElectron,
+  SiNextdotjs,
+  SiMysql,
+  SiSqlite,
+  SiPostgresql,
+  SiOllama,
+  SiGit,
+  SiGithub,
+  SiLinux,
+  SiSelenium,
+} from "react-icons/si";
 import AuroraBackground from "@/components/AuroraBackground";
-import ProjectCarousel from "@/components/ProjectCarousel";
 import ScrollReveal from "@/components/ui/scroll-reveal";
+import LogoLoop, { type LogoItem } from "@/components/ui/logo-loop";
+
+const TECH_LOGOS: LogoItem[] = [
+  { node: <SiPython />, title: "Python" },
+  { node: <SiC />, title: "C" },
+  { node: <SiCplusplus />, title: "C++" },
+  { node: <SiJavascript />, title: "JavaScript" },
+  { node: <SiHtml5 />, title: "HTML5" },
+  { node: <SiCss />, title: "CSS" },
+  { node: <SiReact />, title: "React" },
+  { node: <SiFastapi />, title: "FastAPI" },
+  { node: <SiElectron />, title: "Electron" },
+  { node: <SiNextdotjs />, title: "Next.js" },
+  { node: <SiMysql />, title: "MySQL" },
+  { node: <SiSqlite />, title: "SQLite" },
+  { node: <SiPostgresql />, title: "PostgreSQL" },
+  { node: <SiOllama />, title: "Ollama" },
+  { node: <SiGit />, title: "Git" },
+  { node: <SiGithub />, title: "GitHub" },
+  { node: <SiLinux />, title: "Linux" },
+  { node: <SiSelenium />, title: "Selenium" },
+];
 
 export default function Playbook() {
   return (
@@ -39,7 +80,25 @@ export default function Playbook() {
           </ScrollReveal>
         </div>
 
-        <ProjectCarousel />
+        <div className="w-full">
+          <div className="relative overflow-hidden rounded-2xl border border-paper/10 bg-ink-soft p-6 shadow-2xl md:p-8">
+            <p className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-paper/50">
+              Tools &amp; Tech
+            </p>
+            <LogoLoop
+              logos={TECH_LOGOS}
+              speed={60}
+              direction="left"
+              logoHeight={32}
+              gap={40}
+              fadeOut
+              fadeOutColor="#0c1220"
+              scaleOnHover
+              ariaLabel="Languages, frameworks, and tools"
+              className="text-paper/70"
+            />
+          </div>
+        </div>
       </div>
     </section>
   );
