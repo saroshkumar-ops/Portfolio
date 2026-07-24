@@ -142,8 +142,9 @@ export default function Projects() {
     >
       <div
         aria-hidden
-        className={`${anton.className} pointer-events-none absolute inset-x-0 top-8 flex select-none items-center justify-center text-paper opacity-[0.05]`}
+        className={`${anton.className} pointer-events-none absolute inset-x-0 top-8 flex select-none items-center justify-center opacity-[0.14]`}
         style={{
+          color: "var(--grad-red)",
           fontSize: "clamp(70px, 18vw, 260px)",
           lineHeight: 1,
           letterSpacing: "-0.02em",
