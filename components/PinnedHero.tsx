@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Hero from "@/components/Hero";
+import type { ScrubVideoFramesHandle } from "@/components/ui/scrub-video-frames";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,11 +12,13 @@ gsap.registerPlugin(ScrollTrigger);
  * Pins the hero for an extra viewport of scroll while the Playbook section
  * (rendered after this, with rounded top corners) slides up and over it —
  * the same "curtain reveal" continuous-motion feel as the reference video.
- * A scroll-scrubbed GSAP tween fades/scales the hero content as it gets covered.
+ * A scroll-scrubbed GSAP tween fades/scales the hero content as it gets covered,
+ * and the same scroll range drives Hero's background frame sequence.
  */
 export default function PinnedHero() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
+  const frameApiRef = useRef<ScrubVideoFramesHandle>(null);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
@@ -35,6 +38,7 @@ export default function PinnedHero() {
           start: "top top",
           end: "bottom top",
           scrub: 0.8,
+          onUpdate: (self) => frameApiRef.current?.setProgress(self.progress),
         },
       });
     }, wrapperRef);
@@ -45,7 +49,7 @@ export default function PinnedHero() {
   return (
     <div ref={wrapperRef} className="relative h-[160vh]">
       <div ref={stickyRef} className="sticky top-0 h-screen">
-        <Hero />
+        <Hero frameApiRef={frameApiRef} />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
+import type { RefObject } from "react";
 import LensReveal from "@/components/LensReveal";
-import { StarsBackground } from "@/components/ui/stars";
 import OptionWheel from "@/components/ui/option-wheel";
+import ScrubVideoFrames, { type ScrubVideoFramesHandle } from "@/components/ui/scrub-video-frames";
 
 const FOCUS_AREAS = [
   "AI Systems",
@@ -10,13 +11,25 @@ const FOCUS_AREAS = [
   "Developer Tools",
 ];
 
-export default function Hero() {
+const LANDING_FRAME_COUNT = 200;
+const landingFrameSrc = (index: number) => `/Landing/ezgif-frame-${String(index).padStart(3, "0")}.jpg`;
+
+export default function Hero({
+  frameApiRef,
+}: {
+  frameApiRef?: RefObject<ScrubVideoFramesHandle | null>;
+}) {
   return (
     <section
       id="top"
       className="relative h-full overflow-hidden bg-ink"
     >
-      <StarsBackground className="flex h-full flex-col justify-between px-6 pt-32 pb-12 md:px-12">
+      <div className="relative flex h-full flex-col justify-between px-6 pt-32 pb-12 md:px-12">
+        <div className="absolute inset-0 z-0">
+          <ScrubVideoFrames ref={frameApiRef} frameCount={LANDING_FRAME_COUNT} frameSrc={landingFrameSrc} />
+          <div className="absolute inset-0 bg-ink/60" />
+        </div>
+
         <div
           aria-hidden
           className="pointer-events-none absolute -right-1/4 top-0 h-[60vh] w-[60vh] rounded-full bg-[radial-gradient(circle,_rgba(53,110,232,0.35),_transparent_70%)] blur-3xl"
@@ -47,7 +60,7 @@ export default function Hero() {
             className="hidden h-10 w-px animate-bounce self-end bg-paper/40 md:block"
           />
         </div>
-      </StarsBackground>
+      </div>
 
       <div className="pointer-events-auto absolute right-6 top-1/2 hidden h-[46vh] w-56 -translate-y-1/2 xl:block xl:right-12">
         <OptionWheel
