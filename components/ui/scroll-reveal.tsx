@@ -85,19 +85,35 @@ export default function ScrollReveal({
 
     const wordElements = el.querySelectorAll<HTMLElement>(".word");
 
+    // The container itself is often just a few lines tall, which gives
+    // ScrollTrigger very little natural scroll distance to spread the
+    // words across (they'd all reveal within a few px of scroll). Scale
+    // the reveal's scroll distance by word count instead, so each word
+    // gets a comfortable, consistent window and visibly lights up one at
+    // a time rather than all at once.
+    const revealDistance = Math.max(wordElements.length * 45, 200);
+    const computedEnd =
+      wordAnimationEnd === "bottom bottom"
+        ? `+=${revealDistance}`
+        : wordAnimationEnd;
+
+    // A short duration relative to the stagger delay keeps each word's
+    // fade window from overlapping its neighbors, so words visibly light
+    // up one at a time as you scroll instead of blending into one fade.
     const opacityTween = gsap.fromTo(
       wordElements,
       { opacity: baseOpacity, willChange: "opacity" },
       {
         ease: "none",
         opacity: 1,
-        stagger: 0.05,
+        duration: 0.25,
+        stagger: 0.4,
         scrollTrigger: {
           trigger: el,
           scroller,
-          start: "top bottom-=20%",
-          end: wordAnimationEnd,
-          scrub: true,
+          start: "top bottom-=10%",
+          end: computedEnd,
+          scrub: 0.4,
         },
       }
     );
@@ -110,13 +126,14 @@ export default function ScrollReveal({
         {
           ease: "none",
           filter: "blur(0px)",
-          stagger: 0.05,
+          duration: 0.25,
+          stagger: 0.4,
           scrollTrigger: {
             trigger: el,
             scroller,
-            start: "top bottom-=20%",
-            end: wordAnimationEnd,
-            scrub: true,
+            start: "top bottom-=10%",
+            end: computedEnd,
+            scrub: 0.4,
           },
         }
       );

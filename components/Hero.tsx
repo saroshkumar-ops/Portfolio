@@ -1,6 +1,5 @@
 import LensReveal from "@/components/LensReveal";
 import { StarsBackground } from "@/components/ui/stars";
-import GradualBlur from "@/components/ui/gradual-blur";
 import OptionWheel from "@/components/ui/option-wheel";
 import TextPressure from "@/components/ui/text-pressure";
 import { robotoFlex } from "@/lib/fonts";
@@ -88,13 +87,6 @@ export default function Hero() {
           draggable
         />
       </div>
-
-      <GradualBlur
-        target="parent"
-        position="bottom"
-        preset="subtle"
-        curve="bezier"
-      />
     </section>
   );
 }
