@@ -11,7 +11,7 @@ export default function Nav() {
         href="#top"
         className="text-sm font-bold tracking-[0.08em] uppercase"
       >
-        Jordan Ray
+        Sarosh Kumar
       </a>
       <nav className="flex gap-4 text-[10px] font-medium tracking-[0.14em] uppercase text-paper/80 sm:gap-6 sm:text-xs md:gap-10 md:tracking-[0.18em]">
         {LINKS.map((link) => (

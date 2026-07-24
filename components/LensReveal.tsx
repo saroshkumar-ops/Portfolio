@@ -169,12 +169,12 @@ function useSpringCircle(
 function Headline() {
   return (
     <h1 className="font-sans text-[15vw] font-bold leading-[0.85] tracking-tight text-paper sm:text-[10vw] md:text-[7.5vw]">
-      Designing
+      Sarosh Kumar
       <br />
       <span className="font-serif italic font-normal text-accent-amber">
-        thoughtful
+        Software
       </span>{" "}
-      products
+      Engineer
     </h1>
   );
 }
