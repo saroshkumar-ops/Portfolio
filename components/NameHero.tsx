@@ -5,9 +5,12 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroPortrait from "@/components/HeroPortrait";
 import TiltedCard from "@/components/ui/tilted-card";
-import Particles from "@/components/ui/particles";
+import ScrubVideoFrames, { type ScrubVideoFramesHandle } from "@/components/ui/scrub-video-frames";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const ABOUT_FRAME_COUNT = 120;
+const aboutFrameSrc = (index: number) => `/About/ezgif-frame-${String(index).padStart(3, "0")}.jpg`;
 
 const CARD_BG = `data:image/svg+xml,${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="300" viewBox="0 0 240 300">
@@ -33,6 +36,7 @@ export default function NameHero() {
   const typeRef = useRef<HTMLHeadingElement>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
+  const frameApiRef = useRef<ScrubVideoFramesHandle>(null);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -51,6 +55,9 @@ export default function NameHero() {
             end: "+=180%",
             scrub: 0.6,
             pin: true,
+            // Scrub the background frame sequence in lockstep with the same
+            // pinned scroll range driving the entrance/exit timeline below.
+            onUpdate: (self) => frameApiRef.current?.setProgress(self.progress),
           },
         })
         // Entrance: portrait from the left, name from the right, box up from below.
@@ -75,16 +82,8 @@ export default function NameHero() {
       className="relative flex h-screen items-center justify-center overflow-hidden bg-ink px-6"
     >
       <div className="absolute inset-0 z-0">
-        <Particles
-          particleColors={["#e8452c", "#f5a623"]}
-          particleCount={200}
-          particleSpread={10}
-          speed={0.1}
-          particleBaseSize={100}
-          moveParticlesOnHover
-          alphaParticles
-          disableRotation={false}
-        />
+        <ScrubVideoFrames ref={frameApiRef} frameCount={ABOUT_FRAME_COUNT} frameSrc={aboutFrameSrc} />
+        <div className="absolute inset-0 bg-ink/60" />
       </div>
 
       <div className="relative flex h-full w-full items-center justify-center">
