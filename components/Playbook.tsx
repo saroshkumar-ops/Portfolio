@@ -18,8 +18,9 @@ export default function Playbook() {
           <ScrollReveal
             containerClassName="my-0"
             textClassName="text-3xl font-bold leading-tight sm:text-4xl md:text-5xl"
-            baseRotation={4}
-            blurStrength={6}
+            baseRotation={0}
+            baseOpacity={0.2}
+            enableBlur={false}
           >
             {"I build "}
             <span className="font-serif italic font-normal text-accent-mint">
@@ -30,8 +31,9 @@ export default function Playbook() {
           <ScrollReveal
             containerClassName="my-0 mt-8"
             textClassName="max-w-md text-sm uppercase tracking-[0.14em] text-paper/50 font-normal leading-normal"
-            baseRotation={2}
-            blurStrength={4}
+            baseRotation={0}
+            baseOpacity={0.2}
+            enableBlur={false}
           >
             Product design / UX & UI / Brand systems
           </ScrollReveal>

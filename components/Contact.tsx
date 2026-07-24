@@ -17,8 +17,9 @@ export default function Contact() {
           <ScrollReveal
             containerClassName="my-0"
             textClassName="text-4xl font-bold leading-tight sm:text-6xl md:text-7xl"
-            baseRotation={3}
-            blurStrength={5}
+            baseRotation={0}
+            baseOpacity={0.2}
+            enableBlur={false}
           >
             hello@example.com
           </ScrollReveal>

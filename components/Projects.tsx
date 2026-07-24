@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { anton } from "@/lib/fonts";
+import ScrollReveal from "@/components/ui/scroll-reveal";
 
 type Role = "center" | "left" | "right" | "back";
 
@@ -162,10 +163,16 @@ export default function Projects() {
           <h2 className="max-w-xl text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
             Featured projects
           </h2>
-          <p className="mt-4 max-w-md text-sm text-paper/60">
+          <ScrollReveal
+            containerClassName="my-0 mt-4"
+            textClassName="max-w-md text-sm text-paper/60 font-normal leading-normal"
+            baseRotation={0}
+            baseOpacity={0.2}
+            enableBlur={false}
+          >
             A closer look at recent product, brand, and interface work —
             each box below is ready for your project details.
-          </p>
+          </ScrollReveal>
         </div>
 
         <div className="flex items-center gap-6">

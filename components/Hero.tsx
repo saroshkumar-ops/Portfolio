@@ -1,4 +1,3 @@
-import Image from "next/image";
 import LensReveal from "@/components/LensReveal";
 import { StarsBackground } from "@/components/ui/stars";
 import GradualBlur from "@/components/ui/gradual-blur";
@@ -44,19 +43,6 @@ export default function Hero() {
         </div>
 
         <div className="relative flex flex-1 items-center">
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[46%] sm:block">
-            <Image
-              src="/sarosh.png"
-              alt=""
-              fill
-              priority
-              sizes="46vw"
-              className="object-contain object-bottom opacity-30 grayscale"
-            />
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent to-ink" />
-            <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-ink to-transparent" />
-          </div>
-
           <LensReveal />
         </div>
 
