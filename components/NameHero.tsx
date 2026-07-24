@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroPortrait from "@/components/HeroPortrait";
 import TiltedCard from "@/components/ui/tilted-card";
-import Hyperspeed, { type HyperspeedHandle } from "@/components/ui/hyperspeed";
+import Particles from "@/components/ui/particles";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,21 +15,6 @@ const CARD_BG = `data:image/svg+xml,${encodeURIComponent(
     <rect x="0" y="0" width="240" height="300" fill="none" stroke="#e8452c" stroke-width="6" />
   </svg>`
 )}`;
-
-// Memoized outside the component so Hyperspeed doesn't tear down/rebuild its
-// WebGL scene on every render.
-const HYPERSPEED_OPTIONS = {
-  colors: {
-    roadColor: 0x0a0a0a,
-    islandColor: 0x0c1220,
-    background: 0x05070c,
-    shoulderLines: 0xe8452c,
-    brokenLines: 0xf5a623,
-    leftCars: [0xe8452c, 0xf5a623, 0xe8452c],
-    rightCars: [0xf5a623, 0xe8452c, 0xf5a623],
-    sticks: 0xe8452c,
-  },
-};
 
 /**
  * Alternate hero treatment: giant background type behind an overlapping
@@ -48,7 +33,6 @@ export default function NameHero() {
   const typeRef = useRef<HTMLHeadingElement>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
-  const hyperspeedRef = useRef<HyperspeedHandle>(null);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -67,16 +51,6 @@ export default function NameHero() {
             end: "+=180%",
             scrub: 0.6,
             pin: true,
-            // Drive the Hyperspeed background off scroll speed instead of a
-            // click-and-hold trigger: the faster you scroll through the
-            // section, the faster the light streaks move.
-            onUpdate: (self) => {
-              const velocity = Math.abs(self.getVelocity());
-              const intensity = gsap.utils.clamp(0, 1, velocity / 1400);
-              hyperspeedRef.current?.setIntensity(intensity);
-            },
-            onLeave: () => hyperspeedRef.current?.setIntensity(0),
-            onLeaveBack: () => hyperspeedRef.current?.setIntensity(0),
           },
         })
         // Entrance: portrait from the left, name from the right, box up from below.
@@ -101,7 +75,16 @@ export default function NameHero() {
       className="relative flex h-screen items-center justify-center overflow-hidden bg-ink px-6"
     >
       <div className="absolute inset-0 z-0">
-        <Hyperspeed ref={hyperspeedRef} effectOptions={HYPERSPEED_OPTIONS} />
+        <Particles
+          particleColors={["#e8452c", "#f5a623"]}
+          particleCount={200}
+          particleSpread={10}
+          speed={0.1}
+          particleBaseSize={100}
+          moveParticlesOnHover
+          alphaParticles
+          disableRotation={false}
+        />
       </div>
 
       <div className="relative flex h-full w-full items-center justify-center">
