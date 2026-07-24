@@ -1,5 +1,6 @@
 import LensReveal from "@/components/LensReveal";
 import { StarsBackground } from "@/components/ui/stars";
+import GradualBlur from "@/components/ui/gradual-blur";
 
 export default function Hero() {
   return (
@@ -39,6 +40,13 @@ export default function Hero() {
           />
         </div>
       </StarsBackground>
+
+      <GradualBlur
+        target="parent"
+        position="bottom"
+        preset="subtle"
+        curve="bezier"
+      />
     </section>
   );
 }
