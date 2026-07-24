@@ -1,15 +1,13 @@
 import LensReveal from "@/components/LensReveal";
 import { StarsBackground } from "@/components/ui/stars";
 import OptionWheel from "@/components/ui/option-wheel";
-import TextPressure from "@/components/ui/text-pressure";
-import { robotoFlex } from "@/lib/fonts";
 
 const FOCUS_AREAS = [
-  "Product Design",
-  "UX & UI",
-  "Brand Identity",
-  "Web Development",
-  "Motion & Illustration",
+  "AI Systems",
+  "Backend Engineering",
+  "Full-Stack Development",
+  "Computer Vision",
+  "Developer Tools",
 ];
 
 export default function Hero() {
@@ -24,23 +22,6 @@ export default function Hero() {
           className="pointer-events-none absolute -right-1/4 top-0 h-[60vh] w-[60vh] rounded-full bg-[radial-gradient(circle,_rgba(53,110,232,0.35),_transparent_70%)] blur-3xl"
         />
 
-        <div className="relative hidden h-16 w-full max-w-2xl shrink-0 sm:block sm:h-20 md:h-24">
-          <TextPressure
-            text="WELCOME"
-            fontFamily={robotoFlex.style.fontFamily}
-            fontUrl=""
-            textColor="#e8452c"
-            minFontSize={20}
-            flex
-            width
-            weight
-            italic={false}
-            alpha={false}
-            stroke={false}
-            scale
-          />
-        </div>
-
         <div className="relative flex flex-1 items-center">
           <LensReveal />
         </div>
@@ -48,16 +29,16 @@ export default function Hero() {
         <div className="relative flex flex-col justify-between gap-10 md:flex-row md:items-end">
           <div className="flex flex-wrap gap-10 text-xs uppercase tracking-[0.14em] text-paper/60 md:gap-16">
             <div>
-              <p className="font-semibold text-paper/90">Product / Brand</p>
-              <p>Design & Motion</p>
+              <p className="font-semibold text-paper/90">Focus</p>
+              <p>AI &amp; Backend Systems</p>
             </div>
             <div>
               <p className="font-semibold text-paper/90">Based in</p>
-              <p>Remote, worldwide</p>
+              <p>Hubli, India</p>
             </div>
             <div>
               <p className="font-semibold text-paper/90">Status</p>
-              <p>Open for new projects</p>
+              <p>Open to opportunities</p>
             </div>
           </div>
 

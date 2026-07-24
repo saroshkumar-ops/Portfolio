@@ -1,7 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
+import gsap from "gsap";
+import { ArrowRight } from "lucide-react";
 import { anton } from "@/lib/fonts";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 
@@ -17,94 +26,113 @@ type Project = {
 const PROJECTS: Project[] = [
   {
     accent: "var(--accent-amber)",
-    eyebrow: "Project 01",
-    title: "Project title goes here",
+    eyebrow: "AI Desktop Assistant",
+    title: "Victor — AI Desktop Copilot",
     description:
-      "Replace this placeholder with a short one- or two-line description of the project.",
+      "A local AI desktop assistant built with FastAPI, Electron, and Ollama — voice recognition, real-time WebSocket chat, desktop automation, memory persistence, and autonomous scheduling.",
   },
   {
     accent: "var(--accent-mint)",
-    eyebrow: "Project 02",
-    title: "Project title goes here",
+    eyebrow: "Autonomous SRE",
+    title: "Persistent Context Engine",
     description:
-      "Replace this placeholder with a short one- or two-line description of the project.",
+      "A context engine for autonomous SRE using MinHash and LSH-based incident retrieval with a FastAPI + React dashboard — ~124ms p95 latency, 100% recall@5 on large-scale benchmarks.",
   },
   {
     accent: "var(--grad-purple)",
-    eyebrow: "Project 03",
-    title: "Project title goes here",
+    eyebrow: "Computer Vision",
+    title: "GestureScroll",
     description:
-      "Replace this placeholder with a short one- or two-line description of the project.",
+      "A computer-vision background scrolling utility built with Python and MediaPipe — gesture-controlled scrolling for secondary windows without interrupting fullscreen tasks or games.",
   },
   {
     accent: "var(--grad-teal)",
-    eyebrow: "Project 04",
-    title: "Project title goes here",
+    eyebrow: "Smart Manufacturing",
+    title: "BharatAuto",
     description:
-      "Replace this placeholder with a short one- or two-line description of the project.",
+      "An AI-driven smart manufacturing platform using Next.js, Spring Boot, FastAPI, and PostgreSQL — live sensor streaming, ML risk models, and LLM agents with Twilio-based incident escalation.",
+  },
+  {
+    accent: "var(--grad-gold)",
+    eyebrow: "Linux Utility",
+    title: "Listny",
+    description:
+      "A Linux desktop utility that identifies playing songs via ShazamIO acoustic fingerprinting, fetches lyrics through the Genius API, and surfaces local Ollama LLM-powered music insights.",
   },
 ];
 
-const TRANSITION =
-  "transform 650ms cubic-bezier(0.4,0,0.2,1), filter 650ms cubic-bezier(0.4,0,0.2,1), opacity 650ms cubic-bezier(0.4,0,0.2,1), left 650ms cubic-bezier(0.4,0,0.2,1), height 650ms cubic-bezier(0.4,0,0.2,1)";
+type Target = {
+  left: string;
+  height: string;
+  scale: number;
+  blur: number;
+  opacity: number;
+  zIndex: number;
+};
 
-function getBoxStyle(role: Role, isMobile: boolean): CSSProperties {
-  const base: CSSProperties = {
-    position: "absolute",
-    top: "50%",
-    aspectRatio: "0.72 / 1",
-    transition: TRANSITION,
-    willChange: "transform, filter, opacity, left, height",
-  };
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
+function getTarget(role: Role | undefined, isMobile: boolean): Target {
   switch (role) {
     case "center":
       return {
-        ...base,
         left: "50%",
         height: isMobile ? "82%" : "94%",
-        transform: "translate(-50%, -50%)",
-        filter: "blur(0px)",
+        scale: 1,
+        blur: 0,
         opacity: 1,
         zIndex: 20,
       };
     case "left":
       return {
-        ...base,
         left: isMobile ? "10%" : "22%",
         height: isMobile ? "50%" : "64%",
-        transform: "translate(-50%, -50%) scale(0.94)",
-        filter: "blur(3px)",
+        scale: 0.94,
+        blur: 3,
         opacity: 0.45,
         zIndex: 10,
       };
     case "right":
       return {
-        ...base,
         left: isMobile ? "90%" : "78%",
         height: isMobile ? "50%" : "64%",
-        transform: "translate(-50%, -50%) scale(0.94)",
-        filter: "blur(3px)",
+        scale: 0.94,
+        blur: 3,
         opacity: 0.45,
         zIndex: 10,
       };
     case "back":
       return {
-        ...base,
         left: "50%",
         height: isMobile ? "46%" : "56%",
-        transform: "translate(-50%, -50%) scale(0.9)",
-        filter: "blur(5px)",
+        scale: 0.9,
+        blur: 5,
         opacity: 0.2,
         zIndex: 5,
+      };
+    default:
+      // Extra items beyond the 4 visible slots sit hidden until they
+      // rotate into view.
+      return {
+        left: "50%",
+        height: isMobile ? "40%" : "48%",
+        scale: 0.6,
+        blur: 8,
+        opacity: 0,
+        zIndex: 0,
       };
   }
 }
 
 export default function Projects() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const isAnimatingRef = useRef(false);
+  const hasMountedRef = useRef(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const boxRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const dragRef = useRef<{ x: number; moved: boolean } | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640);
@@ -113,28 +141,115 @@ export default function Projects() {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const navigate = useCallback(
-    (direction: "next" | "prev") => {
-      if (isAnimating) return;
-      setIsAnimating(true);
-      setActiveIndex((prev) =>
-        direction === "next"
-          ? (prev + 1) % PROJECTS.length
-          : (prev + PROJECTS.length - 1) % PROJECTS.length
-      );
-      window.setTimeout(() => setIsAnimating(false), 650);
-    },
-    [isAnimating]
-  );
+  const navigate = useCallback((direction: "next" | "prev") => {
+    if (isAnimatingRef.current) return;
+    isAnimatingRef.current = true;
+    setActiveIndex((prev) =>
+      direction === "next"
+        ? (prev + 1) % PROJECTS.length
+        : (prev + PROJECTS.length - 1) % PROJECTS.length
+    );
+    window.setTimeout(() => {
+      isAnimatingRef.current = false;
+    }, 700);
+  }, []);
 
-  const roleByIndex = useMemo<Role[]>(() => {
-    const roles: Role[] = new Array(PROJECTS.length);
+  const roleByIndex = useMemo<(Role | undefined)[]>(() => {
+    const roles: (Role | undefined)[] = new Array(PROJECTS.length).fill(
+      undefined
+    );
     roles[activeIndex] = "center";
     roles[(activeIndex + PROJECTS.length - 1) % PROJECTS.length] = "left";
     roles[(activeIndex + 1) % PROJECTS.length] = "right";
     roles[(activeIndex + 2) % PROJECTS.length] = "back";
     return roles;
   }, [activeIndex]);
+
+  // GSAP drives every position/scale/blur/opacity change so switching
+  // between projects (via scroll, drag, or keyboard — no buttons) animates
+  // smoothly rather than jumping between states. Runs as a layout effect
+  // so the very first positioning happens before paint, avoiding a flash
+  // of unstyled/stacked cards.
+  useIsomorphicLayoutEffect(() => {
+    const isFirstRun = !hasMountedRef.current;
+    hasMountedRef.current = true;
+
+    roleByIndex.forEach((role, i) => {
+      const el = boxRefs.current[i];
+      if (!el) return;
+      const target = getTarget(role, isMobile);
+      const vars = {
+        left: target.left,
+        height: target.height,
+        scale: target.scale,
+        filter: `blur(${target.blur}px)`,
+        opacity: target.opacity,
+        zIndex: target.zIndex,
+        xPercent: -50,
+        yPercent: -50,
+        overwrite: "auto" as const,
+      };
+
+      if (isFirstRun) {
+        gsap.set(el, vars);
+      } else {
+        gsap.to(el, { ...vars, duration: 0.7, ease: "power3.inOut" });
+      }
+    });
+  }, [roleByIndex, isMobile]);
+
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    let wheelLock = false;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (wheelLock) return;
+      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if (Math.abs(delta) < 12) return;
+      wheelLock = true;
+      navigate(delta > 0 ? "next" : "prev");
+      window.setTimeout(() => {
+        wheelLock = false;
+      }, 700);
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [navigate]);
+
+  const handlePointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    dragRef.current = { x: e.clientX, moved: false };
+  }, []);
+
+  const handlePointerMove = useCallback(
+    (e: ReactPointerEvent<HTMLDivElement>) => {
+      const drag = dragRef.current;
+      if (!drag || drag.moved) return;
+      const dx = e.clientX - drag.x;
+      if (Math.abs(dx) > 60) {
+        drag.moved = true;
+        navigate(dx < 0 ? "next" : "prev");
+      }
+    },
+    [navigate]
+  );
+
+  const handlePointerEnd = useCallback(() => {
+    dragRef.current = null;
+  }, []);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate("next");
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate("prev");
+      }
+    },
+    [navigate]
+  );
 
   return (
     <section
@@ -170,34 +285,20 @@ export default function Projects() {
             baseOpacity={0.2}
             enableBlur={false}
           >
-            A closer look at recent product, brand, and interface work —
-            each box below is ready for your project details.
+            AI tools, backend systems, and full-stack builds from
+            hackathons and hands-on engineering.
           </ScrollReveal>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="flex gap-3">
-            <button
-              type="button"
-              aria-label="Previous project"
-              onClick={() => navigate("prev")}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-paper/30 transition-colors hover:border-accent-amber hover:text-accent-amber"
-            >
-              <ArrowLeft size={20} strokeWidth={2.25} />
-            </button>
-            <button
-              type="button"
-              aria-label="Next project"
-              onClick={() => navigate("next")}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-paper/30 transition-colors hover:border-accent-amber hover:text-accent-amber"
-            >
-              <ArrowRight size={20} strokeWidth={2.25} />
-            </button>
-          </div>
-
+        <div className="flex flex-col items-start gap-2 sm:items-end">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-paper/40">
+            {String(activeIndex + 1).padStart(2, "0")} /{" "}
+            {String(PROJECTS.length).padStart(2, "0")} — scroll, drag, or
+            use arrow keys
+          </span>
           <a
             href="#contact"
-            className={`${anton.className} hidden items-center gap-2 text-2xl uppercase leading-none tracking-tight text-paper/85 transition-opacity hover:text-paper hover:opacity-100 sm:flex`}
+            className={`${anton.className} flex items-center gap-2 text-2xl uppercase leading-none tracking-tight text-paper/85 transition-opacity hover:text-paper hover:opacity-100`}
           >
             Discuss a project
             <ArrowRight className="h-5 w-5" strokeWidth={2.25} />
@@ -205,43 +306,63 @@ export default function Projects() {
         </div>
       </div>
 
-      <div className="relative h-[56vh] sm:h-[60vh] md:h-[64vh]">
-        {PROJECTS.map((project, index) => {
-          const role = roleByIndex[index];
-          return (
-            <div key={project.eyebrow} style={getBoxStyle(role, isMobile)}>
-              <div
-                className="flex h-full w-full flex-col justify-between rounded-2xl border border-paper/10 bg-ink-soft/90 p-6 shadow-2xl backdrop-blur-sm sm:p-8"
-                style={{
-                  boxShadow: `0 0 0 1px ${project.accent}22, 0 30px 60px -25px ${project.accent}55`,
-                }}
-              >
-                <div>
-                  <span
-                    className="text-xs font-semibold uppercase tracking-[0.18em]"
-                    style={{ color: project.accent }}
-                  >
-                    {project.eyebrow}
-                  </span>
-                  <h3 className="mt-4 text-xl font-bold sm:text-2xl">
-                    {project.title}
-                  </h3>
-                  <p className="mt-3 text-sm text-paper/60">
-                    {project.description}
-                  </p>
-                </div>
-
-                <div
-                  className="mt-6 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em]"
+      <div
+        ref={carouselRef}
+        role="listbox"
+        tabIndex={0}
+        aria-label="Featured projects carousel"
+        onKeyDown={handleKeyDown}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerEnd}
+        onPointerCancel={handlePointerEnd}
+        className="relative h-[56vh] cursor-grab touch-pan-y select-none outline-none active:cursor-grabbing sm:h-[60vh] md:h-[64vh]"
+      >
+        {PROJECTS.map((project, index) => (
+          <div
+            key={project.eyebrow}
+            ref={(el) => {
+              boxRefs.current[index] = el;
+            }}
+            role="option"
+            aria-selected={activeIndex === index}
+            className="absolute top-1/2"
+            style={{
+              aspectRatio: "0.72 / 1",
+              willChange: "transform, filter, opacity",
+            }}
+          >
+            <div
+              className="flex h-full w-full flex-col justify-between rounded-2xl border border-paper/10 bg-ink-soft/90 p-6 shadow-2xl backdrop-blur-sm sm:p-8"
+              style={{
+                boxShadow: `0 0 0 1px ${project.accent}22, 0 30px 60px -25px ${project.accent}55`,
+              }}
+            >
+              <div>
+                <span
+                  className="text-xs font-semibold uppercase tracking-[0.18em]"
                   style={{ color: project.accent }}
                 >
-                  View project
-                  <ArrowRight size={14} strokeWidth={2.25} />
-                </div>
+                  {project.eyebrow}
+                </span>
+                <h3 className="mt-4 text-xl font-bold sm:text-2xl">
+                  {project.title}
+                </h3>
+                <p className="mt-3 text-sm text-paper/60">
+                  {project.description}
+                </p>
+              </div>
+
+              <div
+                className="mt-6 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em]"
+                style={{ color: project.accent }}
+              >
+                View project
+                <ArrowRight size={14} strokeWidth={2.25} />
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </section>
   );

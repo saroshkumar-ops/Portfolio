@@ -5,19 +5,29 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const SLIDES = [
   {
-    label: "Product Design",
+    label: "Languages",
     accent: "var(--grad-teal)",
-    detail: "End-to-end UX for web & mobile products",
+    detail: "Python, C, C++, JavaScript, HTML/CSS",
   },
   {
-    label: "Brand Identity",
+    label: "Frameworks",
     accent: "var(--grad-gold)",
-    detail: "Logo systems, type, and visual language",
+    detail: "React.js, FastAPI, Electron, Next.js",
   },
   {
-    label: "Motion & Illustration",
+    label: "AI / ML",
     accent: "var(--grad-purple)",
-    detail: "Custom illustration and interface motion",
+    detail: "Ollama, Faster-Whisper, MediaPipe",
+  },
+  {
+    label: "Databases",
+    accent: "var(--accent-mint)",
+    detail: "MySQL, SQLite, PostgreSQL",
+  },
+  {
+    label: "Tools",
+    accent: "var(--accent-amber)",
+    detail: "Git, GitHub, Linux, Selenium, PyAutoGUI",
   },
 ];
 

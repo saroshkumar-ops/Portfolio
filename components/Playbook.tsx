@@ -24,9 +24,9 @@ export default function Playbook() {
           >
             {"I build "}
             <span className="font-serif italic font-normal text-accent-mint">
-              considered
+              intelligent
             </span>
-            {" interfaces that balance craft with clarity, for the web and beyond."}
+            {" systems — from real-time backends to AI-powered tools, sharpened through hackathons and hands-on engineering."}
           </ScrollReveal>
           <ScrollReveal
             containerClassName="my-0 mt-8"
@@ -35,7 +35,7 @@ export default function Playbook() {
             baseOpacity={0.2}
             enableBlur={false}
           >
-            Product design / UX & UI / Brand systems
+            AI Systems / Backend Engineering / Full-Stack Development
           </ScrollReveal>
         </div>
 

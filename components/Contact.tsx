@@ -11,7 +11,7 @@ export default function Contact() {
           Contact
         </p>
         <a
-          href="mailto:hello@example.com"
+          href="mailto:Saroshkumar00@gmail.com"
           className="block transition-colors hover:text-accent-amber"
         >
           <ScrollReveal
@@ -21,22 +21,29 @@ export default function Contact() {
             baseOpacity={0.2}
             enableBlur={false}
           >
-            hello@example.com
+            Saroshkumar00@gmail.com
           </ScrollReveal>
         </a>
       </div>
 
       <div className="mt-16 flex flex-col gap-6 border-t border-paper/10 pt-8 text-xs uppercase tracking-[0.14em] text-paper/50 sm:flex-row sm:items-center sm:justify-between">
-        <span>&copy; {new Date().getFullYear()} Jordan Ray. All rights reserved.</span>
+        <span>&copy; {new Date().getFullYear()} Sarosh Kumar. All rights reserved.</span>
         <div className="flex gap-6">
-          <a href="#" className="transition-colors hover:text-accent-amber">
-            Instagram
-          </a>
-          <a href="#" className="transition-colors hover:text-accent-amber">
-            Behance
-          </a>
-          <a href="#" className="transition-colors hover:text-accent-amber">
+          <a
+            href="https://www.linkedin.com/in/sarosh-kumar-132111297/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-accent-amber"
+          >
             LinkedIn
+          </a>
+          <a
+            href="https://github.com/saroshkumar-ops"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-accent-amber"
+          >
+            GitHub
           </a>
         </div>
       </div>
