@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #05070c;
+  --ink-soft: #0c1220;
+  --paper: #f4f5f7;
+  --accent-amber: #f5a623;
+  --accent-mint: #35e8c0;
+  --grad-purple: #7c2ae8;
+  --grad-teal: #17c9a8;
+  --grad-gold: #f2b134;
+  --grad-red: #e8452c;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paper: var(--paper);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-mint: var(--accent-mint);
+  --color-grad-purple: var(--grad-purple);
+  --color-grad-teal: var(--grad-teal);
+  --color-grad-gold: var(--grad-gold);
+  --color-grad-red: var(--grad-red);
+  --font-sans: var(--font-archivo);
+  --font-serif: var(--font-instrument-serif);
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--ink);
+  color: var(--paper);
+  overscroll-behavior: none;
+}
+
+/* Lenis smooth-scroll requirements */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@keyframes grain-shift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-1%, -2%);
+  }
+  30% {
+    transform: translate(2%, 1%);
+  }
+  50% {
+    transform: translate(-2%, 2%);
+  }
+  70% {
+    transform: translate(1%, -1%);
+  }
+  90% {
+    transform: translate(-1%, 1%);
+  }
+}
+
+.animate-grain-shift {
+  animation: grain-shift 1.2s steps(4) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
