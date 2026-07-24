@@ -78,7 +78,7 @@ export default function ScrollReveal({
           scroller,
           start: "top bottom",
           end: rotationEnd,
-          scrub: true,
+          scrub: 0.6,
         },
       }
     );

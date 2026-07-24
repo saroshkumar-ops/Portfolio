@@ -34,7 +34,7 @@ export default function PinnedHero() {
           trigger: wrapper,
           start: "top top",
           end: "bottom top",
-          scrub: true,
+          scrub: 0.8,
         },
       });
     }, wrapperRef);

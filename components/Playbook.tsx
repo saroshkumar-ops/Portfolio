@@ -18,9 +18,12 @@ import {
   SiLinux,
   SiSelenium,
 } from "react-icons/si";
-import AuroraBackground from "@/components/AuroraBackground";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import LogoLoop, { type LogoItem } from "@/components/ui/logo-loop";
+import VideoBackground from "@/components/ui/video-background";
+
+const APPROACH_VIDEO_SRC =
+  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4";
 
 const TECH_LOGOS: LogoItem[] = [
   { node: <SiPython />, title: "Python" },
@@ -49,7 +52,7 @@ export default function Playbook() {
       id="work"
       className="relative z-10 flex min-h-screen items-center overflow-hidden rounded-t-[2.5rem] bg-ink px-6 py-24 shadow-[0_-40px_80px_rgba(0,0,0,0.6)] md:px-12"
     >
-      <AuroraBackground />
+      <VideoBackground src={APPROACH_VIDEO_SRC} />
 
       <div className="relative grid w-full gap-16 md:grid-cols-2 md:items-center md:gap-12">
         <div>
