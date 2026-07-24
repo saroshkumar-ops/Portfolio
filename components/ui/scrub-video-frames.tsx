@@ -20,12 +20,17 @@ const ScrubVideoFrames = forwardRef<
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const currentIndexRef = useRef(1);
+  const lastDrawnIndexRef = useRef(0);
 
-  const draw = (index: number) => {
+  const draw = (index: number, force = false) => {
+    if (!force && index === lastDrawnIndexRef.current) return;
+
     const canvas = canvasRef.current;
     const ctx2d = canvas?.getContext("2d");
     const img = imagesRef.current[index - 1];
     if (!canvas || !ctx2d || !img || !img.complete || img.naturalWidth === 0) return;
+
+    lastDrawnIndexRef.current = index;
 
     const canvasRatio = canvas.width / canvas.height;
     const imgRatio = img.naturalWidth / img.naturalHeight;
@@ -78,7 +83,7 @@ const ScrubVideoFrames = forwardRef<
       const rect = parent.getBoundingClientRect();
       canvas.width = rect.width;
       canvas.height = rect.height;
-      draw(currentIndexRef.current);
+      draw(currentIndexRef.current, true);
     };
     resize();
 

@@ -37,7 +37,7 @@ export default function PinnedHero() {
           trigger: wrapper,
           start: "top top",
           end: "bottom top",
-          scrub: 0.8,
+          scrub: true,
           onUpdate: (self) => frameApiRef.current?.setProgress(self.progress),
         },
       });
