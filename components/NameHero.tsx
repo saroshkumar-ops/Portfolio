@@ -9,17 +9,17 @@ import TiltedCard from "@/components/ui/tilted-card";
 gsap.registerPlugin(ScrollTrigger);
 
 const CARD_BG = `data:image/svg+xml,${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 220 220">
-    <rect width="220" height="220" fill="#0c1220" />
-    <rect x="0" y="0" width="220" height="220" fill="none" stroke="#e8452c" stroke-width="6" />
+  `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="300" viewBox="0 0 240 300">
+    <rect width="240" height="300" fill="#0c1220" />
+    <rect x="0" y="0" width="240" height="300" fill="none" stroke="#e8452c" stroke-width="6" />
   </svg>`
 )}`;
 
 /**
  * Alternate hero treatment: giant background type behind an overlapping
- * portrait, on a black backdrop with orange/red accents, with a row of
- * TiltedCard info boxes underneath. Kept as a separate section (not
- * replacing the primary LensReveal hero) so both can be seen.
+ * portrait, on a black backdrop with orange/red accents, with a TiltedCard
+ * info box tucked in the corner. Kept as a separate section (not replacing
+ * the primary LensReveal hero) so both can be seen.
  *
  * The section pins while scrolling: the portrait slides in from the left,
  * the name slides in from the right, and the box slides up from below, all
@@ -71,16 +71,16 @@ export default function NameHero() {
     <section
       id="intro"
       ref={sectionRef}
-      className="relative flex h-screen flex-col items-center justify-center gap-6 overflow-hidden bg-ink px-6 pb-12 pt-20"
+      className="relative flex h-screen items-center justify-center overflow-hidden bg-ink px-6"
     >
-      <div className="relative flex w-full flex-1 items-center justify-center">
+      <div className="relative flex h-full w-full items-center justify-center">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 select-none justify-center"
         >
           <h2
             ref={typeRef}
-            className="whitespace-nowrap font-serif text-[18vw] italic font-normal leading-none tracking-tight text-grad-red sm:text-[16vw] md:text-[14vw]"
+            className="whitespace-nowrap font-serif text-[22vw] italic font-normal leading-none tracking-tight text-grad-red sm:text-[20vw] md:text-[18vw]"
           >
             SAROSH
           </h2>
@@ -88,30 +88,34 @@ export default function NameHero() {
 
         <div
           ref={portraitRef}
-          className="relative z-10 h-[60%] w-[38%] max-w-xs overflow-hidden rounded-2xl shadow-2xl sm:h-[68%]"
+          className="relative z-10 h-[70%] w-[42%] max-w-sm overflow-hidden rounded-2xl shadow-2xl sm:h-[78%]"
         >
           <HeroPortrait src="/sarosh.png" alt="Sarosh Kumar" />
         </div>
       </div>
 
-      <div ref={boxRef} className="relative z-10 flex w-full max-w-xs items-center justify-center">
+      <div ref={boxRef} className="absolute bottom-10 right-6 z-20 md:right-12">
         <TiltedCard
           imageSrc={CARD_BG}
           altText="Comp Sci Enthusiast"
           captionText="Comp Sci Enthusiast"
-          containerHeight="220px"
-          containerWidth="220px"
-          imageHeight="220px"
-          imageWidth="220px"
+          containerHeight="300px"
+          containerWidth="240px"
+          imageHeight="300px"
+          imageWidth="240px"
           rotateAmplitude={12}
           scaleOnHover={1.08}
           showMobileWarning={false}
           showTooltip
           displayOverlayContent
           overlayContent={
-            <div className="flex h-[220px] w-[220px] flex-col items-center justify-center rounded-[15px] px-4 text-center">
-              <span className="font-serif text-xl italic text-grad-red">Comp Sci</span>
-              <span className="font-serif text-xl italic text-grad-red">Enthusiast</span>
+            <div className="flex h-[300px] w-[240px] flex-col items-center justify-center gap-3 rounded-[15px] px-5 text-center">
+              <span className="font-serif text-lg italic text-grad-red">Comp Sci Enthusiast</span>
+              <p className="text-xs leading-relaxed text-paper/80">
+                B.E. in Computer Science &amp; Engineering at KLE Technological University, Hubli
+                (2024–2028). Building AI systems, backend engineering, and full-stack projects
+                through hackathons and hands-on work.
+              </p>
             </div>
           }
         />
