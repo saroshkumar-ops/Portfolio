@@ -64,16 +64,17 @@ export default function Gallery() {
 
       <div
         onClick={handleGalleryClick}
-        className="relative w-full max-w-3xl [&_img]:cursor-pointer [&_img]:rounded-xl [&_img]:border [&_img]:border-paper/15 [&_img]:shadow-2xl [&_img]:transition-transform [&_img]:duration-300 [&_img]:hover:scale-105"
+        className="relative w-full max-w-6xl [&_img]:cursor-pointer [&_img]:rounded-xl [&_img]:border [&_img]:border-paper/15 [&_img]:shadow-2xl [&_img]:transition-transform [&_img]:duration-300 [&_img]:hover:scale-105"
       >
         <OrbitImages
           images={GALLERY_IMAGES}
           shape="ellipse"
-          radiusX={340}
-          radiusY={80}
+          baseWidth={1200}
+          radiusX={550}
+          radiusY={160}
           rotation={-8}
           duration={30}
-          itemSize={80}
+          itemSize={140}
           responsive
         />
       </div>
