@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroPortrait from "@/components/HeroPortrait";
 import TiltedCard from "@/components/ui/tilted-card";
+import Particles from "@/components/ui/particles";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -73,6 +74,19 @@ export default function NameHero() {
       ref={sectionRef}
       className="relative flex h-screen items-center justify-center overflow-hidden bg-ink px-6"
     >
+      <div className="absolute inset-0 z-0">
+        <Particles
+          particleColors={["#e8452c", "#f5a623"]}
+          particleCount={200}
+          particleSpread={10}
+          speed={0.1}
+          particleBaseSize={100}
+          moveParticlesOnHover
+          alphaParticles
+          disableRotation={false}
+        />
+      </div>
+
       <div className="relative flex h-full w-full items-center justify-center">
         <div
           aria-hidden
