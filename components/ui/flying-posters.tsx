@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, type HTMLAttributes } from "react";
+import { useRef, useEffect, useImperativeHandle, forwardRef, type HTMLAttributes } from "react";
 import { Renderer, Camera, Transform, Plane, Program, Mesh, Texture, type OGLRenderingContext } from "ogl";
 
 type GL = OGLRenderingContext;
@@ -448,6 +448,10 @@ class Canvas {
     this.scroll.target += e.deltaY * 0.005;
   }
 
+  setScroll(value: number) {
+    this.scroll.target = value;
+  }
+
   update() {
     this.scroll.current = lerp(this.scroll.current, this.scroll.target, this.scroll.ease);
     this.medias?.forEach((media) => media.update(this.scroll));
@@ -488,20 +492,33 @@ export interface FlyingPostersProps extends HTMLAttributes<HTMLDivElement> {
   cameraZ?: number;
 }
 
-export default function FlyingPosters({
-  items = [],
-  planeWidth = 320,
-  planeHeight = 320,
-  distortion = 3,
-  scrollEase = 0.01,
-  cameraFov = 45,
-  cameraZ = 20,
-  className = "",
-  ...props
-}: FlyingPostersProps) {
+export interface FlyingPostersHandle {
+  setScroll: (value: number) => void;
+}
+
+const FlyingPosters = forwardRef<FlyingPostersHandle, FlyingPostersProps>(function FlyingPosters(
+  {
+    items = [],
+    planeWidth = 320,
+    planeHeight = 320,
+    distortion = 3,
+    scrollEase = 0.01,
+    cameraFov = 45,
+    cameraZ = 20,
+    className = "",
+    ...props
+  },
+  ref
+) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const instanceRef = useRef<Canvas | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    setScroll: (value: number) => {
+      instanceRef.current?.setScroll(value);
+    },
+  }));
 
   useEffect(() => {
     if (!containerRef.current || !canvasRef.current) return;
@@ -551,4 +568,6 @@ export default function FlyingPosters({
       <canvas ref={canvasRef} className="block h-full w-full" />
     </div>
   );
-}
+});
+
+export default FlyingPosters;
