@@ -1,4 +1,4 @@
-import { Archivo, Instrument_Serif, Roboto_Flex } from "next/font/google";
+import { Anton, Archivo, Instrument_Serif, Roboto_Flex } from "next/font/google";
 
 export const archivo = Archivo({
   variable: "--font-archivo",
@@ -18,5 +18,12 @@ export const robotoFlex = Roboto_Flex({
   subsets: ["latin"],
   weight: "variable",
   axes: ["wdth", "opsz"],
+  display: "swap",
+});
+
+export const anton = Anton({
+  variable: "--font-anton",
+  subsets: ["latin"],
+  weight: "400",
   display: "swap",
 });
