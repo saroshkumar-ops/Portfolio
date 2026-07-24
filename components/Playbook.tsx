@@ -1,5 +1,6 @@
 import AuroraBackground from "@/components/AuroraBackground";
 import ProjectCarousel from "@/components/ProjectCarousel";
+import ScrollReveal from "@/components/ui/scroll-reveal";
 
 export default function Playbook() {
   return (
@@ -14,17 +15,26 @@ export default function Playbook() {
           <p className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-paper/60">
             Approach
           </p>
-          <h2 className="text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
-            I build{" "}
+          <ScrollReveal
+            containerClassName="my-0"
+            textClassName="text-3xl font-bold leading-tight sm:text-4xl md:text-5xl"
+            baseRotation={4}
+            blurStrength={6}
+          >
+            {"I build "}
             <span className="font-serif italic font-normal text-accent-mint">
               considered
-            </span>{" "}
-            interfaces that balance craft with clarity, for the web and
-            beyond.
-          </h2>
-          <p className="mt-8 max-w-md text-sm uppercase tracking-[0.14em] text-paper/50">
-            Product design / UX &amp; UI / Brand systems
-          </p>
+            </span>
+            {" interfaces that balance craft with clarity, for the web and beyond."}
+          </ScrollReveal>
+          <ScrollReveal
+            containerClassName="my-0 mt-8"
+            textClassName="max-w-md text-sm uppercase tracking-[0.14em] text-paper/50 font-normal leading-normal"
+            baseRotation={2}
+            blurStrength={4}
+          >
+            Product design / UX & UI / Brand systems
+          </ScrollReveal>
         </div>
 
         <ProjectCarousel />

@@ -1,3 +1,5 @@
+import ScrollReveal from "@/components/ui/scroll-reveal";
+
 export default function Contact() {
   return (
     <section
@@ -10,9 +12,16 @@ export default function Contact() {
         </p>
         <a
           href="mailto:hello@example.com"
-          className="block text-4xl font-bold leading-tight transition-colors hover:text-accent-amber sm:text-6xl md:text-7xl"
+          className="block transition-colors hover:text-accent-amber"
         >
-          hello@example.com
+          <ScrollReveal
+            containerClassName="my-0"
+            textClassName="text-4xl font-bold leading-tight sm:text-6xl md:text-7xl"
+            baseRotation={3}
+            blurStrength={5}
+          >
+            hello@example.com
+          </ScrollReveal>
         </a>
       </div>
 

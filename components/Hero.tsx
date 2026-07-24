@@ -27,10 +27,10 @@ export default function Hero() {
 
         <div className="relative hidden h-16 w-full max-w-2xl shrink-0 sm:block sm:h-20 md:h-24">
           <TextPressure
-            text="PORTFOLIO"
+            text="WELCOME"
             fontFamily={robotoFlex.style.fontFamily}
             fontUrl=""
-            textColor="#f4f5f7"
+            textColor="#e8452c"
             minFontSize={20}
             flex
             width
