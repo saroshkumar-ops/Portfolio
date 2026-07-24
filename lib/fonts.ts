@@ -1,4 +1,4 @@
-import { Archivo, Instrument_Serif } from "next/font/google";
+import { Archivo, Instrument_Serif, Roboto_Flex } from "next/font/google";
 
 export const archivo = Archivo({
   variable: "--font-archivo",
@@ -11,5 +11,12 @@ export const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   style: ["normal", "italic"],
+  display: "swap",
+});
+
+export const robotoFlex = Roboto_Flex({
+  subsets: ["latin"],
+  weight: "variable",
+  axes: ["wdth", "opsz"],
   display: "swap",
 });

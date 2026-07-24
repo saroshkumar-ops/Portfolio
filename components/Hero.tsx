@@ -1,6 +1,17 @@
 import LensReveal from "@/components/LensReveal";
 import { StarsBackground } from "@/components/ui/stars";
 import GradualBlur from "@/components/ui/gradual-blur";
+import OptionWheel from "@/components/ui/option-wheel";
+import TextPressure from "@/components/ui/text-pressure";
+import { robotoFlex } from "@/lib/fonts";
+
+const FOCUS_AREAS = [
+  "Product Design",
+  "UX & UI",
+  "Brand Identity",
+  "Web Development",
+  "Motion & Illustration",
+];
 
 export default function Hero() {
   return (
@@ -13,6 +24,23 @@ export default function Hero() {
           aria-hidden
           className="pointer-events-none absolute -right-1/4 top-0 h-[60vh] w-[60vh] rounded-full bg-[radial-gradient(circle,_rgba(53,110,232,0.35),_transparent_70%)] blur-3xl"
         />
+
+        <div className="relative hidden h-16 w-full max-w-2xl shrink-0 sm:block sm:h-20 md:h-24">
+          <TextPressure
+            text="PORTFOLIO"
+            fontFamily={robotoFlex.style.fontFamily}
+            fontUrl=""
+            textColor="#f4f5f7"
+            minFontSize={20}
+            flex
+            width
+            weight
+            italic={false}
+            alpha={false}
+            stroke={false}
+            scale
+          />
+        </div>
 
         <div className="relative flex flex-1 items-center">
           <LensReveal />
@@ -40,6 +68,26 @@ export default function Hero() {
           />
         </div>
       </StarsBackground>
+
+      <div className="pointer-events-auto absolute right-6 top-1/2 hidden h-[46vh] w-56 -translate-y-1/2 xl:block xl:right-12">
+        <OptionWheel
+          items={FOCUS_AREAS}
+          defaultSelected={0}
+          side="right"
+          textColor="#7c828f"
+          activeColor="#f5a623"
+          fontSize={1.15}
+          spacing={1.7}
+          curve={1}
+          tilt={9}
+          blur={2.5}
+          fade={0.35}
+          smoothing={220}
+          inset={24}
+          loop
+          draggable
+        />
+      </div>
 
       <GradualBlur
         target="parent"
