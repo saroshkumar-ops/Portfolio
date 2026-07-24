@@ -47,7 +47,7 @@ export default function PinnedHero() {
   }, []);
 
   return (
-    <div ref={wrapperRef} className="relative h-[160vh]">
+    <div ref={wrapperRef} className="relative h-[400vh]">
       <div ref={stickyRef} className="sticky top-0 h-screen">
         <Hero frameApiRef={frameApiRef} />
       </div>
