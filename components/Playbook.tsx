@@ -63,9 +63,10 @@ export default function Playbook() {
 
     const trigger = ScrollTrigger.create({
       trigger: section,
-      start: "top bottom",
-      end: "bottom top",
+      start: "top top",
+      end: "+=350%",
       scrub: true,
+      pin: true,
       onUpdate: (self) => frameApiRef.current?.setProgress(self.progress),
     });
 
