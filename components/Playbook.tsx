@@ -1,3 +1,8 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   SiPython,
   SiC,
@@ -20,10 +25,12 @@ import {
 } from "react-icons/si";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import LogoLoop, { type LogoItem } from "@/components/ui/logo-loop";
-import VideoBackground from "@/components/ui/video-background";
+import ScrubVideoFrames, { type ScrubVideoFramesHandle } from "@/components/ui/scrub-video-frames";
 
-const APPROACH_VIDEO_SRC =
-  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4";
+gsap.registerPlugin(ScrollTrigger);
+
+const APPROACH_FRAME_COUNT = 231;
+const approachFrameSrc = (index: number) => `/approach/img_${String(index).padStart(5, "0")}.jpg`;
 
 const TECH_LOGOS: LogoItem[] = [
   { node: <SiPython />, title: "Python" },
@@ -47,12 +54,34 @@ const TECH_LOGOS: LogoItem[] = [
 ];
 
 export default function Playbook() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const frameApiRef = useRef<ScrubVideoFramesHandle>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const trigger = ScrollTrigger.create({
+      trigger: section,
+      start: "top bottom",
+      end: "bottom top",
+      scrub: true,
+      onUpdate: (self) => frameApiRef.current?.setProgress(self.progress),
+    });
+
+    return () => trigger.kill();
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       id="work"
       className="relative z-10 flex min-h-screen items-center overflow-hidden rounded-t-[2.5rem] bg-ink px-6 py-24 shadow-[0_-40px_80px_rgba(0,0,0,0.6)] md:px-12"
     >
-      <VideoBackground src={APPROACH_VIDEO_SRC} />
+      <div className="absolute inset-0 z-0">
+        <ScrubVideoFrames ref={frameApiRef} frameCount={APPROACH_FRAME_COUNT} frameSrc={approachFrameSrc} />
+        <div className="absolute inset-0 bg-ink/60" />
+      </div>
 
       <div className="relative grid w-full gap-16 md:grid-cols-2 md:items-center md:gap-12">
         <div>
