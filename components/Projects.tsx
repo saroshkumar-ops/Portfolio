@@ -10,6 +10,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, X } from "lucide-react";
 import { anton, jetbrainsMono, kanit } from "@/lib/fonts";
@@ -17,6 +18,12 @@ import ScrollReveal from "@/components/ui/scroll-reveal";
 import BorderGlow from "@/components/ui/border-glow";
 import { Terminal, AnimatedSpan, TypingAnimation } from "@/components/ui/terminal";
 import { PROJECT_DETAILS } from "@/components/projectDetails";
+import ScrubVideoFrames, { type ScrubVideoFramesHandle } from "@/components/ui/scrub-video-frames";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const PROJECTS_FRAME_COUNT = 75;
+const projectsFrameSrc = (index: number) => `/Projects/img_${String(index).padStart(5, "0")}.jpg`;
 
 type Role = "center" | "left" | "right" | "back";
 
@@ -146,6 +153,8 @@ export default function Projects() {
   const [isMobile, setIsMobile] = useState(false);
   const isAnimatingRef = useRef(false);
   const hasMountedRef = useRef(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const frameApiRef = useRef<ScrubVideoFramesHandle>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const boxRefs = useRef<(HTMLDivElement | null)[]>([]);
   const dragRef = useRef<{ x: number; moved: boolean } | null>(null);
@@ -166,6 +175,24 @@ export default function Projects() {
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Passive background frame scrub tied to normal page-scroll progress
+  // through the section (no pin) so it doesn't fight the carousel's own
+  // wheel-driven navigation or the rest of the page's scroll flow.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const trigger = ScrollTrigger.create({
+      trigger: section,
+      start: "top bottom",
+      end: "bottom top",
+      scrub: true,
+      onUpdate: (self) => frameApiRef.current?.setProgress(self.progress),
+    });
+
+    return () => trigger.kill();
   }, []);
 
   const navigate = useCallback((direction: "next" | "prev") => {
@@ -282,12 +309,18 @@ export default function Projects() {
 
   return (
     <section
+      ref={sectionRef}
       id="projects"
       className="relative overflow-hidden bg-ink px-6 py-24 md:px-12"
     >
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <ScrubVideoFrames ref={frameApiRef} frameCount={PROJECTS_FRAME_COUNT} frameSrc={projectsFrameSrc} />
+        <div className="absolute inset-0 bg-ink/80" />
+      </div>
+
       <div
         aria-hidden
-        className={`${anton.className} pointer-events-none absolute inset-x-0 top-8 flex select-none items-center justify-center opacity-[0.14]`}
+        className={`${anton.className} pointer-events-none absolute inset-x-0 top-8 z-10 flex select-none items-center justify-center opacity-[0.14]`}
         style={{
           color: "var(--grad-red)",
           fontSize: "clamp(70px, 18vw, 260px)",
@@ -299,7 +332,7 @@ export default function Projects() {
         PROJECTS
       </div>
 
-      <div className="relative mb-12 flex flex-col justify-between gap-8 sm:mb-16 sm:flex-row sm:items-end">
+      <div className="relative z-10 mb-12 flex flex-col justify-between gap-8 sm:mb-16 sm:flex-row sm:items-end">
         <div>
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-paper/60">
             [ Selected Work ]
@@ -347,7 +380,7 @@ export default function Projects() {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerEnd}
         onPointerCancel={handlePointerEnd}
-        className="relative h-[56vh] cursor-grab touch-pan-y select-none outline-none active:cursor-grabbing sm:h-[60vh] md:h-[64vh]"
+        className="relative z-10 h-[56vh] cursor-grab touch-pan-y select-none outline-none active:cursor-grabbing sm:h-[60vh] md:h-[64vh]"
       >
         {PROJECTS.map((project, index) => (
           <div
