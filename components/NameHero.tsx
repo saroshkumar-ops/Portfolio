@@ -9,8 +9,8 @@ import ScrubVideoFrames, { type ScrubVideoFramesHandle } from "@/components/ui/s
 
 gsap.registerPlugin(ScrollTrigger);
 
-const ABOUT_FRAME_COUNT = 120;
-const aboutFrameSrc = (index: number) => `/About/ezgif-frame-${String(index).padStart(3, "0")}.jpg`;
+const ABOUT_FRAME_COUNT = 189;
+const aboutFrameSrc = (index: number) => `/About/img_${String(index).padStart(5, "0")}.jpg`;
 
 const CARD_BG = `data:image/svg+xml,${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="300" viewBox="0 0 240 300">
@@ -52,7 +52,7 @@ export default function NameHero() {
           scrollTrigger: {
             trigger: section,
             start: "top top",
-            end: "+=180%",
+            end: "+=280%",
             scrub: 0.6,
             pin: true,
             // Scrub the background frame sequence in lockstep with the same
