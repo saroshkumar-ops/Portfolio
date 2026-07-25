@@ -14,43 +14,47 @@ gsap.registerPlugin(ScrollTrigger);
  * the same "curtain reveal" continuous-motion feel as the reference video.
  * A scroll-scrubbed GSAP tween fades/scales the hero content as it gets covered,
  * and the same scroll range drives Hero's background frame sequence.
+ *
+ * Uses GSAP's own ScrollTrigger `pin` (not CSS `position: sticky`) — pairing
+ * `position: sticky` with a `scale` transform on the same element is a known
+ * source of visual popping/misalignment during scroll (most noticeable with
+ * continuously-repainting content like a playing <video>, since there's no
+ * static frame to mask the glitch). GSAP's pin uses its own spacer element
+ * and is built to coexist with transforms on the pinned element.
  */
 export default function PinnedHero() {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const stickyRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const frameApiRef = useRef<ScrubVideoFramesHandle>(null);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
-    const wrapper = wrapperRef.current;
-    const sticky = stickyRef.current;
-    if (!wrapper || !sticky || prefersReducedMotion) return;
+    const section = sectionRef.current;
+    if (!section || prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
-      gsap.to(sticky, {
+      gsap.to(section, {
         opacity: 0.3,
         scale: 0.94,
         ease: "none",
         scrollTrigger: {
-          trigger: wrapper,
+          trigger: section,
           start: "top top",
-          end: "bottom top",
+          end: "+=300%",
           scrub: true,
+          pin: true,
           onUpdate: (self) => frameApiRef.current?.setProgress(self.progress),
         },
       });
-    }, wrapperRef);
+    }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <div ref={wrapperRef} className="relative h-[400vh]">
-      <div ref={stickyRef} className="sticky top-0 h-screen">
-        <Hero frameApiRef={frameApiRef} />
-      </div>
+    <div ref={sectionRef} className="h-screen">
+      <Hero frameApiRef={frameApiRef} />
     </div>
   );
 }
