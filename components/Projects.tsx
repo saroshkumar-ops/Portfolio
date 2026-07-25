@@ -10,10 +10,13 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import gsap from "gsap";
-import { ArrowRight } from "lucide-react";
-import { anton, kanit } from "@/lib/fonts";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight, X } from "lucide-react";
+import { anton, jetbrainsMono, kanit } from "@/lib/fonts";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import BorderGlow from "@/components/ui/border-glow";
+import { Terminal, AnimatedSpan, TypingAnimation } from "@/components/ui/terminal";
+import { PROJECT_DETAILS } from "@/components/projectDetails";
 
 type Role = "center" | "left" | "right" | "back";
 
@@ -146,6 +149,17 @@ export default function Projects() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const boxRefs = useRef<(HTMLDivElement | null)[]>([]);
   const dragRef = useRef<{ x: number; moved: boolean } | null>(null);
+  const justDraggedRef = useRef(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  useEffect(() => {
+    if (!selectedProject) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedProject(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedProject]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640);
@@ -232,6 +246,7 @@ export default function Projects() {
 
   const handlePointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     dragRef.current = { x: e.clientX, moved: false };
+    justDraggedRef.current = false;
   }, []);
 
   const handlePointerMove = useCallback(
@@ -241,6 +256,7 @@ export default function Projects() {
       const dx = e.clientX - drag.x;
       if (Math.abs(dx) > 60) {
         drag.moved = true;
+        justDraggedRef.current = true;
         navigate(dx < 0 ? "next" : "prev");
       }
     },
@@ -341,10 +357,17 @@ export default function Projects() {
             }}
             role="option"
             aria-selected={activeIndex === index}
-            className="absolute top-1/2"
+            className="absolute top-1/2 cursor-pointer"
             style={{
               aspectRatio: "0.72 / 1",
               willChange: "transform, filter, opacity",
+            }}
+            onClick={() => {
+              if (justDraggedRef.current) {
+                justDraggedRef.current = false;
+                return;
+              }
+              setSelectedProject(project);
             }}
           >
             <BorderGlow
@@ -385,6 +408,65 @@ export default function Projects() {
           </div>
         ))}
       </div>
+
+      <AnimatePresence>
+        {selectedProject && (
+          <motion.div
+            key="project-detail"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-6 backdrop-blur-sm"
+            onClick={() => setSelectedProject(null)}
+          >
+            <button
+              type="button"
+              aria-label="Close project details"
+              onClick={() => setSelectedProject(null)}
+              className="absolute right-6 top-6 flex h-11 w-11 items-center justify-center rounded-full border border-paper/30 text-paper transition-colors hover:border-accent-amber hover:text-accent-amber"
+            >
+              <X size={20} strokeWidth={2.25} />
+            </button>
+            <motion.div
+              key={selectedProject.title}
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-xl"
+            >
+              <p
+                className="mb-3 text-xs font-semibold uppercase tracking-[0.18em]"
+                style={{ color: selectedProject.accent }}
+              >
+                {selectedProject.eyebrow}
+              </p>
+              <h3 className="mb-4 text-2xl font-bold text-paper sm:text-3xl">
+                {selectedProject.title}
+              </h3>
+              <Terminal className={jetbrainsMono.className}>
+                <TypingAnimation className="text-accent-mint">
+                  {`$ ${PROJECT_DETAILS[selectedProject.title]?.command ?? "info"}`}
+                </TypingAnimation>
+                {PROJECT_DETAILS[selectedProject.title]?.lines.map((line) => (
+                  <AnimatedSpan key={line}>
+                    <span style={{ color: selectedProject.accent }}>✔ </span>
+                    {line}
+                  </AnimatedSpan>
+                ))}
+                <AnimatedSpan className="text-paper/50">
+                  {PROJECT_DETAILS[selectedProject.title]?.stack}
+                </AnimatedSpan>
+                <TypingAnimation className="text-paper/70">
+                  {PROJECT_DETAILS[selectedProject.title]?.summary ?? ""}
+                </TypingAnimation>
+              </Terminal>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
