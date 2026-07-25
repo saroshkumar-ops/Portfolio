@@ -101,7 +101,7 @@ export default function NameHero() {
 
         <div
           ref={portraitRef}
-          className="relative z-10 h-[70%] w-[42%] max-w-sm overflow-hidden rounded-2xl shadow-2xl sm:h-[78%]"
+          className="relative z-10 h-[70%] w-[42%] max-w-sm overflow-hidden sm:h-[78%]"
         >
           <HeroPortrait src="/sarosh.png" alt="Sarosh Kumar" />
         </div>
