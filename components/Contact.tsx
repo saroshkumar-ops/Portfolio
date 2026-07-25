@@ -77,7 +77,7 @@ export default function Contact() {
 
       <div className="relative flex flex-1 flex-col justify-center">
         <p data-reveal className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-paper/60">
-          Contact
+          [ Contact ]
         </p>
 
         <h2

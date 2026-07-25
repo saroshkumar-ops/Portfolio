@@ -49,7 +49,7 @@ export default function Gallery() {
 
       <div className="relative mb-16 text-center">
         <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-paper/60">
-          Gallery
+          [ Gallery ]
         </p>
         <h2
           className={`${kanit.className} gradient-heading text-3xl font-black uppercase leading-tight tracking-tight sm:text-4xl md:text-5xl`}

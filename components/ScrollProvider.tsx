@@ -31,9 +31,11 @@ export default function ScrollProvider({
     }
 
     const instance = new Lenis({
-      duration: 1.1,
-      easing: (t) => 1 - Math.pow(1 - t, 3),
+      duration: 1.35,
+      easing: (t) => 1 - Math.pow(1 - t, 4),
       smoothWheel: true,
+      wheelMultiplier: 0.85,
+      touchMultiplier: 1.1,
     });
 
     lenisRef.current = instance;

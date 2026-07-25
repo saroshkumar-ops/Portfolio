@@ -97,7 +97,7 @@ export default function Playbook() {
       <div className="relative grid w-full gap-16 md:grid-cols-2 md:items-center md:gap-12">
         <div>
           <p className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-paper/60">
-            Approach
+            [ Approach ]
           </p>
           <ScrollReveal
             containerClassName="my-0"

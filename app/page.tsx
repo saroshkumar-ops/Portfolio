@@ -1,4 +1,5 @@
 import Nav from "@/components/Nav";
+import FloatingUtility from "@/components/FloatingUtility";
 import PinnedHero from "@/components/PinnedHero";
 import NameHero from "@/components/NameHero";
 import Playbook from "@/components/Playbook";
@@ -10,6 +11,7 @@ export default function Home() {
   return (
     <>
       <Nav />
+      <FloatingUtility />
       <main>
         <PinnedHero />
         <NameHero />

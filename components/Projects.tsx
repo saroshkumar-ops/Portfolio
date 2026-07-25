@@ -302,7 +302,7 @@ export default function Projects() {
       <div className="relative mb-12 flex flex-col justify-between gap-8 sm:mb-16 sm:flex-row sm:items-end">
         <div>
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-paper/60">
-            Selected Work
+            [ Selected Work ]
           </p>
           <h2
             className={`${kanit.className} gradient-heading max-w-xl text-3xl font-black uppercase leading-tight tracking-tight sm:text-4xl md:text-5xl`}
