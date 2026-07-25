@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
@@ -56,6 +56,7 @@ const TECH_LOGOS: LogoItem[] = [
 export default function Playbook() {
   const sectionRef = useRef<HTMLElement>(null);
   const frameApiRef = useRef<ScrubVideoFramesHandle>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -71,6 +72,15 @@ export default function Playbook() {
     });
 
     return () => trigger.kill();
+  }, []);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting));
+    observer.observe(section);
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -129,6 +139,7 @@ export default function Playbook() {
               scaleOnHover
               ariaLabel="Languages, frameworks, and tools"
               className="text-paper/70"
+              active={isVisible}
             />
           </div>
         </div>

@@ -26,7 +26,7 @@ export default function Hero({
     >
       <div className="relative flex h-full flex-col justify-between px-6 pt-32 pb-12 md:px-12">
         <div className="absolute inset-0 z-0">
-          <ScrubVideoFrames ref={frameApiRef} frameCount={LANDING_FRAME_COUNT} frameSrc={landingFrameSrc} />
+          <ScrubVideoFrames ref={frameApiRef} frameCount={LANDING_FRAME_COUNT} frameSrc={landingFrameSrc} eager />
           <div className="absolute inset-0 bg-ink/60" />
         </div>
 

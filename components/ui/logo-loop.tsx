@@ -36,6 +36,9 @@ export interface LogoLoopProps {
   ariaLabel?: string;
   className?: string;
   style?: React.CSSProperties;
+  /** Set to false to pause the marquee (e.g. while its section is scrolled
+   * out of view) without unmounting it. Defaults to true. */
+  active?: boolean;
 }
 
 const ANIMATION_CONFIG = {
@@ -130,7 +133,8 @@ const useAnimationLoop = (
   seqHeight: number,
   isHovered: boolean,
   hoverSpeed: number | undefined,
-  isVertical: boolean
+  isVertical: boolean,
+  active: boolean
 ) => {
   const rafRef = useRef<number | null>(null);
   const lastTimestampRef = useRef<number | null>(null);
@@ -162,6 +166,12 @@ const useAnimationLoop = (
         lastTimestampRef.current = null;
       };
     }
+
+    // Paused (e.g. section scrolled out of view): don't schedule any frames.
+    // lastTimestampRef is reset in this effect's cleanup, so when `active`
+    // flips back to true the next frame starts at deltaTime 0 instead of
+    // jumping by however long the pause lasted.
+    if (!active) return;
 
     const animate = (timestamp: number) => {
       if (lastTimestampRef.current === null) {
@@ -199,7 +209,7 @@ const useAnimationLoop = (
       }
       lastTimestampRef.current = null;
     };
-  }, [targetVelocity, seqWidth, seqHeight, isHovered, hoverSpeed, isVertical, trackRef]);
+  }, [targetVelocity, seqWidth, seqHeight, isHovered, hoverSpeed, isVertical, trackRef, active]);
 };
 
 export const LogoLoop = React.memo<LogoLoopProps>(
@@ -219,6 +229,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
     ariaLabel = "Partner logos",
     className,
     style,
+    active = true,
   }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
@@ -279,7 +290,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
 
     useImageLoader(seqRef, updateDimensions, [logos, gap, logoHeight, isVertical]);
 
-    useAnimationLoop(trackRef, targetVelocity, seqWidth, seqHeight, isHovered, effectiveHoverSpeed, isVertical);
+    useAnimationLoop(trackRef, targetVelocity, seqWidth, seqHeight, isHovered, effectiveHoverSpeed, isVertical, active);
 
     const cssVariables = useMemo(
       () =>

@@ -17,6 +17,8 @@ export default function LensReveal() {
   const idleT = useRef(0);
   const idleActive = useRef(true);
   const resumeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isVisibleRef = useRef(true);
+  const tickFnRef = useRef<(() => void) | null>(null);
   const [bounds, setBounds] = useState({ width: 800, height: 300 });
 
   const x = useMotionValue(bounds.width * 0.35);
@@ -36,7 +38,23 @@ export default function LensReveal() {
 
     const resizeObserver = new ResizeObserver(updateBounds);
     resizeObserver.observe(el);
-    return () => resizeObserver.disconnect();
+
+    let intersectionObserver: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== "undefined") {
+      intersectionObserver = new IntersectionObserver(([entry]) => {
+        const wasVisible = isVisibleRef.current;
+        isVisibleRef.current = entry.isIntersecting;
+        if (!wasVisible && entry.isIntersecting && idleFrame.current === null) {
+          idleFrame.current = requestAnimationFrame(() => tickFnRef.current?.());
+        }
+      });
+      intersectionObserver.observe(el);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+      intersectionObserver?.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -45,7 +63,15 @@ export default function LensReveal() {
     ).matches;
     if (prefersReducedMotion) return;
 
+    // Idle sweep pauses itself while the hero is scrolled out of view
+    // (isVisibleRef, set by the IntersectionObserver above) and is resumed
+    // by that same observer when it re-enters — no need to keep animating
+    // Framer Motion springs the whole page is scrolled past this section.
     const tick = () => {
+      if (!isVisibleRef.current) {
+        idleFrame.current = null;
+        return;
+      }
       if (idleActive.current) {
         idleT.current += 0.006;
         const sweep = (Math.sin(idleT.current) + 1) / 2;
@@ -54,10 +80,12 @@ export default function LensReveal() {
       }
       idleFrame.current = requestAnimationFrame(tick);
     };
+    tickFnRef.current = tick;
     idleFrame.current = requestAnimationFrame(tick);
 
     return () => {
       if (idleFrame.current) cancelAnimationFrame(idleFrame.current);
+      idleFrame.current = null;
     };
   }, [bounds, x, y]);
 
