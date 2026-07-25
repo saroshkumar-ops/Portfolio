@@ -86,7 +86,7 @@ export default function Playbook() {
   return (
     <section
       ref={sectionRef}
-      id="work"
+      id="approach"
       className="relative z-10 flex min-h-screen items-center overflow-hidden rounded-t-[2.5rem] bg-ink px-6 py-24 shadow-[0_-40px_80px_rgba(0,0,0,0.6)] md:px-12"
     >
       <div className="absolute inset-0 z-0">
