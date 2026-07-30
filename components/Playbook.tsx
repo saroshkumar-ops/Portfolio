@@ -94,7 +94,7 @@ export default function Playbook() {
         <div className="absolute inset-0 bg-ink/60" />
       </div>
 
-      <div className="relative grid w-full gap-16 md:grid-cols-2 md:items-center md:gap-12">
+      <div className="relative grid w-full grid-cols-1 gap-16 md:grid-cols-2 md:items-center md:gap-12">
         <div>
           <p className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-paper/60">
             [ Approach ]

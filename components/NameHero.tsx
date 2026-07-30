@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroPortrait from "@/components/HeroPortrait";
@@ -37,6 +37,14 @@ export default function NameHero() {
   const portraitRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const frameApiRef = useRef<ScrubVideoFramesHandle>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -93,7 +101,7 @@ export default function NameHero() {
         >
           <h2
             ref={typeRef}
-            className="whitespace-nowrap font-serif text-[22vw] italic font-normal leading-none tracking-tight text-grad-red sm:text-[20vw] md:text-[18vw]"
+            className="whitespace-nowrap font-serif text-[17vw] italic font-normal leading-none tracking-tight text-grad-red sm:text-[20vw] md:text-[18vw]"
           >
             SAROSH
           </h2>
@@ -101,7 +109,7 @@ export default function NameHero() {
 
         <div
           ref={portraitRef}
-          className="relative z-10 h-[70%] w-[42%] max-w-sm overflow-hidden sm:h-[78%]"
+          className="relative z-10 h-[48%] w-[32%] max-w-[200px] overflow-hidden sm:h-[70%] sm:w-[42%] sm:max-w-sm"
         >
           <HeroPortrait src="/sarosh.png" alt="Sarosh Kumar" />
         </div>
@@ -112,22 +120,22 @@ export default function NameHero() {
           imageSrc={CARD_BG}
           altText="Comp Sci Enthusiast"
           captionText="Comp Sci Enthusiast"
-          containerHeight="300px"
-          containerWidth="240px"
-          imageHeight="300px"
-          imageWidth="240px"
+          containerHeight="clamp(200px, 56vw, 300px)"
+          containerWidth="clamp(150px, 40vw, 240px)"
+          imageHeight="clamp(200px, 56vw, 300px)"
+          imageWidth="clamp(150px, 40vw, 240px)"
           rotateAmplitude={12}
           scaleOnHover={1.08}
           showMobileWarning={false}
           showTooltip
           displayOverlayContent
           overlayContent={
-            <div className="flex h-[300px] w-[240px] flex-col items-center justify-center gap-3 rounded-[15px] px-5 text-center">
-              <span className="font-serif text-lg italic text-grad-red">Comp Sci Enthusiast</span>
-              <p className="text-xs leading-relaxed text-paper/80">
-                B.E. in Computer Science &amp; Engineering at KLE Technological University, Hubli
-                (2024–2028). Building AI systems, backend engineering, and full-stack projects
-                through hackathons and hands-on work.
+            <div className="flex h-[clamp(200px,56vw,300px)] w-[clamp(150px,40vw,240px)] flex-col items-center justify-center gap-2 rounded-[15px] px-3 text-center sm:gap-3 sm:px-5">
+              <span className="font-serif text-base italic text-grad-red sm:text-lg">Comp Sci Enthusiast</span>
+              <p className="text-[10.5px] leading-snug text-paper/80 sm:text-xs sm:leading-relaxed">
+                {isMobile
+                  ? "B.E. in CS & Engineering at KLE Tech, Hubli. Building AI, backend, and full-stack projects."
+                  : "B.E. in Computer Science & Engineering at KLE Technological University, Hubli (2024–2028). Building AI systems, backend engineering, and full-stack projects through hackathons and hands-on work."}
               </p>
             </div>
           }

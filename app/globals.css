@@ -28,12 +28,14 @@
 
 html {
   scroll-behavior: auto;
+  overflow-x: hidden;
 }
 
 body {
   background: var(--ink);
   color: var(--paper);
   overscroll-behavior: none;
+  overflow-x: hidden;
 }
 
 /* Lenis smooth-scroll requirements */

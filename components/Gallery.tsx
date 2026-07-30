@@ -17,6 +17,14 @@ const GALLERY_IMAGES = [
 
 export default function Gallery() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     if (!selectedImage) return;
@@ -69,12 +77,12 @@ export default function Gallery() {
         <OrbitImages
           images={GALLERY_IMAGES}
           shape="ellipse"
-          baseWidth={1200}
-          radiusX={550}
-          radiusY={160}
+          baseWidth={isMobile ? 480 : 1200}
+          radiusX={isMobile ? 190 : 550}
+          radiusY={isMobile ? 170 : 160}
           rotation={-8}
           duration={30}
-          itemSize={140}
+          itemSize={isMobile ? 92 : 140}
           responsive
         />
       </div>
