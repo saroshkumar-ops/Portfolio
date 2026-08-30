@@ -102,7 +102,15 @@ const ScrubVideoFrames = forwardRef<
       const img = images[index - 1];
       if (!img || img.src) return;
       if (onFirstLoad) img.onload = onFirstLoad;
+      // Decode off the main thread when supported so the first scrub past a
+      // frame doesn't hitch on a synchronous decode inside drawImage.
+      img.decoding = "async";
       img.src = frameSrc(index);
+      if (typeof img.decode === "function") {
+        img.decode().catch(() => {
+          /* decode() rejects if the frame never loads; drawImage still guards on img.complete */
+        });
+      }
     };
 
     // Frame 1 always loads immediately so the poster frame is ready as soon

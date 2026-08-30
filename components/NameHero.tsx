@@ -10,7 +10,7 @@ import ScrubVideoFrames, { type ScrubVideoFramesHandle } from "@/components/ui/s
 gsap.registerPlugin(ScrollTrigger);
 
 const ABOUT_FRAME_COUNT = 189;
-const aboutFrameSrc = (index: number) => `/About/img_${String(index).padStart(5, "0")}.jpg`;
+const aboutFrameSrc = (index: number) => `/About/img_${String(index).padStart(5, "0")}.webp`;
 
 const CARD_BG = `data:image/svg+xml,${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="300" viewBox="0 0 240 300">

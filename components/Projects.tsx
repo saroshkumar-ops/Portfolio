@@ -23,7 +23,7 @@ import ScrubVideoFrames, { type ScrubVideoFramesHandle } from "@/components/ui/s
 gsap.registerPlugin(ScrollTrigger);
 
 const PROJECTS_FRAME_COUNT = 75;
-const projectsFrameSrc = (index: number) => `/Projects/img_${String(index).padStart(5, "0")}.jpg`;
+const projectsFrameSrc = (index: number) => `/Projects/img_${String(index).padStart(5, "0")}.webp`;
 
 type Role = "center" | "left" | "right" | "back";
 

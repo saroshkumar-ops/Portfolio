@@ -30,7 +30,7 @@ import ScrubVideoFrames, { type ScrubVideoFramesHandle } from "@/components/ui/s
 gsap.registerPlugin(ScrollTrigger);
 
 const APPROACH_FRAME_COUNT = 241;
-const approachFrameSrc = (index: number) => `/approach/img_${String(index).padStart(5, "0")}.jpg`;
+const approachFrameSrc = (index: number) => `/approach/img_${String(index).padStart(5, "0")}.webp`;
 
 const TECH_LOGOS: LogoItem[] = [
   { node: <SiPython />, title: "Python" },
