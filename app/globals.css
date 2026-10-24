@@ -1,20 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter+Tight:ital,wght@0,700;0,800;0,900;1,700;1,800;1,900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter+Tight:ital,wght@0,700;0,800;0,900;1,700;1,800;1,900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  --canvas: #090a10;
-  --canvas-card: #0e1017;
-  --canvas-card-hover: #141722;
+  --canvas: #040711;
+  --canvas-card: #080d1a;
+  --canvas-card-hover: #0f172a;
   
-  --ink: #090a10;
+  --ink: #040711;
   --paper: #f8fafc;
   --paper-muted: #94a3b8;
   --paper-subtle: #64748b;
   
-  --acid-lime: #d4ff00;
-  --electric-blue: #0066ff;
-  --hot-vermilion: #ff3b00;
-  --neon-pink: #ff007f;
+  --electric-cyan: #00f2fe;
+  --deep-indigo: #6366f1;
+  --starlight-amber: #f59e0b;
+  --signal-green: #10b981;
 }
 
 @theme inline {
@@ -26,10 +26,10 @@
   --color-paper-muted: var(--paper-muted);
   --color-paper-subtle: var(--paper-subtle);
   
-  --color-acid-lime: var(--acid-lime);
-  --color-electric-blue: var(--electric-blue);
-  --color-hot-vermilion: var(--hot-vermilion);
-  --color-neon-pink: var(--neon-pink);
+  --color-electric-cyan: var(--electric-cyan);
+  --color-deep-indigo: var(--deep-indigo);
+  --color-starlight-amber: var(--starlight-amber);
+  --color-signal-green: var(--signal-green);
   
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-tight: 'Inter Tight', 'Inter', -apple-system, sans-serif;
@@ -39,12 +39,12 @@
 html {
   scroll-behavior: auto;
   overflow-x: hidden;
-  background-color: #090a10;
+  background-color: #040711;
   color: #f8fafc;
 }
 
 body {
-  background-color: #090a10;
+  background-color: #040711;
   color: #f8fafc;
   overscroll-behavior: none;
   overflow-x: hidden;
@@ -63,48 +63,83 @@ html.lenis body {
   overflow: hidden;
 }
 
-/* Swiss Selection */
+/* Swiss / Cyber Selection */
 ::selection {
-  background-color: #d4ff00;
-  color: #000000;
+  background-color: #00f2fe;
+  color: #040711;
 }
 
 /* Minimal Architectural Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090a10;
+  background: #040711;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #232738;
+  background: #1e293b;
   border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4ff00;
+  background: #00f2fe;
 }
 
-/* Crosshair corner markers for Swiss Grid */
-.grid-crosshair {
+/* Conic gradient glowing border */
+.star-border-container {
+  display: block;
   position: relative;
-}
-.grid-crosshair::before {
-  content: "+";
-  position: absolute;
-  top: -9px;
-  left: -6px;
-  font-family: var(--font-mono);
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.3);
-  pointer-events: none;
+  border-radius: 24px;
+  overflow: hidden;
+  padding: 1.5px;
 }
 
-/* Hand-drawn note styling */
-.font-hand {
-  font-family: 'Caveat', cursive;
+.border-gradient-full {
+  position: absolute;
+  inset: -100%;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: rotateGradient 6s linear infinite;
+}
+
+@keyframes rotateGradient {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Card stack styles */
+.scroll-stack-card {
+  will-change: transform, opacity;
+  transform-origin: center top;
+}
+
+/* Focal radar line effect for hackathons */
+.active-award {
+  border-color: #00f2fe !important;
+  background: rgba(0, 242, 254, 0.08) !important;
+  box-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
+  transform: scale(1.02);
+}
+
+/* Scanline overlay */
+.scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.02),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.02)
+  );
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

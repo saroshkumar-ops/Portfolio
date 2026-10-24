@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -9,17 +9,23 @@ gsap.registerPlugin(ScrollTrigger);
 
 interface LenisContextValue {
   lenis: Lenis | null;
-  scrollTo: (target: string | HTMLElement, options?: { offset?: number; duration?: number }) => void;
+  scrollTo: (target: string | HTMLElement | number, options?: { offset?: number; duration?: number }) => void;
+  setLerp: (lerpVal: number) => void;
+  resetLerp: () => void;
 }
 
 const LenisContext = createContext<LenisContextValue>({
   lenis: null,
   scrollTo: () => {},
+  setLerp: () => {},
+  resetLerp: () => {},
 });
 
 export function useLenis() {
   return useContext(LenisContext);
 }
+
+const DEFAULT_LERP = 0.08;
 
 export default function ScrollProvider({
   children,
@@ -37,10 +43,10 @@ export default function ScrollProvider({
     if (prefersReducedMotion) return;
 
     const instance = new Lenis({
-      duration: 1.25,
+      duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      wheelMultiplier: 0.9,
+      wheelMultiplier: 0.95,
       touchMultiplier: 1.2,
     });
 
@@ -64,24 +70,38 @@ export default function ScrollProvider({
     };
   }, []);
 
-  const scrollTo = (
-    target: string | HTMLElement,
+  const scrollTo = useCallback((
+    target: string | HTMLElement | number,
     options?: { offset?: number; duration?: number }
   ) => {
     if (lenisRef.current) {
       lenisRef.current.scrollTo(target, {
-        offset: options?.offset ?? -40,
-        duration: options?.duration ?? 1.3,
+        offset: options?.offset ?? -20,
+        duration: options?.duration ?? 1.2,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       });
     } else if (typeof target === "string") {
       const el = document.querySelector(target);
       el?.scrollIntoView({ behavior: "smooth" });
+    } else if (typeof target === "number") {
+      window.scrollTo({ top: target, behavior: "smooth" });
     }
-  };
+  }, []);
+
+  const setLerp = useCallback((lerpVal: number) => {
+    if (lenisRef.current && (lenisRef.current as any).options) {
+      (lenisRef.current as any).options.lerp = lerpVal;
+    }
+  }, []);
+
+  const resetLerp = useCallback(() => {
+    if (lenisRef.current && (lenisRef.current as any).options) {
+      (lenisRef.current as any).options.lerp = DEFAULT_LERP;
+    }
+  }, []);
 
   return (
-    <LenisContext.Provider value={{ lenis, scrollTo }}>
+    <LenisContext.Provider value={{ lenis, scrollTo, setLerp, resetLerp }}>
       {children}
     </LenisContext.Provider>
   );

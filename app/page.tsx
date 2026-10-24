@@ -1,43 +1,52 @@
 "use client";
 
-import { useState } from "react";
-import InteractiveCanvas from "@/components/InteractiveCanvas";
-import CreativeNavbar from "@/components/CreativeNavbar";
-import CreativeHero from "@/components/CreativeHero";
-import CreativeProjects from "@/components/CreativeProjects";
-import Gallery from "@/components/Gallery";
-import CreativeAbout from "@/components/CreativeAbout";
-import CreativeContact from "@/components/CreativeContact";
+import RedesignNavbar from "@/components/redesign/Navbar";
+import ScrollHUD from "@/components/redesign/ScrollHUD";
+import RedesignHero from "@/components/redesign/HeroSection";
+import UnderHeroReveal from "@/components/redesign/UnderHeroReveal";
+import ProjectsStack from "@/components/redesign/ProjectsStack";
+import ResearchPortal from "@/components/redesign/ResearchPortal";
+import SkillsMatrix from "@/components/redesign/SkillsMatrix";
+import HackathonsRadar from "@/components/redesign/HackathonsRadar";
+import ContactTerminal from "@/components/redesign/ContactTerminal";
+import CurtainFooter from "@/components/redesign/CurtainFooter";
 
 export default function Home() {
-  const [currentStyle, setCurrentStyle] = useState("swiss");
-
   return (
     <>
-      {/* Interactive Screen Drawing Canvas (Inspired by creativeed.dev) */}
-      <InteractiveCanvas />
+      {/* Dynamic Floating Glass Header & Fullscreen Menu */}
+      <RedesignNavbar />
 
-      {/* Swiss Architectural Navigation with Live Style Switcher */}
-      <CreativeNavbar
-        currentStyle={currentStyle}
-        onStyleChange={setCurrentStyle}
-      />
+      {/* Real-time Percentage & Coordinate HUD */}
+      <ScrollHUD />
 
-      <main className="relative flex flex-col bg-[#090a10]">
-        {/* Act I: Asymmetric Swiss Hero Monolith */}
-        <CreativeHero currentStyle={currentStyle} />
+      {/* Fixed Under-the-Hero Architectural Blueprint (Revealed as Hero slides up) */}
+      <UnderHeroReveal />
 
-        {/* Act II: Tactile Blueprints (Victor, Context Engine, GestureScroll, BharatAuto, Listny) */}
-        <CreativeProjects />
+      <main className="relative flex flex-col bg-transparent">
+        {/* Act 0: The Hero Monolith with Canvas Scrubbing & Kinetic Typography */}
+        <RedesignHero />
 
-        {/* Act III: 3D Cylindrical Viewport (TiltedGridHero) */}
-        <Gallery />
+        {/* 100vh Transparent Spacer: lets the Hero slide off, revealing the fixed UnderHero Blueprint */}
+        <div id="about" className="h-screen w-full pointer-events-none" />
 
-        {/* Act IV: Identity, Engineering Philosophy & KLE Tech Context */}
-        <CreativeAbout />
+        {/* Act I: Pinned Card Stack Deck with Dynamic Lenis Lerp Friction */}
+        <ProjectsStack />
 
-        {/* Act V: Monolith Outro & Direct Connection Plane */}
-        <CreativeContact />
+        {/* Act II: Expanding Center Portal Canvas (Open-Source Research Observatory) */}
+        <ResearchPortal />
+
+        {/* Act III: Interactive Categorized Tech Ecosystem */}
+        <SkillsMatrix />
+
+        {/* Act IV: Focal-Line Hackathons Radar & Leadership Showcase */}
+        <HackathonsRadar />
+
+        {/* Act V: Interactive Command Terminal & Transmission Deck */}
+        <ContactTerminal />
+
+        {/* Act VI: Parallax Curtain Reveal Footer */}
+        <CurtainFooter />
       </main>
     </>
   );
