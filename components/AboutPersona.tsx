@@ -31,7 +31,7 @@ const TECH_ITEMS = [
 
 export default function AboutPersona() {
   return (
-    <section id="intro" className="relative px-6 py-28 sm:px-10 md:px-16 lg:px-24 border-t border-white/10 bg-ink-card/50">
+    <section id="about" className="relative px-6 py-28 sm:px-10 md:px-16 lg:px-24 border-t border-white/10 bg-ink-card/50">
       <div className="mx-auto max-w-7xl">
         {/* Section Index */}
         <div className="mb-16 flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-accent-mint">

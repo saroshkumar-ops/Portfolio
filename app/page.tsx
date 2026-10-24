@@ -1,36 +1,28 @@
 import Navbar from "@/components/Navbar";
-import AmoghStyleHero from "@/components/AmoghStyleHero";
-import MarqueeRibbon from "@/components/ui/MarqueeRibbon";
-import ScrollStackProjects from "@/components/ScrollStackProjects";
-import InteractiveSkillsMenu from "@/components/InteractiveSkillsMenu";
+import SaroshHero from "@/components/SaroshHero";
+import SystemDossiers from "@/components/SystemDossiers";
 import Gallery from "@/components/Gallery";
-import AmoghPhilosophy from "@/components/AmoghPhilosophy";
+import AboutPersona from "@/components/AboutPersona";
 import ContactOutro from "@/components/ContactOutro";
 
 export default function Home() {
   return (
     <>
       <Navbar />
-      <main className="relative flex flex-col bg-black">
-        {/* Act I: Hero with Rotating Star Border & Kinetic Manifesto */}
-        <AmoghStyleHero />
+      <main className="relative flex flex-col bg-[#050608]">
+        {/* Act I: Cybernetic Hero & Live Telemetry Control Plane */}
+        <SaroshHero />
 
-        {/* Act II: Giant 13vw Infinite Marquee Divider */}
-        <MarqueeRibbon text="SELECTED WORKS" />
+        {/* Act II: Systems Dossiers (Victor, Context Engine, GestureScroll, BharatAuto, Listny) */}
+        <SystemDossiers />
 
-        {/* Act III: Pinned 3D Stacking Project Cards (Victor, Context Engine, GestureScroll, BharatAuto, Listny) */}
-        <ScrollStackProjects />
-
-        {/* Act IV: Full-Width Interactive Hover-Marquee Capabilities Menu */}
-        <InteractiveSkillsMenu />
-
-        {/* Act V: The Reelmark Curved Video Carousel Showcase (Requested for Gallery) */}
+        {/* Act III: 3D Cylindrical Viewport Gallery (TiltedGridHero) */}
         <Gallery />
 
-        {/* Act VI: Architectural Philosophy & KLE Tech Identity */}
-        <AmoghPhilosophy />
+        {/* Act IV: Identity, Engineering Philosophy & KLE Tech Context */}
+        <AboutPersona />
 
-        {/* Act VII: High-Impact Outro & 1-Click Clipboard Connect */}
+        {/* Act V: High-Impact Outro & Direct Connection Plane */}
         <ContactOutro />
       </main>
     </>

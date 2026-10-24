@@ -1,577 +1,201 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { TiltedGridHero, type TiltedGridImage } from "@/components/ui/tilted-grid-hero";
+import { Eye, Sliders, Sparkles, Layers, Maximize2, Cpu } from "lucide-react";
 
-const POSTER_SRC =
-  "https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/b7ebb74a-8c8a-4f7e-8f80-55e2d74ecd05.webp";
-const VIDEO_SRC =
-  "https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/04fd3d5f-99d7-476e-98a4-46c08518ffb3.mp4";
-
-const CARD_COUNT = 10;
-const PITCH = 196;
-const TOTAL_WIDTH = CARD_COUNT * PITCH; // 1960
+const GALLERY_IMAGES: TiltedGridImage[] = [
+  {
+    src: "/Projects/img_00015.jpg",
+    alt: "Victor Copilot — Local-First AI Control Plane",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+    alt: "Silicon Architecture & Hardware Logic",
+  },
+  {
+    src: "/Projects/img_00030.jpg",
+    alt: "Persistent Context Engine — LSH Incident Vectors",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80",
+    alt: "Telemetry & Network Ingestion Matrix",
+  },
+  {
+    src: "/Projects/img_00007.jpg",
+    alt: "GestureScroll — Zero-Focus Computer Vision Automation",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
+    alt: "Computational Fluid & Geometric Flow",
+  },
+  {
+    src: "/Projects/img_00020.jpg",
+    alt: "BharatAuto — High-Throughput Dispatch Engine",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",
+    alt: "Terminal Kernel Stream & Telemetry Buffers",
+  },
+  {
+    src: "/Projects/img_00025.jpg",
+    alt: "Listny — Audio Synthesis & Offline Storage",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&w=1200&q=80",
+    alt: "Minimal Monolith Concrete Architecture",
+  },
+];
 
 export default function Gallery() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Carousel physics state
-  const scrollRef = useRef(0);
-  const velocityRef = useRef(0);
-  const isDraggingRef = useRef(false);
-  const lastPointerXRef = useRef(0);
-  const lastTimeRef = useRef(0);
-  const animFrameRef = useRef<number | null>(null);
-
-  // Cards layout state recomputed on animation frame
-  const [, setTick] = useState(0);
-
-  // Update scale factor (--u = min(100vw/1440, 100vh/1080))
-  useEffect(() => {
-    const handleResize = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      setIsMobile(vw <= 820);
-      const computedScale = Math.min(vw / 1440, vh / 1080);
-      setScale(computedScale);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Continuous animation loop: auto-scroll right -> left (offset decreases) + momentum coasting
-  useEffect(() => {
-    let lastTimestamp = performance.now();
-
-    const loop = (timestamp: number) => {
-      const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
-      lastTimestamp = timestamp;
-
-      if (!isDraggingRef.current) {
-        // Coasting deceleration (velocity decays 95% per second)
-        if (Math.abs(velocityRef.current) > 1) {
-          scrollRef.current += velocityRef.current * dt;
-          velocityRef.current *= Math.pow(0.05, dt);
-        } else {
-          // Slow continuous auto-scroll: ~50u per second (moving left)
-          scrollRef.current -= 50 * dt;
-        }
-
-        // Loop seamlessly in [0, TOTAL_WIDTH]
-        scrollRef.current =
-          ((scrollRef.current % TOTAL_WIDTH) + TOTAL_WIDTH) % TOTAL_WIDTH;
-
-        setTick((t) => t + 1);
-      }
-
-      animFrameRef.current = requestAnimationFrame(loop);
-    };
-
-    animFrameRef.current = requestAnimationFrame(loop);
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
-  }, []);
-
-  // Pointer drag interactions
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    isDraggingRef.current = true;
-    lastPointerXRef.current = e.clientX;
-    lastTimeRef.current = performance.now();
-    velocityRef.current = 0;
-    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-  }, []);
-
-  const handlePointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!isDraggingRef.current) return;
-      const now = performance.now();
-      const dt = (now - lastTimeRef.current) / 1000;
-      const dx = (e.clientX - lastPointerXRef.current) / (scale || 1);
-
-      scrollRef.current += dx;
-      scrollRef.current =
-        ((scrollRef.current % TOTAL_WIDTH) + TOTAL_WIDTH) % TOTAL_WIDTH;
-
-      if (dt > 0.005) {
-        velocityRef.current = dx / dt;
-      }
-
-      lastPointerXRef.current = e.clientX;
-      lastTimeRef.current = now;
-      setTick((t) => t + 1);
-    },
-    [scale]
-  );
-
-  const handlePointerUp = useCallback((e: React.PointerEvent) => {
-    isDraggingRef.current = false;
-    (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
-  }, []);
-
-  // Generate rounded quad path for cards
-  const getRoundedQuadPath = (
-    w: number,
-    hL: number,
-    hR: number,
-    r: number = 15
-  ) => {
-    const maxH = Math.max(hL, hR);
-    const yTL = (maxH - hL) / 2;
-    const yBL = yTL + hL;
-    const yTR = (maxH - hR) / 2;
-    const yBR = yTR + hR;
-
-    return `M ${r} ${yTL} L ${w - r} ${yTR} Q ${w} ${yTR} ${w} ${
-      yTR + r
-    } L ${w} ${yBR - r} Q ${w} ${yBR} ${w - r} ${yBR} L ${r} ${yBL} Q 0 ${yBL} 0 ${
-      yBL - r
-    } L 0 ${yTL + r} Q 0 ${yTL} ${r} ${yTL} Z`;
-  };
-
-  const u = scale;
+  const [curve, setCurve] = useState<number>(78);
+  const [speed, setSpeed] = useState<number>(3.5);
+  const [tileHeight, setTileHeight] = useState<number>(34);
 
   return (
     <section
       id="gallery"
-      ref={containerRef}
-      className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#F5F8EF] select-none text-[#101410]"
-      style={{
-        fontFamily: "'Inter', sans-serif",
-      }}
+      className="relative flex min-h-screen w-full flex-col justify-between overflow-hidden border-t border-white/10 bg-[#050608] px-4 py-20 sm:px-8 md:px-12 lg:px-16 text-white select-none"
     >
-      {/* 1440 x 1080 Contained Frame */}
+      {/* Background radial atmosphere */}
       <div
-        className="relative overflow-hidden"
-        style={{
-          width: 1440 * u,
-          height: 1080 * u,
-          transformOrigin: "center center",
-        }}
-      >
-        {/* --- Top Bar --- */}
-        {/* Logo: (37, 36) */}
-        <div
-          className="absolute flex items-center gap-2 font-bold tracking-tight"
-          style={{
-            left: 37 * u,
-            top: 36 * u,
-            fontSize: 22 * u,
-            color: "#101410",
-          }}
-        >
-          {/* Green leaf mark */}
-          <svg
-            width={26 * u}
-            height={26 * u}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#08482D"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-          </svg>
-          <span className="font-sans font-bold">Reelmark</span>
-        </div>
+        aria-hidden
+        className="pointer-events-none absolute -top-40 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-gradient-to-b from-[#00f0ff]/10 via-[#00f0ff]/[0.02] to-transparent blur-3xl"
+      />
 
-        {/* Nav: (505, 36) with 31u gap */}
-        {!isMobile && (
-          <nav
-            className="absolute flex items-center"
-            style={{
-              left: 505 * u,
-              top: 39 * u,
-              gap: 31 * u,
-              fontSize: 16.4 * u,
-              color: "#5E5E61",
-            }}
-          >
-            {["Brands", "Creators", "Pricing", "Use Cases", "Contact"].map(
-              (item) => (
-                <span
-                  key={item}
-                  className="cursor-pointer transition-colors hover:text-[#101410] font-medium"
-                >
-                  {item}
-                </span>
-              )
-            )}
-          </nav>
-        )}
+      {/* Cybernetic Dot Grid */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:32px_32px]"
+      />
 
-        {/* Buttons: Log in at (1211, 29) & Sign up at (1304, 29) */}
-        <div
-          className="absolute flex items-center gap-3"
-          style={{ right: 39 * u, top: 29 * u }}
-        >
-          {!isMobile && (
-            <button
-              className="flex items-center justify-center rounded-full bg-white font-medium shadow-sm transition-transform hover:scale-105"
-              style={{
-                width: 92 * u,
-                height: 40 * u,
-                fontSize: 14 * u,
-                color: "#101410",
-                border: "1px solid rgba(0,0,0,0.08)",
-              }}
-            >
-              Log in
-            </button>
-          )}
-          <button
-            className="flex items-center justify-center rounded-full font-medium text-white shadow-sm transition-transform hover:scale-105"
-            style={{
-              width: 97 * u,
-              height: 40 * u,
-              fontSize: 14 * u,
-              backgroundColor: "#08482D",
-            }}
-          >
-            Sign up
-          </button>
-        </div>
+      {/* Top Header / Section Index */}
+      <div className="relative z-10 mx-auto w-full max-w-7xl">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 border-b border-white/10 pb-8">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#00f0ff]/30 bg-[#00f0ff]/10 px-3.5 py-1 font-mono text-xs uppercase tracking-wider text-[#00f0ff]">
+              <Eye className="h-3.5 w-3.5" />
+              <span>03 // VISUAL PERSPECTIVES</span>
+            </div>
 
-        {/* --- Badge: 292x37 at (575, 115) --- */}
-        <div
-          className="absolute flex items-center justify-center rounded-full font-medium"
-          style={{
-            left: 575 * u,
-            top: 115 * u,
-            width: 292 * u,
-            height: 37 * u,
-            backgroundColor: "#DAE7C7",
-            color: "#08482D",
-            fontSize: 14.5 * u,
-          }}
-        >
-          <span>Trusted by 120,000+ indie makers</span>
-        </div>
+            <h2 className="font-sans text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white">
+              CYLINDRICAL{" "}
+              <span className="bg-gradient-to-r from-white via-white/80 to-[#00f0ff] bg-clip-text text-transparent">
+                VIEWPORT
+              </span>
+            </h2>
 
-        {/* --- Headline: Centred at top 176 --- */}
-        <div
-          className="absolute inset-x-0 text-center"
-          style={{
-            top: 176 * u,
-          }}
-        >
-          <h1
-            style={{
-              fontFamily: "'Inter Tight', 'Inter', sans-serif",
-              fontSize: 88 * u,
-              lineHeight: `${92 * u}px`,
-              fontWeight: 700,
-              color: "#101410",
-              letterSpacing: "-0.035em",
-            }}
-          >
-            Captivate Crowds
-          </h1>
-          <h1
-            style={{
-              fontFamily: "'Inter Tight', 'Inter', sans-serif",
-              fontSize: 88 * u,
-              lineHeight: `${92 * u}px`,
-              fontWeight: 700,
-              color: "#101410",
-              letterSpacing: "-0.022em",
-            }}
-          >
-            with Snackable Reels
-          </h1>
-        </div>
+            <p className="max-w-2xl font-sans text-sm sm:text-base text-white/60 font-light leading-relaxed">
+              Real-time hardware-accelerated 3D cylindrical projection. Sixteen faceted slices per tile curl toward the camera across continuous perspective calculations.
+            </p>
+          </div>
 
-        {/* --- Subline: Centred at top 394 --- */}
-        <div
-          className="absolute inset-x-0 text-center font-normal"
-          style={{
-            top: 394 * u,
-            fontSize: 20.8 * u,
-            lineHeight: `${32 * u}px`,
-            color: "#5E5E61",
-          }}
-        >
-          <p>Grow your brand with short, snappy product clips by</p>
-          <p>our handpicked video makers. Our crew is ready to</p>
-          <p>lift your next launch higher.</p>
-        </div>
-
-        {/* --- Hand-drawn Notes & Doodles (Caveat 600, Forest Green) --- */}
-        {/* 1. "//" doodle at (263, 377) */}
-        <svg
-          className="absolute pointer-events-none"
-          style={{
-            left: 263 * u,
-            top: 377 * u,
-            width: 40 * u,
-            height: 40 * u,
-          }}
-          viewBox="0 0 40 40"
-        >
-          <path
-            d="M 8 32 L 20 6"
-            stroke="#08482D"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-          <path
-            d="M 18 32 L 30 6"
-            stroke="#08482D"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-        </svg>
-
-        {/* 2. "Be seen / with clips" rotated 16° at (1212, 310) with curving arrow */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            left: 1212 * u,
-            top: 310 * u,
-            transform: "rotate(16deg)",
-            transformOrigin: "left top",
-            fontFamily: "'Caveat', cursive",
-            fontSize: 28 * u,
-            fontWeight: 600,
-            lineHeight: 1.1,
-            color: "#08482D",
-          }}
-        >
-          <span>
-            Be seen
-            <br />
-            with clips
-          </span>
-
-          {/* Curving arrow that starts below the note and curls down to the cards */}
-          <svg
-            className="absolute"
-            style={{
-              top: 55 * u,
-              left: -35 * u,
-              width: 140 * u,
-              height: 180 * u,
-              overflow: "visible",
-            }}
-            viewBox="0 0 140 180"
-          >
-            <path
-              d="M 40 0 C 35 45, -20 80, -60 120 C -85 145, -95 160, -98 185"
-              stroke="#08482D"
-              strokeWidth="2.4"
-              fill="none"
-              strokeLinecap="round"
-            />
-            {/* Arrowhead */}
-            <path
-              d="M -106 173 L -98 187 L -88 178"
-              stroke="#08482D"
-              strokeWidth="2.4"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-
-        {/* 3. "Zero cost" rotated 24° at (521, 937) with small arrow to button */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            left: 521 * u,
-            top: 937 * u,
-            transform: "rotate(24deg)",
-            transformOrigin: "left top",
-            fontFamily: "'Caveat', cursive",
-            fontSize: 26 * u,
-            fontWeight: 600,
-            color: "#08482D",
-          }}
-        >
-          <span>Zero cost</span>
-          <svg
-            className="absolute"
-            style={{
-              left: 85 * u,
-              top: 5 * u,
-              width: 50 * u,
-              height: 30 * u,
-              overflow: "visible",
-            }}
-            viewBox="0 0 50 30"
-          >
-            <path
-              d="M 0 15 C 15 12, 30 8, 40 2"
-              stroke="#08482D"
-              strokeWidth="2.2"
-              fill="none"
-              strokeLinecap="round"
-            />
-            <path
-              d="M 32 0 L 41 2 L 35 10"
-              stroke="#08482D"
-              strokeWidth="2.2"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-
-        {/* --- Curved Video Carousel (10 Cards) --- */}
-        <div
-          className="absolute inset-x-0 cursor-grab active:cursor-grabbing touch-none select-none"
-          style={{
-            top: 480 * u,
-            height: 420 * u,
-          }}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-        >
-          {Array.from({ length: CARD_COUNT }).map((_, i) => {
-            // Unpushed linear offset t relative to centre 720
-            const p = (i * PITCH + scrollRef.current) % TOTAL_WIDTH;
-            let t = p < 0 ? p + TOTAL_WIDTH : p;
-            t = t - TOTAL_WIDTH / 2; // in [-980, 980]
-
-            // Outward pushed center x formula
-            const pushedX = 720 + t * (1 + 0.083 * Math.pow(t / 706, 2));
-
-            // Normalized distance d = |x - 720| / 706
-            const d = Math.abs(pushedX - 720) / 706;
-
-            // Width = (170 + 48 * d^2)
-            const w = 170 + 48 * d * d;
-
-            // Edges
-            const xLeft = pushedX - w / 2;
-            const xRight = pushedX + w / 2;
-            const qLeft = Math.abs(xLeft - 720) / 706;
-            const qRight = Math.abs(xRight - 720) / 706;
-
-            // Heights
-            const hLeft = 280 + 92 * Math.pow(qLeft, 2.6);
-            const hRight = 280 + 92 * Math.pow(qRight, 2.6);
-            const maxH = Math.max(hLeft, hRight);
-
-            // Vertical center sits at (687 - 12 * d^2)
-            const yCenter = 687 - 12 * d * d;
-
-            // Card top
-            const topY = yCenter - maxH / 2;
-
-            // Clip path
-            const clipPathStr = `path('${getRoundedQuadPath(w, hLeft, hRight, 15)}')`;
-
-            // Tile position in 5x2 grid
-            const col = i % 5;
-            const row = Math.floor(i / 5);
-
-            // Skip rendering if way off-screen
-            if (pushedX < -300 || pushedX > 1740) return null;
-
-            return (
-              <div
-                key={i}
-                className="absolute pointer-events-none"
-                style={{
-                  left: xLeft * u,
-                  top: (topY - 480) * u,
-                  width: w * u,
-                  height: maxH * u,
-                  clipPath: clipPathStr,
-                  WebkitClipPath: clipPathStr,
-                }}
+          {/* Interactive Live Geometry Controls */}
+          <div className="flex flex-wrap items-center gap-3 font-mono text-xs text-white/70">
+            <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2 backdrop-blur-md">
+              <Sliders className="h-3.5 w-3.5 text-[#00f0ff]" />
+              <span className="text-white/40">CURVE:</span>
+              <button
+                type="button"
+                onClick={() => setCurve((c) => (c === 82 ? 65 : c === 65 ? 75 : 82))}
+                className="font-bold text-white transition-colors hover:text-[#00f0ff]"
+                title="Cycle cylinder curvature angle"
               >
-                {/* 5x2 Tile Video & Poster Container */}
-                <div
-                  className="relative h-full w-full overflow-hidden bg-[#08482D]/10"
-                  style={{
-                    backgroundColor: "#DAE7C7",
-                  }}
-                >
-                  <div
-                    className="absolute"
-                    style={{
-                      width: `${500}%`,
-                      height: `${200}%`,
-                      left: `-${col * 100}%`,
-                      top: `-${row * 100}%`,
-                    }}
-                  >
-                    <video
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      poster={POSTER_SRC}
-                      src={VIDEO_SRC}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
+                {curve}°
+              </button>
+            </div>
 
-                  {/* Frosted Play Icon at Bottom-Left */}
-                  <div
-                    className="absolute flex items-center justify-center rounded-full"
-                    style={{
-                      left: 14 * u,
-                      bottom: 14 * u,
-                      width: 28 * u,
-                      height: 28 * u,
-                      backgroundColor: "rgba(255, 255, 255, 0.55)",
-                      backdropFilter: "blur(6px)",
-                      WebkitBackdropFilter: "blur(6px)",
-                    }}
-                  >
-                    <svg
-                      width={11 * u}
-                      height={11 * u}
-                      viewBox="0 0 24 24"
-                      fill="#08482D"
-                    >
-                      <polygon points="6 3 20 12 6 21 6 3" />
-                    </svg>
-                  </div>
+            <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2 backdrop-blur-md">
+              <Sparkles className="h-3.5 w-3.5 text-[#00ffb2]" />
+              <span className="text-white/40">RATE:</span>
+              <button
+                type="button"
+                onClick={() => setSpeed((s) => (s === 3.5 ? 2.0 : s === 2.0 ? 5.0 : 3.5))}
+                className="font-bold text-white transition-colors hover:text-[#00ffb2]"
+                title="Cycle scroll velocity"
+              >
+                {speed}s/tile
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2 backdrop-blur-md">
+              <Layers className="h-3.5 w-3.5 text-[#00f0ff]" />
+              <span className="text-white/40">HEIGHT:</span>
+              <button
+                type="button"
+                onClick={() => setTileHeight((h) => (h === 34 ? 26 : h === 26 ? 42 : 34))}
+                className="font-bold text-white transition-colors hover:text-[#00f0ff]"
+                title="Cycle tile vertical scale"
+              >
+                {tileHeight}%
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* The 3D Cylindrical Hero Viewport */}
+      <div className="relative z-10 mx-auto my-8 w-full max-w-7xl">
+        <div className="relative h-[480px] sm:h-[560px] md:h-[640px] lg:h-[700px] w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#0a0d14]/80 to-[#040609]/90 shadow-2xl shadow-black/90 backdrop-blur-2xl">
+          <TiltedGridHero
+            images={GALLERY_IMAGES}
+            speed={speed}
+            tileHeight={tileHeight}
+            aspectRatio={16 / 9}
+            gap={6}
+            axis={52}
+            curve={curve}
+            fade={14}
+            className="h-full w-full"
+          >
+            {/* Ambient vignette and overlay HUD */}
+            <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-6 sm:p-10">
+              {/* Top watermark */}
+              <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-wider text-white/40">
+                <div className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#00f0ff] animate-pulse" />
+                  <span>STREAM PERSISTENT // COMPOSITOR 60FPS</span>
+                </div>
+                <span>CAMERA D: 1.6R</span>
+              </div>
+
+              {/* Bottom focus indicator */}
+              <div className="flex items-end justify-between font-mono text-[11px] text-white/50">
+                <div className="space-y-1">
+                  <p className="text-white/30 text-[10px]">FACET TILE ENGINE</p>
+                  <p className="font-bold text-white tracking-wider">16 STRIPS / CYLINDER AXIS</p>
+                </div>
+
+                <div className="rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] text-white/60 backdrop-blur-md">
+                  CLICK CONTROLS ABOVE TO RESHAPE CURVATURE
                 </div>
               </div>
-            );
-          })}
+            </div>
+          </TiltedGridHero>
         </div>
+      </div>
 
-        {/* --- Button: Forest-green "Make a Reel" pill inside dashed ring --- */}
-        {/* Dashed outline ring (190x74) at (617, 893) */}
-        <div
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            left: 617 * u,
-            top: 893 * u,
-            width: 190 * u,
-            height: 74 * u,
-            border: `${1.8 * u}px dashed #08482D`,
-          }}
-        />
-
-        {/* Green "Make a Reel" pill (172x58) at (626, 901) */}
-        <button
-          className="absolute flex items-center justify-center rounded-full font-semibold text-white shadow-md transition-transform hover:scale-105 active:scale-95"
-          style={{
-            left: 626 * u,
-            top: 901 * u,
-            width: 172 * u,
-            height: 58 * u,
-            backgroundColor: "#08482D",
-            fontSize: 16 * u,
-          }}
-        >
-          Make a Reel
-        </button>
+      {/* Bottom Telemetry Bar */}
+      <div className="relative z-10 mx-auto w-full max-w-7xl pt-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-white/10 pt-6 font-mono text-xs text-white/50">
+          <div>
+            <span className="block text-[10px] text-white/30">PROJECTION MODEL</span>
+            <span className="font-semibold text-white/80">Cylindrical Harmonic</span>
+          </div>
+          <div>
+            <span className="block text-[10px] text-white/30">TRANSFORM DISPATCH</span>
+            <span className="font-semibold text-white/80">CSS 3D preserve-3d</span>
+          </div>
+          <div>
+            <span className="block text-[10px] text-white/30">GEOMETRY FACETS</span>
+            <span className="font-semibold text-white/80">16 Slices / 0 Drift</span>
+          </div>
+          <div>
+            <span className="block text-[10px] text-white/30">CONTAINER SIZING</span>
+            <span className="font-semibold text-white/80">cqw / cqh Responsive</span>
+          </div>
+        </div>
       </div>
     </section>
   );
