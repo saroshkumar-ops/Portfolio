@@ -52,12 +52,12 @@ export default function Hero({
               src={LANDING_VIDEO_SRC}
             />
           )}
-          <div className="absolute inset-0 bg-ink/60" />
+          <div className="absolute inset-0 bg-ink/70" />
         </div>
 
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-1/4 top-0 h-[60vh] w-[60vh] rounded-full bg-[radial-gradient(circle,_rgba(53,110,232,0.35),_transparent_70%)] blur-3xl"
+          className="pointer-events-none absolute -right-1/4 top-0 h-[60vh] w-[60vh] rounded-full bg-[radial-gradient(circle,_rgba(0,255,178,0.2),_transparent_70%)] blur-3xl"
         />
 
         <div className="relative flex flex-1 items-center">
@@ -65,33 +65,34 @@ export default function Hero({
         </div>
 
         <div className="relative flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div className="flex flex-wrap items-end gap-10 text-xs uppercase tracking-[0.14em] text-paper/60 md:gap-16">
+          <div className="flex flex-wrap items-end gap-10 font-mono text-xs uppercase tracking-[0.14em] text-paper/60 md:gap-16">
             <div>
               <p className="font-semibold text-paper/90">Focus</p>
-              <p>AI &amp; Backend Systems</p>
+              <p className="text-white">AI &amp; Backend Systems</p>
             </div>
             <div>
               <p className="font-semibold text-paper/90">Based in</p>
-              <p>Hubli, India</p>
+              <p className="text-white">India [ 28°N, 77°E ]</p>
             </div>
             <div>
               <p className="font-semibold text-paper/90">Status</p>
-              <p>Open to opportunities</p>
+              <p className="text-accent-mint font-bold">Open to Opportunities</p>
             </div>
 
             <button
               type="button"
               onClick={() => setMode((m) => (m === "animation" ? "video" : "animation"))}
-              className="inline-flex items-center gap-2 rounded-full border border-paper/25 bg-ink/40 px-4 py-2 text-[10px] font-semibold normal-case tracking-[0.1em] text-paper/80 backdrop-blur-md transition-colors hover:border-accent-amber hover:text-accent-amber"
+              className="inline-flex items-center gap-2 rounded-full border border-paper/25 bg-ink/40 px-4 py-2 font-mono text-[10px] font-semibold tracking-[0.1em] text-paper/80 backdrop-blur-md transition-colors hover:border-accent-mint hover:text-accent-mint"
+              data-cursor="hover"
             >
               <RefreshCw size={12} strokeWidth={2.25} />
-              {mode === "animation" ? "Play video" : "Show animation"}
+              {mode === "animation" ? "Play 4K Video" : "Scrub Sequence"}
             </button>
           </div>
 
           <div
             aria-hidden
-            className="hidden h-10 w-px animate-bounce self-end bg-paper/40 md:block"
+            className="hidden h-10 w-px animate-bounce self-end bg-accent-mint/60 md:block"
           />
         </div>
       </div>
@@ -102,7 +103,7 @@ export default function Hero({
           defaultSelected={0}
           side="right"
           textColor="#7c828f"
-          activeColor="#f5a623"
+          activeColor="#00ffb2"
           fontSize={1.15}
           spacing={1.7}
           curve={1}

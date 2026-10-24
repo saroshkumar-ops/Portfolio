@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
-const LENS_SIZE = 190;
+const LENS_SIZE = 220;
 
 /**
  * Renders the hero headline twice: a plain layer, and a chromatic-aberration
@@ -63,10 +63,6 @@ export default function LensReveal() {
     ).matches;
     if (prefersReducedMotion) return;
 
-    // Idle sweep pauses itself while the hero is scrolled out of view
-    // (isVisibleRef, set by the IntersectionObserver above) and is resumed
-    // by that same observer when it re-enters — no need to keep animating
-    // Framer Motion springs the whole page is scrolled past this section.
     const tick = () => {
       if (!isVisibleRef.current) {
         idleFrame.current = null;
@@ -89,9 +85,7 @@ export default function LensReveal() {
     };
   }, [bounds, x, y]);
 
-  const handlePointerMove: React.PointerEventHandler<HTMLDivElement> = (
-    e
-  ) => {
+  const handlePointerMove: React.PointerEventHandler<HTMLDivElement> = (e) => {
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
 
@@ -155,7 +149,7 @@ export default function LensReveal() {
 
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute rounded-full border border-paper/25 backdrop-blur-[1px]"
+        className="pointer-events-none absolute rounded-full border border-paper/30 backdrop-blur-[1px]"
         style={{
           width: LENS_SIZE,
           height: LENS_SIZE,
@@ -173,15 +167,11 @@ function useSpringCircle(
   springX: ReturnType<typeof useSpring>,
   springY: ReturnType<typeof useSpring>
 ) {
-  const [clip, setClip] = useState(
-    `circle(${LENS_SIZE / 2}px at 0px 0px)`
-  );
+  const [clip, setClip] = useState(`circle(${LENS_SIZE / 2}px at 0px 0px)`);
 
   useEffect(() => {
     const update = () => {
-      setClip(
-        `circle(${LENS_SIZE / 2}px at ${springX.get()}px ${springY.get()}px)`
-      );
+      setClip(`circle(${LENS_SIZE / 2}px at ${springX.get()}px ${springY.get()}px)`);
     };
     const unsubX = springX.on("change", update);
     const unsubY = springY.on("change", update);
@@ -196,13 +186,11 @@ function useSpringCircle(
 
 function Headline() {
   return (
-    <h1 className="font-sans text-[12vw] font-bold leading-[1.05] tracking-tight text-paper sm:text-[10vw] sm:leading-[0.85] md:text-[7.5vw]">
-      Sarosh Kumar
+    <h1 className="font-sans text-[12vw] font-black uppercase leading-[0.88] tracking-tight text-paper sm:text-[10vw] md:text-[8vw]">
+      SAROSH KUMAR
       <br />
-      <span className="font-serif italic font-normal text-accent-amber">
-        Software
-      </span>{" "}
-      Engineer
+      <span className="text-accent-mint tracking-tight">CREATIVE</span>{" "}
+      <span className="text-white/40">DEV</span>
     </h1>
   );
 }

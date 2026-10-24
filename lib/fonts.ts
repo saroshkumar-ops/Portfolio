@@ -1,43 +1,22 @@
-import { Anton, Archivo, Instrument_Serif, JetBrains_Mono, Kanit, Roboto_Flex } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
-export const archivo = Archivo({
-  variable: "--font-archivo",
+export const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
-});
-
-export const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-export const robotoFlex = Roboto_Flex({
-  subsets: ["latin"],
-  weight: "variable",
-  axes: ["wdth", "opsz"],
-  display: "swap",
-});
-
-export const anton = Anton({
-  variable: "--font-anton",
-  subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-});
-
-export const kanit = Kanit({
-  variable: "--font-kanit",
-  subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
-  display: "swap",
 });
 
 export const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
+
+// Backward compatibility aliases pointing to Inter
+export const kanit = inter;
+export const anton = inter;
+export const archivo = inter;
+export const instrumentSerif = inter;
+export const robotoFlex = inter;

@@ -8,20 +8,16 @@ import {
   SiC,
   SiCplusplus,
   SiJavascript,
-  SiHtml5,
-  SiCss,
   SiReact,
   SiFastapi,
   SiElectron,
   SiNextdotjs,
-  SiMysql,
-  SiSqlite,
   SiPostgresql,
   SiOllama,
   SiGit,
   SiGithub,
   SiLinux,
-  SiSelenium,
+  SiDocker,
 } from "react-icons/si";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import LogoLoop, { type LogoItem } from "@/components/ui/logo-loop";
@@ -37,20 +33,16 @@ const TECH_LOGOS: LogoItem[] = [
   { node: <SiC />, title: "C" },
   { node: <SiCplusplus />, title: "C++" },
   { node: <SiJavascript />, title: "JavaScript" },
-  { node: <SiHtml5 />, title: "HTML5" },
-  { node: <SiCss />, title: "CSS" },
   { node: <SiReact />, title: "React" },
   { node: <SiFastapi />, title: "FastAPI" },
   { node: <SiElectron />, title: "Electron" },
   { node: <SiNextdotjs />, title: "Next.js" },
-  { node: <SiMysql />, title: "MySQL" },
-  { node: <SiSqlite />, title: "SQLite" },
   { node: <SiPostgresql />, title: "PostgreSQL" },
   { node: <SiOllama />, title: "Ollama" },
+  { node: <SiDocker />, title: "Docker" },
   { node: <SiGit />, title: "Git" },
   { node: <SiGithub />, title: "GitHub" },
   { node: <SiLinux />, title: "Linux" },
-  { node: <SiSelenium />, title: "Selenium" },
 ];
 
 export default function Playbook() {
@@ -87,58 +79,74 @@ export default function Playbook() {
     <section
       ref={sectionRef}
       id="approach"
-      className="relative z-10 flex min-h-screen items-center overflow-hidden rounded-t-[2.5rem] bg-ink px-6 py-24 shadow-[0_-40px_80px_rgba(0,0,0,0.6)] md:px-12"
+      className="relative z-10 flex min-h-screen items-center overflow-hidden rounded-t-[3rem] border-t border-white/10 bg-ink px-6 py-24 shadow-[0_-40px_80px_rgba(0,0,0,0.8)] md:px-16 lg:px-20"
     >
       <div className="absolute inset-0 z-0">
         <ScrubVideoFrames ref={frameApiRef} frameCount={APPROACH_FRAME_COUNT} frameSrc={approachFrameSrc} />
-        <div className="absolute inset-0 bg-ink/60" />
+        <div className="absolute inset-0 bg-ink/75" />
       </div>
 
-      <div className="relative grid w-full grid-cols-1 gap-16 md:grid-cols-2 md:items-center md:gap-12">
+      <div className="relative z-10 grid w-full grid-cols-1 gap-16 md:grid-cols-2 md:items-center md:gap-12">
         <div>
-          <p className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-paper/60">
-            [ Approach ]
-          </p>
+          <div className="mb-6 flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-accent-mint">
+            <span>01</span>
+            <span className="text-white/20">{"//"}</span>
+            <span>SYSTEMS PHILOSOPHY</span>
+          </div>
+
           <ScrollReveal
             containerClassName="my-0"
-            textClassName="text-3xl font-bold leading-tight sm:text-4xl md:text-5xl"
+            textClassName="text-3xl font-black uppercase tracking-tight leading-tight sm:text-4xl md:text-5xl"
             baseRotation={0}
             baseOpacity={0.2}
             enableBlur={false}
           >
-            {"I build "}
-            <span className="font-serif italic font-normal text-accent-mint">
-              intelligent
+            {"I architect "}
+            <span className="text-accent-mint">
+              deterministic
             </span>
-            {" systems — from real-time backends to AI-powered tools, sharpened through hackathons and hands-on engineering."}
+            {" systems — from local AI control planes to sub-second incident retrieval engines."}
           </ScrollReveal>
+
           <ScrollReveal
             containerClassName="my-0 mt-8"
-            textClassName="max-w-md text-sm uppercase tracking-[0.14em] text-paper/50 font-normal leading-normal"
+            textClassName="max-w-md font-mono text-xs uppercase tracking-[0.16em] text-paper/60 font-medium leading-relaxed"
             baseRotation={0}
             baseOpacity={0.2}
             enableBlur={false}
           >
-            AI Systems / Backend Engineering / Full-Stack Development
+            AI Systems · Distributed Backends · OS-Level Automation
           </ScrollReveal>
+
+          <div className="mt-8 flex flex-wrap gap-4 font-mono text-xs">
+            <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5">
+              <span className="text-[10px] text-paper-subtle block uppercase">Retrieval Latency</span>
+              <span className="font-bold text-accent-mint text-sm">~124ms P95</span>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5">
+              <span className="text-[10px] text-paper-subtle block uppercase">Execution Hook</span>
+              <span className="font-bold text-white text-sm">Zero Focus Interruption</span>
+            </div>
+          </div>
         </div>
 
         <div className="w-full">
-          <div className="relative overflow-hidden rounded-2xl border border-paper/10 bg-ink-soft p-6 shadow-2xl md:p-8">
-            <p className="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-paper/50">
-              Tools &amp; Tech
-            </p>
+          <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-ink-card/90 p-6 shadow-2xl backdrop-blur-xl md:p-8">
+            <div className="mb-6 flex items-center justify-between font-mono text-xs uppercase tracking-wider text-paper-muted">
+              <span>Tooling &amp; Stack</span>
+              <span className="text-accent-mint">60FPS Active</span>
+            </div>
             <LogoLoop
               logos={TECH_LOGOS}
-              speed={60}
+              speed={55}
               direction="left"
-              logoHeight={32}
-              gap={40}
+              logoHeight={34}
+              gap={36}
               fadeOut
-              fadeOutColor="#0c1220"
+              fadeOutColor="#12141a"
               scaleOnHover
               ariaLabel="Languages, frameworks, and tools"
-              className="text-paper/70"
+              className="text-paper/80"
               active={isVisible}
             />
           </div>

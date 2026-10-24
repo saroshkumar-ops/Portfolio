@@ -13,7 +13,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, X } from "lucide-react";
-import { anton, jetbrainsMono, kanit } from "@/lib/fonts";
+import { inter, jetbrainsMono } from "@/lib/fonts";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import BorderGlow from "@/components/ui/border-glow";
 import { Terminal, AnimatedSpan, TypingAnimation } from "@/components/ui/terminal";
@@ -38,45 +38,45 @@ type Project = {
 
 const PROJECTS: Project[] = [
   {
-    accent: "var(--accent-amber)",
-    glowColor: "37 91 55",
-    colors: ["var(--accent-amber)", "var(--grad-gold)", "var(--grad-red)"],
+    accent: "var(--accent-mint)",
+    glowColor: "0 255 178",
+    colors: ["var(--accent-mint)", "var(--accent-cyan)", "var(--accent-amber)"],
     eyebrow: "AI Desktop Assistant",
     title: "Victor — AI Desktop Copilot",
     description:
       "A local AI desktop assistant built with FastAPI, Electron, and Ollama — voice recognition, real-time WebSocket chat, desktop automation, memory persistence, and autonomous scheduling.",
   },
   {
-    accent: "var(--accent-mint)",
-    glowColor: "167 80 56",
-    colors: ["var(--accent-mint)", "var(--grad-teal)", "var(--accent-amber)"],
+    accent: "var(--accent-cyan)",
+    glowColor: "0 210 255",
+    colors: ["var(--accent-cyan)", "var(--accent-mint)", "var(--accent-purple)"],
     eyebrow: "Autonomous SRE",
     title: "Persistent Context Engine",
     description:
       "A context engine for autonomous SRE using MinHash and LSH-based incident retrieval with a FastAPI + React dashboard — ~124ms p95 latency, 100% recall@5 on large-scale benchmarks.",
   },
   {
-    accent: "var(--grad-purple)",
-    glowColor: "266 81 54",
-    colors: ["var(--grad-purple)", "var(--accent-mint)", "var(--grad-teal)"],
+    accent: "var(--accent-purple)",
+    glowColor: "157 78 221",
+    colors: ["var(--accent-purple)", "var(--accent-mint)", "var(--accent-cyan)"],
     eyebrow: "Computer Vision",
     title: "GestureScroll",
     description:
       "A computer-vision background scrolling utility built with Python and MediaPipe — gesture-controlled scrolling for secondary windows without interrupting fullscreen tasks or games.",
   },
   {
-    accent: "var(--grad-teal)",
-    glowColor: "169 79 44",
-    colors: ["var(--grad-teal)", "var(--accent-mint)", "var(--grad-purple)"],
+    accent: "var(--accent-amber)",
+    glowColor: "245 166 35",
+    colors: ["var(--accent-amber)", "var(--accent-mint)", "var(--accent-purple)"],
     eyebrow: "Smart Manufacturing",
     title: "BharatAuto",
     description:
       "An AI-driven smart manufacturing platform using Next.js, Spring Boot, FastAPI, and PostgreSQL — live sensor streaming, ML risk models, and LLM agents with Twilio-based incident escalation.",
   },
   {
-    accent: "var(--grad-gold)",
-    glowColor: "39 88 58",
-    colors: ["var(--grad-gold)", "var(--accent-amber)", "var(--grad-red)"],
+    accent: "#ff007f",
+    glowColor: "255 0 127",
+    colors: ["#ff007f", "var(--accent-amber)", "var(--accent-mint)"],
     eyebrow: "Linux Utility",
     title: "Listny",
     description:
@@ -135,8 +135,6 @@ function getTarget(role: Role | undefined, isMobile: boolean): Target {
         zIndex: 5,
       };
     default:
-      // Extra items beyond the 4 visible slots sit hidden until they
-      // rotate into view.
       return {
         left: "50%",
         height: isMobile ? "40%" : "48%",
@@ -177,9 +175,6 @@ export default function Projects() {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // Passive background frame scrub tied to normal page-scroll progress
-  // through the section (no pin) so it doesn't fight the carousel's own
-  // wheel-driven navigation or the rest of the page's scroll flow.
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -209,9 +204,7 @@ export default function Projects() {
   }, []);
 
   const roleByIndex = useMemo<(Role | undefined)[]>(() => {
-    const roles: (Role | undefined)[] = new Array(PROJECTS.length).fill(
-      undefined
-    );
+    const roles: (Role | undefined)[] = new Array(PROJECTS.length).fill(undefined);
     roles[activeIndex] = "center";
     roles[(activeIndex + PROJECTS.length - 1) % PROJECTS.length] = "left";
     roles[(activeIndex + 1) % PROJECTS.length] = "right";
@@ -219,11 +212,6 @@ export default function Projects() {
     return roles;
   }, [activeIndex]);
 
-  // GSAP drives every position/scale/blur/opacity change so switching
-  // between projects (via scroll, drag, or keyboard — no buttons) animates
-  // smoothly rather than jumping between states. Runs as a layout effect
-  // so the very first positioning happens before paint, avoiding a flash
-  // of unstyled/stacked cards.
   useIsomorphicLayoutEffect(() => {
     const isFirstRun = !hasMountedRef.current;
     hasMountedRef.current = true;
@@ -320,12 +308,9 @@ export default function Projects() {
 
       <div
         aria-hidden
-        className={`${anton.className} pointer-events-none absolute inset-x-0 top-8 z-10 flex select-none items-center justify-center opacity-[0.14]`}
+        className="pointer-events-none absolute inset-x-0 top-8 z-10 flex select-none items-center justify-center font-sans text-[18vw] font-black uppercase text-white/10 tracking-tighter"
         style={{
-          color: "var(--grad-red)",
-          fontSize: "clamp(70px, 18vw, 260px)",
           lineHeight: 1,
-          letterSpacing: "-0.02em",
           whiteSpace: "nowrap",
         }}
       >
@@ -334,38 +319,35 @@ export default function Projects() {
 
       <div className="relative z-10 mb-12 flex flex-col justify-between gap-8 sm:mb-16 sm:flex-row sm:items-end">
         <div>
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-paper/60">
-            [ Selected Work ]
-          </p>
-          <h2
-            className={`${kanit.className} gradient-heading max-w-xl text-3xl font-black uppercase leading-tight tracking-tight sm:text-4xl md:text-5xl`}
-          >
-            Featured projects
+          <div className="mb-4 flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-accent-mint">
+            <span>02</span>
+            <span className="text-white/20">{"//"}</span>
+            <span>FEATURED SYSTEMS</span>
+          </div>
+          <h2 className="font-sans text-3xl font-black uppercase leading-tight tracking-tight text-white sm:text-4xl md:text-5xl">
+            Engineered Work
           </h2>
           <ScrollReveal
             containerClassName="my-0 mt-4"
-            textClassName="max-w-md text-sm text-paper/60 font-normal leading-normal"
+            textClassName="max-w-md font-mono text-xs uppercase tracking-wider text-paper/60 font-medium leading-normal"
             baseRotation={0}
             baseOpacity={0.2}
             enableBlur={false}
           >
-            AI tools, backend systems, and full-stack builds from
-            hackathons and hands-on engineering.
+            AI tools, backend infrastructure, and full-scale systems built from scratch.
           </ScrollReveal>
         </div>
 
         <div className="flex flex-col items-start gap-2 sm:items-end">
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-paper/40">
-            {String(activeIndex + 1).padStart(2, "0")} /{" "}
-            {String(PROJECTS.length).padStart(2, "0")} — scroll, drag, or
-            use arrow keys
+          <span className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-accent-mint">
+            {String(activeIndex + 1).padStart(2, "0")} / {String(PROJECTS.length).padStart(2, "0")} — DRAG OR SCROLL DECK
           </span>
           <a
             href="#contact"
-            className={`${anton.className} flex items-center gap-2 text-2xl uppercase leading-none tracking-tight text-paper/85 transition-opacity hover:text-paper hover:opacity-100`}
+            className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-paper/85 transition-colors hover:text-accent-mint"
           >
-            Discuss a project
-            <ArrowRight className="h-5 w-5" strokeWidth={2.25} />
+            <span>Discuss architecture</span>
+            <ArrowRight className="h-4 w-4" strokeWidth={2.25} />
           </a>
         </div>
       </div>
@@ -380,6 +362,8 @@ export default function Projects() {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerEnd}
         onPointerCancel={handlePointerEnd}
+        data-cursor="drag"
+        data-cursor-text="DRAG"
         className="relative z-10 h-[56vh] cursor-grab touch-pan-y select-none outline-none active:cursor-grabbing sm:h-[60vh] md:h-[64vh]"
       >
         {PROJECTS.map((project, index) => (
@@ -390,6 +374,8 @@ export default function Projects() {
             }}
             role="option"
             aria-selected={activeIndex === index}
+            data-cursor="view"
+            data-cursor-text="EXPAND"
             className="absolute top-1/2 cursor-pointer"
             style={{
               aspectRatio: "0.72 / 1",
@@ -416,24 +402,24 @@ export default function Projects() {
               <div className="flex h-full w-full flex-col justify-between p-6 sm:p-8">
                 <div>
                   <span
-                    className="text-xs font-semibold uppercase tracking-[0.18em]"
+                    className="font-mono text-xs font-semibold uppercase tracking-[0.18em]"
                     style={{ color: project.accent }}
                   >
                     {project.eyebrow}
                   </span>
-                  <h3 className="mt-4 text-xl font-bold sm:text-2xl">
+                  <h3 className="mt-4 font-sans text-xl font-extrabold sm:text-2xl tracking-tight text-white">
                     {project.title}
                   </h3>
-                  <p className="mt-3 text-sm text-paper/60">
+                  <p className="mt-3 text-sm text-paper/70 font-sans leading-relaxed">
                     {project.description}
                   </p>
                 </div>
 
                 <div
-                  className="mt-6 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em]"
+                  className="mt-6 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.14em]"
                   style={{ color: project.accent }}
                 >
-                  View project
+                  <span>Inspect Architecture</span>
                   <ArrowRight size={14} strokeWidth={2.25} />
                 </div>
               </div>
@@ -450,14 +436,14 @@ export default function Projects() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-6 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-6 backdrop-blur-md"
             onClick={() => setSelectedProject(null)}
           >
             <button
               type="button"
               aria-label="Close project details"
               onClick={() => setSelectedProject(null)}
-              className="absolute right-6 top-6 flex h-11 w-11 items-center justify-center rounded-full border border-paper/30 text-paper transition-colors hover:border-accent-amber hover:text-accent-amber"
+              className="absolute right-6 top-6 flex h-11 w-11 items-center justify-center rounded-full border border-paper/30 text-paper transition-colors hover:border-accent-mint hover:text-accent-mint"
             >
               <X size={20} strokeWidth={2.25} />
             </button>
@@ -471,12 +457,12 @@ export default function Projects() {
               className="w-full max-w-xl"
             >
               <p
-                className="mb-3 text-xs font-semibold uppercase tracking-[0.18em]"
+                className="mb-3 font-mono text-xs font-semibold uppercase tracking-[0.18em]"
                 style={{ color: selectedProject.accent }}
               >
                 {selectedProject.eyebrow}
               </p>
-              <h3 className="mb-4 text-2xl font-bold text-paper sm:text-3xl">
+              <h3 className="mb-4 font-sans text-2xl font-black uppercase tracking-tight text-paper sm:text-3xl">
                 {selectedProject.title}
               </h3>
               <Terminal className={jetbrainsMono.className}>
@@ -489,10 +475,10 @@ export default function Projects() {
                     {line}
                   </AnimatedSpan>
                 ))}
-                <AnimatedSpan className="text-paper/50">
+                <AnimatedSpan className="text-paper/50 font-mono text-xs">
                   {PROJECT_DETAILS[selectedProject.title]?.stack}
                 </AnimatedSpan>
-                <TypingAnimation className="text-paper/70">
+                <TypingAnimation className="text-paper/70 font-mono text-xs">
                   {PROJECT_DETAILS[selectedProject.title]?.summary ?? ""}
                 </TypingAnimation>
               </Terminal>
