@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <main className="relative flex flex-col bg-[#050608]">
+      <main className="relative flex flex-col bg-[#070814]">
         {/* Act I: Cybernetic Hero & Live Telemetry Control Plane */}
         <SaroshHero />
 

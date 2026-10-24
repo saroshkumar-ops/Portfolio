@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X, Sparkles } from "lucide-react";
 import { useLenis } from "@/components/ScrollProvider";
 
 const NAV_LINKS = [
@@ -66,19 +66,19 @@ export default function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-4 z-50 px-4 sm:top-6 sm:px-6 md:px-8">
-      <div className="mx-auto flex max-w-5xl items-center justify-between rounded-full border border-white/10 bg-ink-soft/80 px-4 py-2.5 shadow-2xl shadow-black/60 backdrop-blur-xl sm:px-6">
+      <div className="mx-auto flex max-w-5xl items-center justify-between rounded-full border border-white/15 bg-[#090b1e]/80 px-4 py-2.5 shadow-[0_8px_32px_rgba(99,102,241,0.2)] backdrop-blur-2xl sm:px-6">
         {/* Brand / Logo */}
         <a
           href="#top"
           onClick={(e) => handleNavClick(e, "#top")}
-          className="group flex items-center gap-2.5 text-xs font-semibold tracking-wider uppercase text-paper transition-colors"
+          className="group flex items-center gap-2.5 text-xs font-semibold tracking-wider uppercase text-white transition-colors"
           data-cursor="hover"
         >
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-mint opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-mint" />
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-80" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00f0ff]" />
           </span>
-          <span className="font-mono tracking-tight font-bold">SAROSH KUMAR</span>
+          <span className="font-mono tracking-wider font-bold">SAROSH KUMAR</span>
         </a>
 
         {/* Desktop Nav Items */}
@@ -90,15 +90,15 @@ export default function Navbar() {
                 key={link.label}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className={`relative px-3.5 py-1.5 font-mono text-xs font-medium tracking-wide transition-colors ${
-                  isActive ? "text-white font-bold" : "text-paper-muted hover:text-paper"
+                className={`relative px-4 py-1.5 font-mono text-xs font-medium tracking-wide transition-colors ${
+                  isActive ? "text-cyan-300 font-bold" : "text-slate-400 hover:text-white"
                 }`}
                 data-cursor="hover"
               >
                 {isActive && (
                   <motion.span
                     layoutId="navbar-active-pill"
-                    className="absolute inset-0 rounded-full bg-white/10 border border-white/15"
+                    className="absolute inset-0 rounded-full border border-cyan-400/40 bg-gradient-to-r from-cyan-500/20 via-indigo-500/20 to-fuchsia-500/20 shadow-[0_0_15px_rgba(0,240,255,0.2)]"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -110,15 +110,15 @@ export default function Navbar() {
 
         {/* Right Info: Live Time & CTA */}
         <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-paper-subtle border-r border-white/10 pr-4">
-            <span className="text-accent-mint">●</span>
+          <div className="hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-slate-400 border-r border-white/10 pr-4">
+            <span className="text-emerald-400">●</span>
             <span>{timeString || "00:00:00 IST"}</span>
           </div>
 
           <a
             href="#contact"
             onClick={(e) => handleNavClick(e, "#contact")}
-            className="group hidden sm:flex items-center gap-1.5 rounded-full bg-accent-mint px-4 py-1.5 font-mono text-xs font-bold text-black transition-transform duration-300 hover:scale-105 active:scale-95"
+            className="group hidden sm:flex items-center gap-1.5 rounded-full bg-gradient-to-r from-cyan-400 via-indigo-500 to-fuchsia-500 px-4 py-1.5 font-mono text-xs font-bold text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all duration-300 hover:scale-105 active:scale-95"
             data-cursor="hover"
           >
             <span>Let&apos;s Talk</span>
@@ -127,7 +127,7 @@ export default function Navbar() {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex items-center justify-center rounded-full p-1.5 text-paper-muted hover:text-white md:hidden"
+            className="flex items-center justify-center rounded-full p-1.5 text-slate-400 hover:text-white md:hidden"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -135,36 +135,39 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* Mobile Drawer Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="mx-auto mt-2 max-w-sm rounded-2xl border border-white/10 bg-ink-card/95 p-4 shadow-2xl backdrop-blur-2xl md:hidden"
+            className="mt-2 overflow-hidden rounded-3xl border border-white/15 bg-[#090b1e]/95 p-6 shadow-2xl backdrop-blur-2xl md:hidden"
           >
-            <div className="flex flex-col gap-2 font-mono">
-              {NAV_LINKS.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className="rounded-lg px-4 py-2.5 text-xs uppercase font-medium text-paper hover:bg-white/5 transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
-              <div className="mt-2 border-t border-white/10 pt-3 flex items-center justify-between text-xs text-paper-muted">
-                <span className="font-mono">{timeString}</span>
-                <a
-                  href="#contact"
-                  onClick={(e) => handleNavClick(e, "#contact")}
-                  className="font-semibold text-accent-mint"
-                >
-                  Get in touch →
-                </a>
-              </div>
+            <nav className="flex flex-col gap-2">
+              {NAV_LINKS.map((link) => {
+                const isActive = activeSection === link.href.replace("#", "");
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className={`flex items-center justify-between rounded-xl px-4 py-3 font-mono text-sm uppercase tracking-wider transition-colors ${
+                      isActive
+                        ? "bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 font-bold text-cyan-300 border border-cyan-400/30"
+                        : "text-slate-300 hover:bg-white/5"
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                    <ArrowUpRight className="h-4 w-4 opacity-50" />
+                  </a>
+                );
+              })}
+            </nav>
+
+            <div className="mt-6 border-t border-white/10 pt-4 font-mono text-xs text-slate-400">
+              <p>India Standard Time: {timeString}</p>
             </div>
           </motion.div>
         )}

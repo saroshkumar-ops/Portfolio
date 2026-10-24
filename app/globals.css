@@ -1,46 +1,65 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter+Tight:ital,wght@0,700;1,700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter+Tight:ital,wght@0,700;1,700&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  --ink: #000000;
-  --ink-soft: #08080a;
-  --ink-card: #0c0d10;
-  --ink-card-hover: #121318;
-  --paper: #f4f5f7;
-  --paper-muted: #8e95a2;
-  --paper-subtle: #4e5360;
-  --accent-mint: #00ffb2;
-  --accent-cyan: #00d2ff;
-  --accent-purple: #9d4edd;
-  --accent-amber: #f5a623;
+  --canvas: #070814;
+  --canvas-subtle: #0d0f22;
+  --canvas-card: #12152b;
+  --canvas-card-hover: #191e3d;
+  
+  --ink: #070814;
+  --ink-soft: #0c0e1e;
+  --ink-card: #12152b;
+  --ink-card-hover: #1a1e3b;
+  
+  --paper: #f8fafc;
+  --paper-muted: #94a3b8;
+  --paper-subtle: #64748b;
+  
+  --chroma-cyan: #00f0ff;
+  --chroma-indigo: #6366f1;
+  --chroma-violet: #8b5cf6;
+  --chroma-fuchsia: #d946ef;
+  --chroma-rose: #f43f5e;
+  --chroma-amber: #f59e0b;
+  --chroma-emerald: #10b981;
+  --chroma-mint: #00ffb2;
 }
 
 @theme inline {
+  --color-canvas: var(--canvas);
+  --color-canvas-subtle: var(--canvas-subtle);
+  --color-canvas-card: var(--canvas-card);
+  --color-canvas-card-hover: var(--canvas-card-hover);
+  
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-ink-card: var(--ink-card);
   --color-ink-card-hover: var(--ink-card-hover);
+  
   --color-paper: var(--paper);
   --color-paper-muted: var(--paper-muted);
   --color-paper-subtle: var(--paper-subtle);
-  --color-accent-mint: var(--accent-mint);
-  --color-accent-cyan: var(--accent-cyan);
-  --color-accent-purple: var(--accent-purple);
-  --color-accent-amber: var(--accent-amber);
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  
+  --color-accent-mint: var(--chroma-mint);
+  --color-accent-cyan: var(--chroma-cyan);
+  --color-accent-purple: var(--chroma-violet);
+  --color-accent-amber: var(--chroma-amber);
+  
+  --font-sans: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 html {
   scroll-behavior: auto;
   overflow-x: hidden;
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #070814;
+  color: #f8fafc;
 }
 
 body {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #070814;
+  color: #f8fafc;
   overscroll-behavior: none;
   overflow-x: hidden;
   font-family: var(--font-sans);
@@ -58,31 +77,31 @@ html.lenis body {
   overflow: hidden;
 }
 
-/* Selection */
+/* Vibrant Selection */
 ::selection {
-  background-color: #00ffb2;
-  color: #000000;
+  background-color: #6366f1;
+  color: #ffffff;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #070814;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, #6366f1, #00f0ff);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00ffb2;
+  background: linear-gradient(180deg, #d946ef, #00ffb2);
 }
 
-/* Hide native cursor on desktop fine-pointer devices */
+/* Hide native cursor on desktop fine-pointer devices if active */
 @media (hover: hover) and (pointer: fine) {
   body.has-custom-cursor,
   body.has-custom-cursor a,
@@ -92,39 +111,68 @@ html.lenis body {
   }
 }
 
-/* Star Border Rotating Glow (Signature Amogh Kini Pattern) */
-@keyframes star-rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* Floating Aurora Mesh Animations */
+@keyframes aurora-1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(60px, -40px) scale(1.15);
+  }
+  66% {
+    transform: translate(-40px, 30px) scale(0.92);
+  }
 }
 
-.star-border-container {
-  display: inline-block;
-  position: relative;
-  border-radius: 9999px;
-  overflow: hidden;
-  padding: 1.5px;
+@keyframes aurora-2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-50px, 45px) scale(1.1);
+  }
+  66% {
+    transform: translate(40px, -30px) scale(0.95);
+  }
 }
 
-.border-gradient-full {
-  position: absolute;
-  width: 250%;
-  height: 250%;
-  top: -75%;
-  left: -75%;
-  z-index: 0;
-  animation: star-rotate 5s linear infinite;
-  background: conic-gradient(from 0deg, transparent 0 320deg, #00ffb2 345deg, #00d2ff 360deg);
-  filter: blur(4px);
+@keyframes aurora-3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(30px, 35px) scale(1.2);
+  }
 }
 
-.inner-content {
-  position: relative;
-  background: #000000;
-  border-radius: 9999px;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+.animate-aurora-1 {
+  animation: aurora-1 18s ease-in-out infinite;
+}
+
+.animate-aurora-2 {
+  animation: aurora-2 22s ease-in-out infinite;
+}
+
+.animate-aurora-3 {
+  animation: aurora-3 15s ease-in-out infinite;
+}
+
+/* Gradient text shimmer */
+@keyframes gradient-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-shimmer {
+  background-size: 200% auto;
+  animation: gradient-shimmer 6s linear infinite;
 }
 
 /* Infinite Marquee Scroll */
@@ -142,20 +190,6 @@ html.lenis body {
 
 .animate-marquee:hover {
   animation-play-state: paused;
-}
-
-/* Subtle Film Grain */
-@keyframes grain-shift {
-  0%, 100% { transform: translate(0, 0); }
-  10% { transform: translate(-1%, -2%); }
-  30% { transform: translate(2%, 1%); }
-  50% { transform: translate(-2%, 2%); }
-  70% { transform: translate(1%, -1%); }
-  90% { transform: translate(-1%, 1%); }
-}
-
-.animate-grain-shift {
-  animation: grain-shift 1.2s steps(4) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

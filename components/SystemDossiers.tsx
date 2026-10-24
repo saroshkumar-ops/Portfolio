@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Terminal, X, Check, Code2, Cpu, Shield, Layers } from "lucide-react";
+import { ArrowUpRight, Terminal, X, Check, Code2, Cpu, Shield, Layers, Radio, Sparkles } from "lucide-react";
 import { SiGithub } from "react-icons/si";
 
 interface SystemDossier {
@@ -20,6 +20,8 @@ interface SystemDossier {
   githubUrl: string;
   image: string;
   accent: string;
+  accentGlow: string;
+  gradient: string;
 }
 
 const SYSTEMS: SystemDossier[] = [
@@ -48,6 +50,8 @@ const SYSTEMS: SystemDossier[] = [
     githubUrl: "https://github.com/saroshkumar-ops",
     image: "/Projects/img_00015.jpg",
     accent: "#00f0ff",
+    accentGlow: "rgba(0, 240, 255, 0.25)",
+    gradient: "from-cyan-500/20 via-blue-500/10 to-transparent",
   },
   {
     id: "context-engine",
@@ -74,6 +78,8 @@ const SYSTEMS: SystemDossier[] = [
     githubUrl: "https://github.com/saroshkumar-ops",
     image: "/Projects/img_00030.jpg",
     accent: "#00ffb2",
+    accentGlow: "rgba(0, 255, 178, 0.25)",
+    gradient: "from-emerald-500/20 via-teal-500/10 to-transparent",
   },
   {
     id: "gesture-scroll",
@@ -98,24 +104,26 @@ const SYSTEMS: SystemDossier[] = [
       "[DISPATCH] PostMessage dispatched to secondary window. Focus untouched.",
     ],
     githubUrl: "https://github.com/saroshkumar-ops",
-    image: "/Projects/img_00045.jpg",
-    accent: "#9d4edd",
+    image: "/Projects/img_00007.jpg",
+    accent: "#f43f5e",
+    accentGlow: "rgba(244, 63, 94, 0.25)",
+    gradient: "from-rose-500/20 via-purple-500/10 to-transparent",
   },
   {
-    id: "bharat-auto",
+    id: "bharatauto",
     code: "SYS-04",
-    name: "BHARAT AUTO",
-    role: "Industrial IoT & Multi-Agent Operations",
+    name: "BHARATAUTO INDUSTRIAL DISPATCH",
+    role: "Autonomous Manufacturing Dispatch & Telemetry",
     summary:
-      "Manufacturing plant ops console streaming 12-machine CNC telemetry into 3 ML risk models with automated Twilio voice escalations. 5 collaborating LLM agents continuously evaluate machine drift and dispatch automated alerts directly to plant floor managers.",
+      "Real-time industrial IoT monitoring system engineered for MSME machining facilities. Ingests current, vibration, and thermal sensor payloads via MQTT, evaluates downtime anomalies via LangGraph agent workflows, and initiates emergency automated telephone alerts.",
     architecture: [
-      "Distributed microservices: Spring Boot handles sensor gateway; FastAPI manages ML risk evaluations.",
-      "5 autonomous agents (Maintenance, Production, Supply Chain, Orchestrator, Supervisor).",
-      "Twilio Voice API integration escalates emergency thermal shutdowns directly via synthesized telephone calls.",
+      "Low-overhead MQTT broker aggregates CNC sensor payloads with sub-50ms ingestion latency.",
+      "LangGraph agent orchestrator models escalation policies based on historic failure patterns.",
+      "Twilio Voice API integration dispatches automated real-time voice calls to plant supervisors.",
     ],
-    metrics: ["5s Telemetry Loop", "5 Cooperating Agents", "Direct Voice Escalation"],
-    stack: ["Next.js", "Spring Boot", "FastAPI", "PostgreSQL", "LLaMA-3.3-70B", "Twilio"],
-    command: "curl -X POST https://api.bharatauto.io/telemetry/simulate",
+    metrics: ["Sub-50ms Ingestion", "Autonomous Phone Triage", "Production Tested"],
+    stack: ["FastAPI", "MQTT", "LangGraph", "Twilio API", "PostgreSQL", "Next.js"],
+    command: "curl -X POST https://api.bharatauto.internal/telemetry/evaluate",
     terminalLogs: [
       "HTTP/1.1 200 OK | Content-Type: application/json",
       "{ 'machine_id': 'CNC-08', 'temperature': '94.2C', 'risk_score': 0.89 }",
@@ -124,13 +132,15 @@ const SYSTEMS: SystemDossier[] = [
       "[TWILIO_CLIENT] Call connected. Audio: 'Warning: Machine 8 thermal overload.'",
     ],
     githubUrl: "https://github.com/saroshkumar-ops",
-    image: "/Projects/img_00060.jpg",
-    accent: "#f5a623",
+    image: "/Projects/img_00020.jpg",
+    accent: "#f59e0b",
+    accentGlow: "rgba(245, 158, 11, 0.25)",
+    gradient: "from-amber-500/20 via-orange-500/10 to-transparent",
   },
   {
     id: "listny",
     code: "SYS-05",
-    name: "LISTNY",
+    name: "LISTNY ACOUSTIC STREAMER",
     role: "Desktop Acoustic Streamer & Fingerprinter",
     summary:
       "Native Linux desktop utility capturing raw audio output directly from PulseAudio/PipeWire monitor sinks, generating Shazam-compatible acoustic fingerprints without commercial API keys, and auto-fetching synchronized Genius lyrics in real time.",
@@ -150,8 +160,10 @@ const SYSTEMS: SystemDossier[] = [
       "[UI] Lyric viewport updated. Local Gemma generating track background insights...",
     ],
     githubUrl: "https://github.com/saroshkumar-ops",
-    image: "/Projects/img_00070.jpg",
-    accent: "#ff007f",
+    image: "/Projects/img_00025.jpg",
+    accent: "#d946ef",
+    accentGlow: "rgba(217, 70, 239, 0.25)",
+    gradient: "from-fuchsia-500/20 via-violet-500/10 to-transparent",
   },
 ];
 
@@ -167,22 +179,34 @@ export default function SystemDossiers() {
   }, []);
 
   return (
-    <section id="projects" className="relative px-6 py-28 sm:px-10 md:px-16 lg:px-24 bg-[#050608] border-t border-white/10 select-none">
-      <div className="mx-auto max-w-7xl">
+    <section id="projects" className="relative px-6 py-28 sm:px-10 md:px-16 lg:px-24 bg-[#070814] border-t border-white/10 select-none overflow-hidden">
+      {/* Chromatic ambient glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-1/4 right-0 h-[600px] w-[600px] rounded-full bg-gradient-to-l from-indigo-600/15 via-violet-600/10 to-transparent blur-[140px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-1/4 left-0 h-[500px] w-[500px] rounded-full bg-gradient-to-r from-cyan-600/15 via-blue-600/10 to-transparent blur-[130px]"
+      />
+
+      <div className="mx-auto max-w-7xl relative z-10">
         {/* Section Header */}
         <div className="mb-20 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[#00f0ff]">
-              <span>02</span>
-              <span className="text-white/20">{"//"}</span>
-              <span>ENGINEERED BLUEPRINTS</span>
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-500/10 px-3.5 py-1 font-mono text-xs uppercase tracking-widest text-cyan-300 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+              <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+              <span>02 // ENGINEERED BLUEPRINTS</span>
             </div>
             <h2 className="mt-3 font-sans text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white">
-              System Dossiers
+              System{" "}
+              <span className="bg-gradient-to-r from-cyan-300 via-indigo-300 to-fuchsia-300 bg-clip-text text-transparent">
+                Dossiers
+              </span>
             </h2>
           </div>
 
-          <p className="max-w-md font-mono text-xs uppercase tracking-wider text-paper-muted">
+          <p className="max-w-md font-mono text-xs uppercase tracking-wider text-slate-400">
             Deterministic architectures built for latency, privacy, and low-level OS automation.
           </p>
         </div>
@@ -192,15 +216,35 @@ export default function SystemDossiers() {
           {SYSTEMS.map((system) => (
             <div
               key={system.id}
-              className="group relative overflow-hidden rounded-3xl border border-white/10 bg-[#0c0d12] p-8 sm:p-10 transition-all duration-500 hover:border-white/30 hover:bg-[#10121a]"
+              className="group relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.05] via-[#0d1020]/90 to-[#070814] p-8 sm:p-10 transition-all duration-500 hover:border-white/30 backdrop-blur-xl"
+              style={{
+                boxShadow: `0 0 0 1px rgba(255, 255, 255, 0.05), 0 20px 50px rgba(0, 0, 0, 0.6)`,
+              }}
             >
+              {/* Dynamic Accent Color Glow Top Rim */}
+              <div
+                className="absolute inset-x-0 top-0 h-[2px] opacity-70 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                  background: `linear-gradient(90deg, transparent, ${system.accent}, transparent)`,
+                  boxShadow: `0 0 20px ${system.accent}`,
+                }}
+              />
+
               {/* Dossier Top Banner */}
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6 mb-8">
                 <div className="flex items-center gap-4">
-                  <span className="rounded-md border border-[#00f0ff]/30 bg-[#00f0ff]/10 px-2.5 py-1 font-mono text-xs font-bold text-[#00f0ff]">
+                  <span
+                    className="rounded-lg border px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider"
+                    style={{
+                      borderColor: `${system.accent}50`,
+                      backgroundColor: `${system.accent}15`,
+                      color: system.accent,
+                      boxShadow: `0 0 15px ${system.accent}25`,
+                    }}
+                  >
                     {system.code}
                   </span>
-                  <span className="font-mono text-xs text-paper-subtle uppercase tracking-wider">
+                  <span className="font-mono text-xs text-slate-400 uppercase tracking-wider">
                     {system.role}
                   </span>
                 </div>
@@ -209,7 +253,7 @@ export default function SystemDossiers() {
                   {system.metrics.map((m) => (
                     <span
                       key={m}
-                      className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 font-mono text-[10px] text-white/80"
+                      className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[10px] text-slate-200"
                     >
                       {m}
                     </span>
@@ -221,30 +265,35 @@ export default function SystemDossiers() {
               <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center">
                 {/* Left: Summary & Architecture (7 cols) */}
                 <div className="lg:col-span-7 space-y-6">
-                  <h3 className="font-sans text-2xl sm:text-3xl md:text-4xl font-extrabold uppercase tracking-tight text-white group-hover:text-[#00f0ff] transition-colors">
+                  <h3
+                    className="font-sans text-2xl sm:text-3xl md:text-4xl font-extrabold uppercase tracking-tight text-white transition-colors duration-300"
+                  >
                     {system.name}
                   </h3>
 
-                  <p className="text-base sm:text-lg text-paper-muted leading-relaxed font-light">
+                  <p className="text-base sm:text-lg text-slate-300 leading-relaxed font-light">
                     {system.summary}
                   </p>
 
                   {/* Key Pillars */}
-                  <div className="space-y-2.5 rounded-2xl border border-white/5 bg-black/40 p-5 font-mono text-xs text-paper-muted">
+                  <div className="space-y-2.5 rounded-2xl border border-white/10 bg-black/40 p-5 font-mono text-xs text-slate-300">
                     {system.architecture.map((arch, idx) => (
                       <div key={idx} className="flex items-start gap-2.5">
-                        <Check className="h-4 w-4 shrink-0 text-[#00f0ff] mt-0.5" />
+                        <Check
+                          className="h-4 w-4 shrink-0 mt-0.5"
+                          style={{ color: system.accent }}
+                        />
                         <span className="leading-snug">{arch}</span>
                       </div>
                     ))}
                   </div>
 
-                  {/* Stack Pills */}
+                  {/* Stack Pills with colored badges */}
                   <div className="flex flex-wrap gap-2 pt-2">
                     {system.stack.map((item) => (
                       <span
                         key={item}
-                        className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[11px] text-white/90"
+                        className="rounded-full border border-white/10 bg-white/[0.05] px-3.5 py-1 font-mono text-[11px] text-white/90 hover:border-white/30 transition-colors"
                       >
                         {item}
                       </span>
@@ -255,52 +304,81 @@ export default function SystemDossiers() {
                   <div className="flex flex-wrap items-center gap-4 pt-4">
                     <button
                       onClick={() => setActiveDossier(system)}
-                      className="group/btn flex items-center gap-2 rounded-full bg-white px-5 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-black transition-all hover:bg-[#00f0ff] hover:scale-105 active:scale-95"
+                      className="group/btn flex items-center gap-2 rounded-full px-6 py-3 font-mono text-xs font-bold uppercase tracking-wider text-black transition-all hover:scale-105 active:scale-95 shadow-lg"
+                      style={{
+                        backgroundColor: system.accent,
+                        boxShadow: `0 0 25px ${system.accentGlow}`,
+                      }}
                       data-cursor="hover"
                     >
-                      <Terminal className="h-3.5 w-3.5" />
+                      <Terminal className="h-4 w-4" />
                       <span>Inspect Runbook</span>
-                      <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+                      <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
                     </button>
 
                     <a
                       href={system.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2.5 font-mono text-xs font-semibold text-paper hover:bg-white/10 transition-colors"
+                      className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-3 font-mono text-xs text-slate-300 transition-all hover:border-white/40 hover:bg-white/10 hover:text-white"
                       data-cursor="hover"
                     >
-                      <SiGithub className="h-3.5 w-3.5" />
-                      <span>Source</span>
+                      <SiGithub className="h-4 w-4" />
+                      <span>Source Blueprint</span>
                     </a>
                   </div>
                 </div>
 
-                {/* Right: Simulated Terminal Frame (5 cols) */}
+                {/* Right: Simulated Live Terminal Runbook (5 cols) */}
                 <div className="lg:col-span-5">
-                  <div className="overflow-hidden rounded-2xl border border-white/15 bg-black/90 shadow-2xl">
-                    <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-4 py-2.5 font-mono text-[11px] text-paper-subtle">
+                  <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-[#090b16] shadow-2xl">
+                    {/* Terminal Top Chrome */}
+                    <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                        <span className="text-paper-muted">$ {system.command}</span>
+                        <span className="h-3 w-3 rounded-full bg-[#f43f5e]" />
+                        <span className="h-3 w-3 rounded-full bg-[#f59e0b]" />
+                        <span className="h-3 w-3 rounded-full bg-[#10b981]" />
                       </div>
-                      <span className="text-[10px] text-[#00f0ff]">ONLINE</span>
+                      <span className="font-mono text-[10px] text-slate-400">
+                        {system.id}.sh — zsh
+                      </span>
+                      <span
+                        className="h-2 w-2 rounded-full animate-pulse"
+                        style={{ backgroundColor: system.accent }}
+                      />
                     </div>
 
-                    <div className="p-4 font-mono text-[11px] text-paper-muted space-y-1.5">
-                      {system.terminalLogs.map((line, idx) => (
-                        <p key={idx} className="leading-snug">
-                          <span className="text-white/30 mr-2">&gt;</span>
-                          <span className={idx === system.terminalLogs.length - 1 ? "text-[#00f0ff] font-semibold" : ""}>
-                            {line}
-                          </span>
-                        </p>
-                      ))}
-                    </div>
+                    {/* Terminal Body */}
+                    <div className="p-5 font-mono text-xs space-y-3">
+                      <div className="flex items-center gap-2" style={{ color: system.accent }}>
+                        <span className="text-white/40">$</span>
+                        <span className="font-semibold">{system.command}</span>
+                      </div>
 
-                    <div className="flex items-center justify-between border-t border-white/5 bg-white/[0.01] px-4 py-2 font-mono text-[10px] text-paper-subtle">
-                      <span>STATUS: EXIT 0</span>
-                      <span className="text-emerald-400 font-semibold">{system.metrics[0]}</span>
+                      <div className="space-y-1.5 text-slate-400 text-[11px] border-t border-white/5 pt-3">
+                        {system.terminalLogs.map((log, i) => (
+                          <div key={i} className="leading-relaxed">
+                            {log.startsWith("[") ? (
+                              <>
+                                <span style={{ color: system.accent }} className="font-semibold">
+                                  {log.slice(0, log.indexOf("]") + 1)}
+                                </span>{" "}
+                                <span className="text-slate-300">{log.slice(log.indexOf("]") + 1)}</span>
+                              </>
+                            ) : (
+                              <span className="text-slate-300">{log}</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="pt-2 flex items-center justify-between text-[10px] text-slate-400 border-t border-white/5">
+                        <span className="flex items-center gap-1.5">
+                          <Radio className="h-3 w-3 text-emerald-400 animate-pulse" />
+                          <span>PIPELINE HEALTHY</span>
+                        </span>
+                        <span className="font-mono uppercase text-slate-400">P95 ~ 124ms</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -310,100 +388,119 @@ export default function SystemDossiers() {
         </div>
       </div>
 
-      {/* Interactive Terminal Inspection Modal */}
+      {/* ── Slide-Over Modal Dossier Detail ── */}
       <AnimatePresence>
         {activeDossier && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10">
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setActiveDossier(null)}
-              className="absolute inset-0 bg-black/85 backdrop-blur-md"
+              className="absolute inset-0 bg-black/80 backdrop-blur-xl"
             />
 
+            {/* Modal Card */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ type: "spring", stiffness: 350, damping: 30 }}
-              className="relative z-10 max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-white/20 bg-[#0c0d12] p-6 shadow-2xl sm:p-8 md:p-10"
+              transition={{ duration: 0.3 }}
+              className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-white/20 bg-[#0a0c1a] p-6 sm:p-8 md:p-10 text-white shadow-2xl"
+              style={{
+                boxShadow: `0 0 60px ${activeDossier.accentGlow}`,
+              }}
             >
-              <div className="flex items-center justify-between border-b border-white/10 pb-6">
+              {/* Header */}
+              <div className="flex items-start justify-between border-b border-white/10 pb-6">
                 <div>
-                  <span className="font-mono text-xs font-semibold text-[#00f0ff] uppercase">
-                    SYSTEM RUNBOOK // {activeDossier.code}
-                  </span>
-                  <h3 className="mt-1 font-sans text-2xl sm:text-3xl font-black uppercase text-white">
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="rounded-md border px-2.5 py-0.5 font-mono text-xs font-bold"
+                      style={{
+                        borderColor: `${activeDossier.accent}50`,
+                        backgroundColor: `${activeDossier.accent}20`,
+                        color: activeDossier.accent,
+                      }}
+                    >
+                      {activeDossier.code}
+                    </span>
+                    <span className="font-mono text-xs uppercase tracking-wider text-slate-400">
+                      {activeDossier.role}
+                    </span>
+                  </div>
+                  <h3 className="mt-2 font-sans text-2xl sm:text-3xl font-black uppercase text-white">
                     {activeDossier.name}
                   </h3>
                 </div>
 
                 <button
                   onClick={() => setActiveDossier(null)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-paper-muted hover:bg-white/10 hover:text-white transition-colors"
+                  className="rounded-full border border-white/10 bg-white/5 p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
-              <div className="mt-6 space-y-6">
+              {/* Modal Body */}
+              <div className="space-y-6 pt-6 font-mono text-xs">
                 <div>
-                  <h4 className="font-mono text-xs uppercase tracking-wider text-paper-subtle">
-                    [ Engineering Architecture ]
-                  </h4>
-                  <p className="mt-2 text-base text-paper leading-relaxed font-light">
+                  <h4 className="font-bold text-white uppercase tracking-wider mb-2">Summary</h4>
+                  <p className="font-sans text-sm text-slate-300 leading-relaxed">
                     {activeDossier.summary}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {activeDossier.metrics.map((m, idx) => (
-                    <div key={idx} className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-center">
-                      <span className="font-mono text-xs font-bold text-[#00f0ff]">{m}</span>
-                    </div>
-                  ))}
+                <div>
+                  <h4 className="font-bold text-white uppercase tracking-wider mb-3">
+                    Architectural Tenets
+                  </h4>
+                  <ul className="space-y-2">
+                    {activeDossier.architecture.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-slate-300">
+                        <Check
+                          className="h-4 w-4 shrink-0 mt-0.5"
+                          style={{ color: activeDossier.accent }}
+                        />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2 rounded-t-xl border border-b-0 border-white/10 bg-black/60 px-4 py-2 font-mono text-xs text-paper-muted">
-                    <Terminal className="h-3.5 w-3.5 text-[#00f0ff]" />
-                    <span>bash ~ {activeDossier.command}</span>
-                  </div>
-                  <div className="rounded-b-xl border border-white/10 bg-black/90 p-4 font-mono text-xs text-paper-muted space-y-1">
-                    {activeDossier.terminalLogs.map((line, idx) => (
-                      <p key={idx} className="text-[11px] leading-relaxed">
-                        <span className="text-white/30 mr-2">&gt;</span>
-                        <span className={idx === activeDossier.terminalLogs.length - 1 ? "text-[#00f0ff] font-semibold" : ""}>
-                          {line}
-                        </span>
-                      </p>
+                  <h4 className="font-bold text-white uppercase tracking-wider mb-3">
+                    Verified Execution Log
+                  </h4>
+                  <div className="rounded-2xl border border-white/10 bg-black/60 p-4 font-mono text-[11px] space-y-2 text-slate-300">
+                    <div style={{ color: activeDossier.accent }}>$ {activeDossier.command}</div>
+                    {activeDossier.terminalLogs.map((log, i) => (
+                      <div key={i} className="text-slate-400">
+                        {log}
+                      </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between border-t border-white/10 pt-6">
-                  <div className="flex flex-wrap gap-2">
-                    {activeDossier.stack.map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-xs text-paper"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between">
                   <a
                     href={activeDossier.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-full bg-white px-5 py-2 font-mono text-xs font-bold text-black hover:bg-[#00f0ff] transition-colors"
+                    className="flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-white hover:bg-white/10 transition-colors"
                   >
                     <SiGithub className="h-4 w-4" />
-                    <span>View GitHub</span>
-                    <ArrowUpRight className="h-3.5 w-3.5" />
+                    <span>View Repository</span>
                   </a>
+
+                  <button
+                    onClick={() => setActiveDossier(null)}
+                    className="rounded-full px-5 py-2.5 font-bold text-black"
+                    style={{ backgroundColor: activeDossier.accent }}
+                  >
+                    Done
+                  </button>
                 </div>
               </div>
             </motion.div>
