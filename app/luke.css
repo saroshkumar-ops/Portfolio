@@ -1248,21 +1248,49 @@ a.chr-hover {
 }
 
 .skill-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.skill-group.open .skill-body {
+  grid-template-rows: 1fr;
+}
+
+.skill-body-wrapper {
   overflow: hidden;
-  height: 0;
 }
 
 .skill-body-inner {
   list-style: none;
-  padding: 0 0 1.6rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 0.85rem;
+  align-items: center;
+  padding: 0.4rem 0 2rem 0;
   margin: 0;
 }
 
 .skill-body-inner li {
   font-family: 'Breton', sans-serif;
-  font-size: clamp(1rem, 1.3vw, 1.2rem);
-  line-height: 2.2;
-  color: rgba(255, 255, 255, 0.45);
+  font-size: clamp(0.85rem, 1.1vw, 1.05rem);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 0.4em 1em;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50px;
+  line-height: 1.3;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+  user-select: none;
+  cursor: default;
+}
+
+.skill-body-inner li:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 
