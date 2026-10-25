@@ -8,92 +8,118 @@ import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Project dossiers mapped to Luke Baffait's project detail modal schema
-const PROJECTS_DATA: Record<
-  string,
-  {
-    title: string;
-    year: string;
-    desc: string;
-    tags: string[];
-    link: string;
-    cover: string;
-  }
-> = {
+interface ProjectItem {
+  id: string;
+  title: string;
+  year: string;
+  desc: string;
+  tags: string[];
+  link?: string;
+  cover: string;
+  images: string[];
+}
+
+const PROJECTS_MAP: Record<string, ProjectItem> = {
   "voice-integrity": {
+    id: "voice-integrity",
     title: "Voice Integrity",
     year: "03 2026",
     desc: "Real-time deepfake voice detection engine. Engineered 7,000 Hz low-pass parity gate to eliminate resampler spectral bias. Ensembled LFCC-LCNN and WavLM Base+ logits via Platt scaling and EMA smoothing, achieving 91.5% zero-day recall at 1.7% false alarm rate across 25 unseen generators. Sub-250ms streaming FastAPI WebSocket pipeline with RMS Voice Activity Detection.",
     tags: ["PyTorch", "WavLM", "LFCC-LCNN", "FastAPI", "WebSockets", "Hugging Face"],
     link: "https://voicenow.vercel.app/",
     cover: "/About/img_00001.jpg",
+    images: ["/About/img_00001.jpg", "/About/img_00002.jpg", "/About/img_00003.jpg"],
   },
   "exoterra": {
+    id: "exoterra",
     title: "ExoTerra",
     year: "01 2026",
     desc: "NASA exoplanet characterization and discovery engine. Ingested and cached 5,800+ confirmed exoplanets via NASA's TAP API with Chen & Kipping empirical mass-radius relations and Stefan-Boltzmann flux modeling. Implemented Kopparapu Habitable Zone polynomial boundaries and Earth Similarity Index. 3D PCA capturing 89.2% cosmological variance.",
     tags: ["Python", "Scikit-Learn", "NASA TAP API", "Streamlit", "NumPy", "Pandas"],
     link: "https://github.com/saroshkumar-ops/NASA-Exoplanet-Engine",
     cover: "/About/img_00010.jpg",
+    images: ["/About/img_00010.jpg", "/About/img_00011.jpg", "/About/img_00012.jpg"],
   },
   "aqi-forecaster": {
+    id: "aqi-forecaster",
     title: "Air Quality Forecasting",
     year: "11 2025",
     desc: "Autoregressive 24-hour AQI predictive and heuristic source attribution engine using recursive XGBoost on 3-year OpenAQ data benchmarked against Prophet. Computes dynamic emission breakdown (Traffic, Industry, Construction) using PM10/PM2.5 ratios, chemical markers (NO2, SO2), and wind vectors.",
     tags: ["Python", "XGBoost", "Prophet", "FastAPI", "OpenAQ", "Groq API"],
     link: "https://github.com/saroshkumar-ops",
     cover: "/About/img_00020.jpg",
+    images: ["/About/img_00020.jpg", "/About/img_00021.jpg", "/About/img_00022.jpg"],
   },
   "brainglobe": {
+    id: "brainglobe",
     title: "BrainGlobe (cellfinder)",
     year: "08 2025",
     desc: "Core contribution to computational neuroscience initiative. Enhanced production 3D image processing and classification pipelines in Python/PyTorch, optimizing tensor operations and multi-dimensional array evaluation for high-throughput brain slice analysis.",
     tags: ["Python", "PyTorch", "Computer Vision", "Neuroscience"],
     link: "https://github.com/brainglobe/cellfinder",
     cover: "/About/img_00030.jpg",
+    images: ["/About/img_00030.jpg", "/About/img_00031.jpg", "/About/img_00032.jpg"],
   },
   "neural-lam": {
+    id: "neural-lam",
     title: "ML-LAM (neural-lam)",
     year: "06 2025",
     desc: "Graph neural weather prediction framework. Worked on Graph Neural Network (GNN) architectures, message-passing layers, and distributed training utilities in PyTorch for high-resolution limited-area atmospheric modeling.",
     tags: ["PyTorch", "GNNs", "PyG", "Weather AI"],
     link: "https://github.com/saroshkumar-ops",
     cover: "/About/img_00040.jpg",
+    images: ["/About/img_00040.jpg", "/About/img_00041.jpg", "/About/img_00042.jpg"],
   },
   "deeplense": {
+    id: "deeplense",
     title: "ML4SCI (DeepLense)",
     year: "04 2025",
-    desc: "Deep learning for gravitational lensing and dark matter detection. Modernized Apple Silicon MPS device detection, resolved micro-AUROC metric calculations in transformer classification pipelines, and modernized scheduler parameters.",
+    desc: "Deep learning for gravitational lensing and dark matter detection. Modernized Apple Silicon MPS device detection, resolved micro-AUROC metric calculations in transformer classification pipelines, and cleaned deprecated scheduler parameters.",
     tags: ["PyTorch", "Transformers", "MPS Acceleration", "Astrophysics"],
     link: "https://github.com/saroshkumar-ops",
     cover: "/About/img_00050.jpg",
+    images: ["/About/img_00050.jpg", "/About/img_00051.jpg", "/About/img_00052.jpg"],
   },
 };
 
 export default function LukeBaffaitPortfolio() {
-  const { lenis } = useLenis();
-  const [activeProject, setActiveProject] = useState<string | null>(null);
-  const [openSkillsGroup, setOpenSkillsGroup] = useState<string>("dl");
+  const { lenis, scrollTo } = useLenis();
+  const [openGroup, setOpenGroup] = useState<string>("dl");
 
   useEffect(() => {
-    // 1. Build .chr-hover character split roll spans
-    document.querySelectorAll(".chr-hover[data-chr]").forEach((el) => {
-      const target = el as HTMLElement;
+    // =========================================================================
+    // 1. Character Roll Effect (.chr-hover)
+    // =========================================================================
+    const hoverEls = document.querySelectorAll<HTMLElement>(
+      ".chr-hover[data-chr], .chr-hover[data-chr-contact], .chr-hover[data-chr-footer]"
+    );
+    hoverEls.forEach((target) => {
       if (target.querySelector(".ch-wrap")) return;
-      const text = target.dataset.chr || "";
+      const text =
+        target.dataset.chr ||
+        target.getAttribute("data-chr-contact") ||
+        target.getAttribute("data-chr-footer") ||
+        "";
       target.innerHTML = "";
       [...text].forEach((ch, i) => {
+        if (ch === " ") {
+          const sp = document.createElement("span");
+          sp.style.cssText = "width:0.35em;display:inline-block;";
+          sp.innerHTML = "&nbsp;";
+          target.appendChild(sp);
+          return;
+        }
         const wrap = document.createElement("span");
         wrap.className = "ch-wrap";
         wrap.style.setProperty("--i", String(i));
 
         const top = document.createElement("span");
         top.className = "ch-top";
-        top.textContent = ch === " " ? "\u00A0" : ch;
+        top.textContent = ch;
 
         const bot = document.createElement("span");
         bot.className = "ch-bot";
-        bot.textContent = ch === " " ? "\u00A0" : ch;
+        bot.textContent = ch;
 
         wrap.appendChild(top);
         wrap.appendChild(bot);
@@ -101,339 +127,1147 @@ export default function LukeBaffaitPortfolio() {
       });
     });
 
-    // 2. Preloader & Name Layer Animation
-    const preloaderLogo = document.getElementById("preloader-logo");
-    const preloaderLuke = document.getElementById("preloader-luke");
-    const preloaderBaffait = document.getElementById("preloader-baffait");
-    const preloaderDot = document.getElementById("preloader-dot");
-    const transitionPanelDark = document.getElementById("t-panel-dark");
-    const transitionPanelRed = document.getElementById("t-panel-red");
+    // =========================================================================
+    // 2. Preloader & Name Split Helpers
+    // =========================================================================
+    const pContent = document.getElementById("preloader-content");
+    const pLogo = document.getElementById("preloader-logo");
+    const pLuke = document.getElementById("preloader-luke");
+    const pBaffait = document.getElementById("preloader-baffait");
+    const pDot = document.getElementById("preloader-dot");
+    const tPanelRed = document.getElementById("t-panel-red");
+    const tPanelDark = document.getElementById("t-panel-dark");
     const introBg = document.getElementById("intro-bg");
-    const nameLayer = document.getElementById("name-layer");
     const hero = document.getElementById("hero");
-    const heroTagline = document.getElementById("hero-tagline");
-    const heroBar = document.getElementById("hero-bar");
+    const nameLayer = document.getElementById("name-layer");
 
-    const introTl = gsap.timeline({ delay: 0.1 });
+    function splitIntoChars(el: HTMLElement | null): HTMLElement[] {
+      if (!el) return [];
+      const raw = el.textContent || "";
+      el.innerHTML = "";
+      const inners: HTMLElement[] = [];
+      raw.split("").forEach((ch) => {
+        const outer = document.createElement("span");
+        outer.style.cssText =
+          "display:inline-block;overflow:hidden;vertical-align:top;padding:0.15em 0.3em;margin:-0.15em -0.3em;";
+        const inner = document.createElement("span");
+        inner.className = "char";
+        inner.style.display = "inline-block";
+        inner.textContent = ch === " " ? "\u00A0" : ch;
+        outer.appendChild(inner);
+        el.appendChild(outer);
+        inners.push(inner);
+      });
+      return inners;
+    }
 
-    introTl
-      .fromTo(
-        preloaderLogo,
-        { scale: 0.8, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.6, ease: "power2.out" }
-      )
-      .fromTo(
-        [preloaderLuke, preloaderBaffait, preloaderDot],
-        { opacity: 0, x: -10 },
-        { opacity: 1, x: 0, duration: 0.6, stagger: 0.08, ease: "power2.out" },
-        "-=0.2"
-      )
+    const logoChar = splitIntoChars(pLogo);
+    const lukeChars = splitIntoChars(pLuke);
+    const baffaitChars = splitIntoChars(pBaffait);
+    const allRevealEls = [...logoChar, ...lukeChars, ...baffaitChars];
+
+    function getCharGap() {
+      if (!pBaffait) return 16;
+      return (parseFloat(getComputedStyle(pBaffait).fontSize) || 16) * 0.55;
+    }
+
+    function layoutNames() {
+      if (!pBaffait || !pLuke || !pDot) return;
+      const fs = parseFloat(getComputedStyle(pBaffait).fontSize);
+      if (!fs) return;
+      const baselineOffset = -0.06;
+
+      const lukeLeft = pLuke.offsetLeft;
+      const lukeWidth = pLuke.offsetWidth;
+      const gapPx = fs * 0.55;
+
+      const baffaitLeftPx = lukeLeft + lukeWidth + gapPx;
+      pBaffait.style.left = baffaitLeftPx / fs + "em";
+      pBaffait.style.top = baselineOffset + "em";
+
+      const dotLeftPx = baffaitLeftPx + pBaffait.offsetWidth;
+      pDot.style.left = dotLeftPx / fs + "em";
+      pDot.style.top = baselineOffset + "em";
+    }
+
+    function getTotalWidth() {
+      if (!pLogo || !pLuke || !pBaffait || !pDot) return 0;
+      return (
+        pLogo.offsetWidth +
+        pLuke.offsetWidth +
+        getCharGap() +
+        pBaffait.offsetWidth +
+        pDot.offsetWidth
+      );
+    }
+
+    function placeIntroNameAtBottom() {
+      if (!pContent || !pLogo) return;
+      layoutNames();
+      const totalW = getTotalWidth();
+      const offsetX = -(totalW / 2 - pLogo.offsetWidth / 2);
+      const vw = window.innerWidth;
+      const offsetX_vw = (offsetX / vw) * 100;
+      const newH = pContent.offsetHeight;
+      const vh = window.innerHeight;
+      const bottomPad = vw <= 768 ? Math.max(vh * 0.12, 80) : 80;
+      const targetBottom = vh - bottomPad;
+      const offsetY = targetBottom - newH / 2 - vh / 2;
+      gsap.set(pContent, {
+        x: `${offsetX_vw}vw`,
+        y: offsetY,
+        transformOrigin: "50% 50%",
+      });
+    }
+
+    layoutNames();
+    if (typeof document !== "undefined" && document.fonts) {
+      document.fonts.ready.then(() => {
+        layoutNames();
+        placeIntroNameAtBottom();
+      });
+    }
+
+    gsap.set([pLogo, pLuke, pBaffait], { opacity: 1 });
+    gsap.set(allRevealEls, { yPercent: 110 });
+    gsap.set(pDot, { opacity: 0 });
+    gsap.set([pContent, tPanelRed, tPanelDark], { willChange: "transform" });
+
+    // =========================================================================
+    // 3. Master Intro Sequence Timeline
+    // =========================================================================
+    const master = gsap.timeline({ delay: 0.2 });
+
+    master
+      .add(() => {
+        layoutNames();
+        if (pContent && pLogo) {
+          gsap.set(pContent, {
+            x: -(getTotalWidth() / 2 - pLogo.offsetWidth / 2),
+          });
+        }
+        if (pLuke) gsap.set(pLuke, { x: 0 });
+      })
+      .to(allRevealEls, {
+        yPercent: 0,
+        duration: 0.45,
+        ease: "power3.out",
+        stagger: { each: 0.025, from: "center" },
+      })
+      .add(() => layoutNames())
+      .to(pDot, {
+        opacity: 1,
+        duration: 0.25,
+        ease: "power2.out",
+      })
+      .to({}, { duration: 0.25 })
+      .add(() => {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const mobile = vw <= 768;
+        const pad = mobile ? 20 : 48;
+        const currentW = getTotalWidth();
+        const targetW = vw - pad * 2;
+        const scale = currentW > 0 ? targetW / currentW : 1;
+
+        if (pContent && pLogo) {
+          const visualCenterX = getTotalWidth() / 2;
+          const visualCenterY = pContent.offsetHeight / 2;
+          gsap.set(pContent, {
+            transformOrigin: `${visualCenterX}px ${visualCenterY}px`,
+          });
+
+          const bottomPad = mobile ? Math.max(vh * 0.18, 110) : 80;
+          const targetBottom = vh - bottomPad;
+          const contentRect = pContent.getBoundingClientRect();
+          const curVisualCenterY = contentRect.top + visualCenterY;
+          const targetVisualCenterY =
+            targetBottom - (pContent.offsetHeight * scale) / 2;
+          const deltaY = targetVisualCenterY - curVisualCenterY;
+
+          const baseFontSize = parseFloat(getComputedStyle(pLogo).fontSize) || 40;
+          const newFontSize = baseFontSize * scale;
+
+          const applyFinalState = () => {
+            pContent.style.visibility = "hidden";
+            gsap.set(pContent, { scale: 1, x: 0, y: 0 });
+            if (nameLayer) gsap.set(nameLayer, { mixBlendMode: "difference" });
+            const vwSize = (newFontSize / vw) * 100;
+            [pLogo, pLuke, pBaffait, pDot].forEach((el) => {
+              if (el) el.style.fontSize = `${vwSize}vw`;
+            });
+            void pContent.offsetWidth;
+            placeIntroNameAtBottom();
+            pContent.style.visibility = "visible";
+          };
+
+          gsap.to(pContent, {
+            scale: scale,
+            y: `+=${deltaY}`,
+            duration: 0.75,
+            ease: "power3.inOut",
+            onComplete: () => {
+              requestAnimationFrame(applyFinalState);
+            },
+          });
+        }
+      })
       .to(
-        transitionPanelDark,
+        tPanelDark,
         {
-          yPercent: -100,
-          duration: 0.9,
+          y: "0%",
+          duration: 0.45,
           ease: "power3.inOut",
         },
-        "+=0.4"
+        "<+=0.05"
       )
       .to(
-        transitionPanelRed,
+        tPanelRed,
         {
-          yPercent: -100,
-          duration: 0.9,
+          y: "0%",
+          duration: 0.45,
           ease: "power3.inOut",
         },
-        "-=0.75"
+        "-=0.3"
+      )
+      .set(introBg, { display: "none" })
+      .set(hero, { opacity: 1 })
+      .to(
+        tPanelRed,
+        {
+          y: "-100%",
+          duration: 0.55,
+          ease: "power3.inOut",
+        },
+        "+=0.05"
       )
       .to(
-        introBg,
-        { opacity: 0, pointerEvents: "none", duration: 0.3 },
-        "-=0.5"
-      )
-      .to(
-        nameLayer,
-        { opacity: 0, pointerEvents: "none", duration: 0.4 },
-        "-=0.5"
-      )
-      .to(
-        hero,
-        { opacity: 1, duration: 0.6, ease: "power2.out" },
+        tPanelDark,
+        {
+          y: "-100%",
+          duration: 0.55,
+          ease: "power3.inOut",
+        },
         "-=0.4"
       )
       .to(
-        [heroTagline, heroBar],
+        "#hero-tagline",
         {
-          clipPath: "inset(0% 0% 0% 0%)",
           opacity: 1,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: "power2.out",
+          clipPath: "inset(0 0 0% 0)",
+          duration: 1.1,
+          ease: "power3.inOut",
         },
         "-=0.2"
+      )
+      .to(
+        "#hero-bar",
+        {
+          opacity: 1,
+          clipPath: "inset(0 0 0% 0)",
+          duration: 1.0,
+          ease: "power3.inOut",
+        },
+        "-=0.8"
+      )
+      .fromTo(
+        "#hero-line",
+        { opacity: 1, scaleX: 0 },
+        { scaleX: 1, duration: 1.0, ease: "power3.inOut" },
+        "<"
       );
 
-    // 3. Reveal Canvas Image Sequence Scrubbing
-    const revealCanvas = document.getElementById("reveal-canvas") as HTMLCanvasElement | null;
+    // =========================================================================
+    // 4. Hero Sequence Canvas Scrubber
+    // =========================================================================
+    const canvas = document.getElementById("reveal-canvas") as HTMLCanvasElement | null;
     const revealWrap = document.getElementById("reveal-image-wrap");
-    const revealPhrase = document.getElementById("reveal-phrase");
-    const TOTAL_FRAMES = 200;
-    const frames: HTMLImageElement[] = [];
+    const revealSeq = document.querySelectorAll(".reveal-seq");
+    const phraseEl = document.getElementById("reveal-phrase");
 
-    // Preload keyframes
-    for (let i = 1; i <= TOTAL_FRAMES; i += 2) {
+    const TOTAL_FRAMES = 200;
+    const frames: HTMLImageElement[] = new Array(TOTAL_FRAMES);
+    let drawnIdx = -1;
+
+    for (let i = 1; i <= TOTAL_FRAMES; i++) {
       const img = new Image();
-      const padded = String(i).padStart(3, "0");
-      img.src = `/Landing/ezgif-frame-${padded}.jpg`;
-      frames[i] = img;
+      const pad = String(i).padStart(3, "0");
+      img.src = `/Landing/ezgif-frame-${pad}.jpg`;
+      img.onload = () => {
+        frames[i - 1] = img;
+        if (drawnIdx === i - 1 && canvas) {
+          const ctx = canvas.getContext("2d");
+          if (ctx) drawFrameToCanvas(ctx, canvas, img);
+        }
+      };
+      if (i % 2 === 1) frames[i - 1] = img;
     }
 
-    if (revealCanvas) {
-      const ctx = revealCanvas.getContext("2d");
+    function drawFrameToCanvas(
+      ctx: CanvasRenderingContext2D,
+      cvs: HTMLCanvasElement,
+      img: HTMLImageElement
+    ) {
+      if (!img.complete || img.naturalWidth === 0) return;
+      const cw = cvs.width;
+      const ch = cvs.height;
+      const iw = img.naturalWidth;
+      const ih = img.naturalHeight;
+      const s = Math.max(cw / iw, ch / ih);
+      const dw = iw * s;
+      const dh = ih * s;
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.drawImage(img, (cw - dw) * 0.5, (ch - dh) * 0.5, dw, dh);
+    }
+
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
 
       const resizeCanvas = () => {
-        if (!revealCanvas || !ctx) return;
+        if (!canvas || !ctx) return;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        revealCanvas.width = w * dpr;
-        revealCanvas.height = h * dpr;
-        revealCanvas.style.width = `${w}px`;
-        revealCanvas.style.height = `${h}px`;
-        ctx.scale(dpr, dpr);
+        canvas.width = Math.round(window.innerWidth * dpr);
+        canvas.height = Math.round(window.innerHeight * dpr);
+        canvas.style.width = `${window.innerWidth}px`;
+        canvas.style.height = `${window.innerHeight}px`;
+        if (drawnIdx >= 0 && frames[drawnIdx]) {
+          drawFrameToCanvas(ctx, canvas, frames[drawnIdx]);
+        }
       };
+
+      const drawFrame = (idx: number) => {
+        if (!ctx || !canvas) return;
+        let img = frames[idx];
+        if (!img || !img.complete) {
+          for (let d = 1; d < 20; d++) {
+            if (frames[idx - d]?.complete) {
+              img = frames[idx - d];
+              break;
+            }
+            if (frames[idx + d]?.complete) {
+              img = frames[idx + d];
+              break;
+            }
+          }
+        }
+        if (img) {
+          drawFrameToCanvas(ctx, canvas, img);
+          drawnIdx = idx;
+        }
+      };
+
       resizeCanvas();
       window.addEventListener("resize", resizeCanvas);
 
-      const drawFrame = (index: number) => {
-        if (!ctx || !revealCanvas) return;
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        let img = frames[index];
-        if (!img || !img.complete) {
-          for (let d = 1; d < 20; d++) {
-            if (frames[index - d]?.complete) {
-              img = frames[index - d];
-              break;
-            }
-            if (frames[index + d]?.complete) {
-              img = frames[index + d];
-              break;
-            }
-          }
-        }
-        if (img && img.complete && img.naturalWidth > 0) {
-          const imgAspect = img.naturalWidth / img.naturalHeight;
-          const screenAspect = w / h;
-          let dw = w, dh = h, ox = 0, oy = 0;
-          if (screenAspect > imgAspect) {
-            dw = w;
-            dh = w / imgAspect;
-            oy = (h - dh) / 2;
-          } else {
-            dh = h;
-            dw = h * imgAspect;
-            ox = (w - dw) / 2;
-          }
-          ctx.drawImage(img, ox, oy, dw, dh);
-        }
-      };
+      let phraseChars: HTMLElement[] = [];
+      if (phraseEl) {
+        const text = phraseEl.textContent || "";
+        phraseEl.innerHTML = "";
+        [...text].forEach((ch) => {
+          const span = document.createElement("span");
+          span.className = "rp-char";
+          span.style.display = "inline-block";
+          span.textContent = ch === " " ? "\u00A0" : ch;
+          phraseEl.appendChild(span);
+          phraseChars.push(span);
+        });
+        gsap.set(phraseChars, { opacity: 0, filter: "blur(10px)" });
+      }
 
-      // ScrollTrigger for Hero sequence scrub
+      const scrollTl = gsap.timeline({ paused: true });
+
+      scrollTl.fromTo(
+        "#hero-tagline",
+        { opacity: 1 },
+        { opacity: 0, duration: 0.15, ease: "none" },
+        0
+      );
+      scrollTl.fromTo(
+        "#hero-bar",
+        { opacity: 1 },
+        { opacity: 0, duration: 0.15, ease: "none" },
+        0
+      );
+      scrollTl.fromTo(
+        "#hero-line",
+        { opacity: 1 },
+        { opacity: 0, duration: 0.15, ease: "none" },
+        0
+      );
+
+      scrollTl.fromTo(
+        revealWrap,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.01 },
+        0.3
+      );
+      scrollTl.fromTo(
+        revealSeq,
+        { scale: 0 },
+        { scale: 1, duration: 0.7, ease: "none" },
+        0.3
+      );
+
+      scrollTl.fromTo(
+        [pLogo, pLuke],
+        { x: "0vw", opacity: 1 },
+        { x: "-55vw", opacity: 0, duration: 0.7, ease: "none" },
+        0.3
+      );
+      scrollTl.fromTo(
+        [pBaffait, pDot],
+        { x: "0vw", opacity: 1 },
+        { x: "55vw", opacity: 0, duration: 0.7, ease: "none" },
+        0.3
+      );
+      scrollTl.set(nameLayer, { autoAlpha: 0 }, 0.98);
+
+      if (phraseChars.length) {
+        scrollTl.to(
+          phraseChars,
+          {
+            opacity: 1,
+            filter: "blur(0px)",
+            duration: 0.06,
+            ease: "none",
+            stagger: { each: 0.007, from: "start" },
+          },
+          0.62
+        );
+      }
+
       ScrollTrigger.create({
         trigger: "#scroll-wrap",
         start: "top top",
         end: "bottom bottom",
         scrub: 0.5,
+        animation: scrollTl,
         onUpdate: (self) => {
           const p = self.progress;
-          const frameIndex = Math.max(1, Math.min(TOTAL_FRAMES, Math.round(p * (TOTAL_FRAMES - 1)) + 1));
-          drawFrame(frameIndex);
-
-          if (revealWrap) {
-            if (p > 0.08 && p < 0.95) {
-              revealWrap.style.opacity = "1";
-              revealWrap.style.pointerEvents = "auto";
-            } else {
-              revealWrap.style.opacity = "0";
-              revealWrap.style.pointerEvents = "none";
-            }
-          }
-
-          if (revealPhrase) {
-            const phraseP = Math.min(Math.max((p - 0.25) / 0.5, 0), 1);
-            revealPhrase.style.opacity = String(phraseP);
-            revealPhrase.style.transform = `translateY(${(1 - phraseP) * 30}px)`;
-          }
+          const frameIdx = Math.max(
+            0,
+            Math.min(TOTAL_FRAMES - 1, Math.round(p * (TOTAL_FRAMES - 1)))
+          );
+          drawFrame(frameIdx);
         },
       });
     }
 
-    // 4. About Photo Scroll Parallax
+    // =========================================================================
+    // 5. About Section: Word Unblur & Photo Parallax
+    // =========================================================================
+    function wrapWords(el: HTMLElement | null) {
+      if (!el) return;
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      const textNodes: Node[] = [];
+      while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+      textNodes.forEach((node) => {
+        const words = (node.textContent || "").split(/(\s+)/);
+        const frag = document.createDocumentFragment();
+        words.forEach((w) => {
+          if (/^\s+$/.test(w)) {
+            frag.appendChild(document.createTextNode(w));
+          } else if (w) {
+            const span = document.createElement("span");
+            span.className = "word";
+            span.textContent = w;
+            frag.appendChild(span);
+          }
+        });
+        node.parentNode?.replaceChild(frag, node);
+      });
+    }
+
+    const aboutText = document.getElementById("about-text");
+    const aboutSub = document.getElementById("about-sub");
+    const aboutVersion = document.querySelector(".about-version") as HTMLElement | null;
     const photoWrap = document.getElementById("about-photo-wrap");
-    if (photoWrap) {
-      gsap.fromTo(
-        photoWrap,
-        { y: -60 },
-        {
-          y: 60,
+    const photo = document.querySelector(".about-photo") as HTMLImageElement | null;
+
+    wrapWords(aboutText);
+    wrapWords(aboutVersion);
+
+    if (aboutText) {
+      aboutText.querySelectorAll(".word").forEach((word) => {
+        gsap.to(word, {
+          opacity: 1,
+          filter: "blur(0px)",
+          ease: "none",
           scrollTrigger: {
-            trigger: photoWrap,
-            start: "top bottom",
-            end: "bottom top",
+            trigger: word,
+            start: "top 75%",
+            end: "top 60%",
+            scrub: true,
+          },
+        });
+      });
+    }
+
+    if (aboutVersion) {
+      aboutVersion.querySelectorAll(".word").forEach((word) => {
+        gsap.to(word, {
+          opacity: 1,
+          filter: "blur(0px)",
+          ease: "none",
+          scrollTrigger: {
+            trigger: word,
+            start: "top 85%",
+            end: "top 70%",
+            scrub: true,
+          },
+        });
+      });
+    }
+
+    if (aboutSub) {
+      gsap.fromTo(
+        aboutSub,
+        { opacity: 0, filter: "blur(12px)" },
+        {
+          opacity: 1,
+          filter: "blur(0px)",
+          ease: "none",
+          scrollTrigger: {
+            trigger: aboutSub,
+            start: "top 80%",
+            end: "top 60%",
             scrub: true,
           },
         }
       );
     }
 
-    // 5. Projects Interactive Floating Preview Card
-    const projItems = document.querySelectorAll(".proj-item");
-    const projPreview = document.getElementById("proj-preview");
-    const projCard = document.getElementById("proj-card");
-    const projCover = document.getElementById("proj-cover") as HTMLImageElement | null;
-    const projDate = document.getElementById("proj-date");
-    const projCursor = document.getElementById("proj-cursor");
-
-    let mouseX = 0, mouseY = 0, cardX = 0, cardY = 0;
-
-    const onMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      if (projCursor) {
-        projCursor.style.left = `${mouseX}px`;
-        projCursor.style.top = `${mouseY}px`;
-      }
-    };
-    window.addEventListener("mousemove", onMouseMove);
-
-    const lerpCard = () => {
-      cardX += (mouseX - cardX) * 0.12;
-      cardY += (mouseY - cardY) * 0.12;
-      if (projPreview) {
-        projPreview.style.transform = `translate3d(${cardX + 24}px, ${cardY - 120}px, 0)`;
-      }
-      requestAnimationFrame(lerpCard);
-    };
-    requestAnimationFrame(lerpCard);
-
-    projItems.forEach((item) => {
-      const el = item as HTMLElement;
-      const imgUrl = el.dataset.img || "/About/img_00001.jpg";
-      const dateText = el.dataset.date || "2026";
-
-      // Dynamic Lenis lerp braking (tactile drag over projects from Luke Baffait)
-      ScrollTrigger.create({
-        trigger: el,
-        start: "top 55%",
-        end: "bottom 45%",
-        onEnter: () => {
-          if (lenis && (lenis as any).options) (lenis as any).options.lerp = 0.04;
-        },
-        onLeave: () => {
-          if (lenis && (lenis as any).options) (lenis as any).options.lerp = 0.06;
-        },
-        onEnterBack: () => {
-          if (lenis && (lenis as any).options) (lenis as any).options.lerp = 0.04;
-        },
-        onLeaveBack: () => {
-          if (lenis && (lenis as any).options) (lenis as any).options.lerp = 0.06;
-        },
-      });
-
-      el.addEventListener("mouseenter", () => {
-        if (projCover) projCover.src = imgUrl;
-        if (projDate) projDate.textContent = dateText;
-        if (projPreview) projPreview.classList.add("visible");
-        if (projCursor) projCursor.classList.add("visible");
-      });
-
-      el.addEventListener("mouseleave", () => {
-        if (projPreview) projPreview.classList.remove("visible");
-        if (projCursor) projCursor.classList.remove("visible");
-      });
-
-      el.addEventListener("click", () => {
-        const id = el.dataset.id;
-        if (id) setActiveProject(id);
-      });
-    });
-
-    // 6. Circle Gallery 3D Elliptical Orbit
-    const cgPin = document.getElementById("circle-gallery-pin");
-    const cgImgs = document.querySelectorAll(".cg-img");
-
-    if (cgPin && cgImgs.length) {
-      const rx = 420;
-      const rz = 400;
-      const tiltY = -25;
-      const offX = 950;
-      const entryAngle = Math.PI * 0.5;
-
-      const getPos = (t: number) => {
-        if (t <= 0.12) {
-          const p = t / 0.12;
-          return {
-            x: -offX * (1 - p),
-            y: tiltY,
-            z: rz * p,
-            rotY: 0,
-          };
-        }
-        if (t <= 0.88) {
-          const p = (t - 0.12) / 0.76;
-          const angle = entryAngle - p * Math.PI * 2;
-          const x = Math.cos(angle) * rx;
-          const z = Math.sin(angle) * rz;
-          const ry = p * Math.PI * 2;
-          return {
-            x,
-            y: (z / rz) * tiltY,
-            z,
-            rotY: ry,
-          };
-        }
-        const p = (t - 0.88) / 0.12;
-        return {
-          x: offX * p,
-          y: tiltY,
-          z: rz * (1 - p),
-          rotY: Math.PI * 2,
-        };
+    if (photo && photoWrap) {
+      const initPhotoScroll = () => {
+        const pTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: photoWrap,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+        pTl.fromTo(photo, { y: "-40%" }, { y: "40%", ease: "none" }, 0);
+        pTl.fromTo(
+          photo,
+          { opacity: 0, filter: "blur(20px)" },
+          { opacity: 1, filter: "blur(0px)", ease: "none", duration: 0.35 },
+          0
+        );
       };
+      if (photo.complete) initPhotoScroll();
+      else photo.onload = initPhotoScroll;
+    }
 
-      const stagger = 0.11;
-      const totalRange = 1 + (cgImgs.length - 1) * stagger;
-
-      ScrollTrigger.create({
-        trigger: "#circle-gallery",
-        start: "top top",
-        end: "bottom bottom",
-        pin: "#circle-gallery-pin",
-        onUpdate: (self) => {
-          const progress = self.progress;
-          cgImgs.forEach((img, i) => {
-            const el = img as HTMLElement;
-            const imgT = progress * totalRange - i * stagger;
-            if (imgT <= 0 || imgT >= 1) {
-              el.style.opacity = "0";
-              return;
-            }
-            let alpha = 1;
-            if (imgT < 0.08) alpha = imgT / 0.08;
-            else if (imgT > 0.92) alpha = (1 - imgT) / 0.08;
-
-            const pos = getPos(imgT);
-            const rotDeg = ((pos.rotY * 180) / Math.PI).toFixed(1);
-
-            el.style.opacity = String(alpha);
-            el.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, ${pos.z.toFixed(1)}px) rotateY(${rotDeg}deg)`;
-          });
+    // =========================================================================
+    // 6. Projects Section: Drawing Red Fluid Line & Fixed Card Preview
+    // =========================================================================
+    const linePath = document.getElementById("fluid-line") as SVGPathElement | null;
+    if (linePath && linePath.getTotalLength) {
+      const lineLen = linePath.getTotalLength();
+      gsap.set(linePath, { strokeDasharray: lineLen, strokeDashoffset: lineLen });
+      gsap.to(linePath, {
+        strokeDashoffset: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#projects",
+          start: "top 70%",
+          end: "bottom 20%",
+          scrub: 1,
         },
       });
     }
 
-    // 7. Awards Focal-Line Highlight
+    const items = document.querySelectorAll(".proj-item");
+    const card = document.getElementById("proj-card");
+    const cover = document.getElementById("proj-cover") as HTMLImageElement | null;
+    const dateEl = document.getElementById("proj-date");
+    const preview = document.getElementById("proj-preview");
+    const projCursor = document.getElementById("proj-cursor");
+    const projectsEl = document.getElementById("projects");
+
+    let currentIdx = -1;
+    let projectsVisible = false;
+    if (card) gsap.set(card, { opacity: 0 });
+
+    const itemQuickX = Array.from(items).map((item) =>
+      gsap.quickTo(item, "x", { duration: 0.6, ease: "power2.out" })
+    );
+
+    if (projectsEl && preview) {
+      ScrollTrigger.create({
+        trigger: projectsEl,
+        start: "top 80%",
+        end: "bottom 20%",
+        onEnter: () => {
+          preview.classList.add("visible");
+          projectsVisible = true;
+        },
+        onLeave: () => {
+          preview.classList.remove("visible");
+          projectsVisible = false;
+        },
+        onEnterBack: () => {
+          preview.classList.add("visible");
+          projectsVisible = true;
+        },
+        onLeaveBack: () => {
+          preview.classList.remove("visible");
+          projectsVisible = false;
+        },
+      });
+    }
+
+    function deactivateAll() {
+      if (currentIdx >= 0 && items[currentIdx]) {
+        items[currentIdx].classList.remove("active");
+      }
+      currentIdx = -1;
+      if (card) gsap.to(card, { opacity: 0, duration: 0.25, ease: "power2.in" });
+    }
+
+    function activateProject(i: number) {
+      if (i === currentIdx) return;
+      if (currentIdx >= 0 && items[currentIdx]) {
+        items[currentIdx].classList.remove("active");
+      }
+      if (items[i]) items[i].classList.add("active");
+
+      const itemEl = items[i] as HTMLElement;
+      const imgSrc = itemEl.dataset.img || "/About/img_00001.jpg";
+      const dateText = itemEl.dataset.date || "";
+
+      if (currentIdx === -1) {
+        if (cover) cover.src = imgSrc;
+        if (dateEl) dateEl.textContent = dateText;
+        if (card) gsap.to(card, { opacity: 1, duration: 0.4, ease: "power2.out" });
+      } else {
+        if (card) {
+          gsap.to(card, {
+            opacity: 0,
+            duration: 0.18,
+            ease: "power2.in",
+            onComplete: () => {
+              if (cover) cover.src = imgSrc;
+              if (dateEl) dateEl.textContent = dateText;
+              gsap.to(card, { opacity: 1, duration: 0.3, ease: "power2.out" });
+            },
+          });
+        }
+      }
+      currentIdx = i;
+    }
+
+    function onProjectsScroll() {
+      if (!projectsVisible) {
+        if (currentIdx >= 0) deactivateAll();
+        return;
+      }
+      const cy = window.innerHeight / 2;
+      const halfH = window.innerHeight / 2;
+      let closestIdx = -1;
+      let closestDist = Infinity;
+
+      items.forEach((item, i) => {
+        const rect = item.getBoundingClientRect();
+        const itemCy = rect.top + rect.height / 2;
+        const dist = Math.abs(itemCy - cy);
+
+        itemQuickX[i](Math.min(dist / halfH, 1) * 80);
+
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestIdx = i;
+        }
+      });
+
+      if (closestIdx >= 0 && closestDist < window.innerHeight * 0.45) {
+        activateProject(closestIdx);
+      } else {
+        deactivateAll();
+      }
+    }
+
+    window.addEventListener("scroll", onProjectsScroll, { passive: true });
+    onProjectsScroll();
+
+    // Mouse Tracking: Tilt for Preview Card & Follower for projCursor
+    const qCursorX = projCursor
+      ? gsap.quickTo(projCursor, "left", { duration: 0.35, ease: "power3.out" })
+      : null;
+    const qCursorY = projCursor
+      ? gsap.quickTo(projCursor, "top", { duration: 0.35, ease: "power3.out" })
+      : null;
+
+    let tiltTargetRY = 0;
+    let tiltTargetRX = 0;
+    let tiltRY = 0;
+    let tiltRX = 0;
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (projectsVisible) {
+        if (qCursorX) qCursorX(e.clientX);
+        if (qCursorY) qCursorY(e.clientY);
+        if (card) {
+          const rect = card.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const ry = Math.max(-1, Math.min(1, (e.clientX - cx) / (rect.width / 2)));
+          const rx = Math.max(-1, Math.min(1, (e.clientY - cy) / (rect.height / 2)));
+          tiltTargetRY = ry * 6;
+          tiltTargetRX = -rx * 5;
+        }
+      }
+    };
+    window.addEventListener("mousemove", onMouseMove);
+
+    let rafTilt = 0;
+    const tickTilt = () => {
+      tiltRY += (tiltTargetRY - tiltRY) * 0.1;
+      tiltRX += (tiltTargetRX - tiltRX) * 0.1;
+      if (card && projectsVisible) {
+        card.style.transform = `rotateX(${tiltRX.toFixed(2)}deg) rotateY(${tiltRY.toFixed(2)}deg)`;
+      }
+      rafTilt = requestAnimationFrame(tickTilt);
+    };
+    rafTilt = requestAnimationFrame(tickTilt);
+
+    if (cover && projCursor) {
+      cover.addEventListener("mouseenter", () => projCursor.classList.add("active"));
+      cover.addEventListener("mouseleave", () => projCursor.classList.remove("active"));
+    }
+
+    // =========================================================================
+    // 7. Full Project Detail Modal Overlay & Transition
+    // =========================================================================
+    const pageFade = document.getElementById("page-fade");
+    const flyingTitle = document.getElementById("flying-title");
+    const detailEl = document.getElementById("project-detail");
+    const detailBack = document.getElementById("detail-back");
+    const detailTitleWrap = document.getElementById("detail-title-wrap");
+    const detailTitle = document.getElementById("detail-title");
+    const detailYear = document.getElementById("detail-year");
+    const detailDesc = document.getElementById("detail-desc");
+    const detailTags = document.getElementById("detail-tags");
+    const detailVisit = document.getElementById("detail-visit") as HTMLAnchorElement | null;
+    const detailGalleryWrap = document.getElementById("detail-gallery-wrap");
+    const detailThumbs = document.getElementById("detail-thumbs");
+    const detailThumbsInner = document.getElementById("detail-thumbs-inner");
+    const detailSelected = document.getElementById("detail-selected");
+
+    let projectOpen = false;
+    let flyingSourceItem: HTMLElement | null = null;
+    let galleryY = 0;
+    let galleryMaxScroll = 0;
+    let qGalleryY: ((v: number) => void) | null = null;
+    let cachedSelImg: HTMLImageElement | null = null;
+
+    function openProject(id: string, clickedItem: HTMLElement) {
+      const proj = PROJECTS_MAP[id];
+      if (!proj || projectOpen) return;
+      projectOpen = true;
+      flyingSourceItem = clickedItem;
+
+      if (lenis) lenis.stop();
+
+      const stTimeline = document.getElementById("scroll-timeline");
+      const pctEl = document.getElementById("scroll-pct");
+      if (stTimeline) stTimeline.style.display = "none";
+      if (pctEl) pctEl.style.display = "none";
+
+      const rect = clickedItem.getBoundingClientRect();
+      const cs = getComputedStyle(clickedItem);
+      if (flyingTitle) {
+        flyingTitle.textContent = clickedItem.textContent;
+        flyingTitle.style.fontSize = cs.fontSize;
+        flyingTitle.style.lineHeight = cs.lineHeight;
+        flyingTitle.style.letterSpacing = cs.letterSpacing;
+        gsap.set(flyingTitle, {
+          left: rect.left,
+          top: rect.top,
+          opacity: 1,
+          scale: 1,
+          x: 0,
+          y: 0,
+          transformOrigin: "left top",
+        });
+      }
+
+      clickedItem.style.visibility = "hidden";
+
+      if (detailTitle) detailTitle.textContent = clickedItem.textContent;
+      if (detailYear) detailYear.textContent = proj.year;
+      if (detailDesc) detailDesc.textContent = proj.desc;
+      if (detailTags) {
+        detailTags.innerHTML = proj.tags
+          .map((t) => `<span class="detail-tag">${t}</span>`)
+          .join("");
+      }
+
+      if (detailVisit) {
+        if (proj.link) {
+          detailVisit.href = proj.link;
+          detailVisit.classList.add("has-link");
+        } else {
+          detailVisit.removeAttribute("href");
+          detailVisit.classList.remove("has-link");
+        }
+      }
+
+      const allImages = [clickedItem.dataset.img || proj.cover, ...proj.images];
+      if (detailThumbsInner) {
+        detailThumbsInner.innerHTML = allImages
+          .map((src) => `<img src="${src}" alt="" decoding="async">`)
+          .join("");
+        const thumbImgs = detailThumbsInner.querySelectorAll("img");
+        thumbImgs.forEach((tImg, idx) => {
+          tImg.addEventListener("click", () => {
+            thumbImgs.forEach((img) => img.classList.remove("active"));
+            tImg.classList.add("active");
+            if (cachedSelImg) cachedSelImg.src = tImg.src;
+          });
+        });
+        if (thumbImgs[0]) thumbImgs[0].classList.add("active");
+        gsap.set(detailThumbsInner, { y: 0 });
+      }
+
+      if (detailSelected) {
+        detailSelected.innerHTML = `<img src="${allImages[0]}" alt="" decoding="async">`;
+        cachedSelImg = detailSelected.querySelector("img");
+      }
+
+      galleryY = 0;
+
+      const remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const targetTop = window.innerHeight * 0.22;
+      const targetLeft = remPx * 4;
+      const targetFontSize = Math.min(
+        Math.max(window.innerWidth * 0.05, remPx * 3),
+        remPx * 5
+      );
+
+      const tl = gsap.timeline();
+      tl.to(pageFade, { opacity: 1, duration: 0.8, ease: "power2.inOut" }, 0);
+      tl.to(
+        flyingTitle,
+        {
+          top: targetTop,
+          left: targetLeft,
+          fontSize: targetFontSize,
+          duration: 1,
+          ease: "power3.inOut",
+        },
+        0.3
+      );
+      tl.to(
+        detailEl,
+        {
+          opacity: 1,
+          duration: 0.4,
+          ease: "power2.out",
+          onStart: () => detailEl?.classList.add("active"),
+        },
+        1.0
+      );
+      tl.set(flyingTitle, { opacity: 0 }, 1.1);
+      tl.set(detailTitleWrap, { opacity: 1 }, 1.1);
+      tl.to(detailDesc, { opacity: 1, duration: 0.6, ease: "power2.out" }, 1.2);
+      tl.to(detailTags, { opacity: 1, duration: 0.5, ease: "power2.out" }, 1.3);
+      tl.to(detailVisit, { opacity: 1, duration: 0.5, ease: "power2.out" }, 1.4);
+      tl.to(detailBack, { opacity: 1, duration: 0.5, ease: "power2.out" }, 1.3);
+      tl.fromTo(
+        detailGalleryWrap,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.8, ease: "power3.out" },
+        1.2
+      );
+      tl.add(() => {
+        if (detailThumbsInner && detailThumbs) {
+          galleryMaxScroll = Math.max(
+            0,
+            detailThumbsInner.scrollHeight - detailThumbs.clientHeight
+          );
+          qGalleryY = gsap.quickTo(detailThumbsInner, "y", {
+            duration: 0.8,
+            ease: "power2.out",
+          });
+        }
+      });
+    }
+
+    function closeProject() {
+      if (!projectOpen) return;
+      projectOpen = false;
+      qGalleryY = null;
+
+      const stTimeline = document.getElementById("scroll-timeline");
+      const pctEl = document.getElementById("scroll-pct");
+      if (stTimeline) stTimeline.style.display = "";
+      if (pctEl) pctEl.style.display = "";
+
+      const tl = gsap.timeline();
+      tl.to([detailDesc, detailTags, detailVisit, detailBack], {
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.in",
+      }, 0);
+      tl.to(detailGalleryWrap, { opacity: 0, duration: 0.4, ease: "power2.in" }, 0);
+
+      if (detailTitle && flyingTitle) {
+        const dtRect = detailTitle.getBoundingClientRect();
+        const dtCs = getComputedStyle(detailTitle);
+        flyingTitle.textContent = detailTitle.textContent;
+        flyingTitle.style.fontSize = dtCs.fontSize;
+        gsap.set(flyingTitle, { left: dtRect.left, top: dtRect.top, opacity: 1, x: 0, y: 0 });
+        gsap.set(detailTitleWrap, { opacity: 0 });
+      }
+
+      tl.to(detailEl, { opacity: 0, duration: 0.4, ease: "power2.in" }, 0.2);
+
+      if (flyingSourceItem && flyingTitle) {
+        const itemRect = flyingSourceItem.getBoundingClientRect();
+        const itemCs = getComputedStyle(flyingSourceItem);
+        tl.to(
+          flyingTitle,
+          {
+            left: itemRect.left,
+            top: itemRect.top,
+            fontSize: parseFloat(itemCs.fontSize),
+            duration: 0.9,
+            ease: "power3.inOut",
+          },
+          0.3
+        );
+      }
+
+      tl.to(pageFade, { opacity: 0, duration: 0.6, ease: "power2.out" }, 0.5);
+
+      tl.add(() => {
+        detailEl?.classList.remove("active");
+        gsap.set(
+          [detailTitleWrap, detailDesc, detailTags, detailVisit, detailBack, detailGalleryWrap],
+          { opacity: 0 }
+        );
+        gsap.set(flyingTitle, { opacity: 0 });
+        if (flyingSourceItem) {
+          flyingSourceItem.style.visibility = "";
+          flyingSourceItem = null;
+        }
+        if (lenis) lenis.start();
+        ScrollTrigger.refresh();
+      });
+    }
+
+    items.forEach((item, i) => {
+      item.addEventListener("click", () => {
+        const itemEl = item as HTMLElement;
+        if (itemEl.classList.contains("active")) {
+          const id = itemEl.dataset.id;
+          if (id) openProject(id, itemEl);
+        } else {
+          activateProject(i);
+          let docTop = 0;
+          let el: HTMLElement | null = itemEl;
+          while (el) {
+            docTop += el.offsetTop;
+            el = el.offsetParent as HTMLElement | null;
+          }
+          if (scrollTo) {
+            scrollTo(docTop - window.innerHeight / 2 + itemEl.offsetHeight / 2, {
+              duration: 1.2,
+            });
+          }
+        }
+      });
+    });
+
+    if (cover) {
+      cover.addEventListener("click", () => {
+        if (currentIdx >= 0 && items[currentIdx]) {
+          const itemEl = items[currentIdx] as HTMLElement;
+          const id = itemEl.dataset.id;
+          if (id) openProject(id, itemEl);
+        }
+      });
+    }
+
+    if (detailBack) detailBack.addEventListener("click", closeProject);
+
+    if (detailEl) {
+      detailEl.addEventListener(
+        "wheel",
+        (e) => {
+          if (!projectOpen) return;
+          e.preventDefault();
+          const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+          galleryY = Math.max(-galleryMaxScroll, Math.min(0, galleryY - delta));
+          if (qGalleryY) qGalleryY(galleryY);
+        },
+        { passive: false }
+      );
+    }
+
+    // =========================================================================
+    // 8. 3D Elliptical Orbit Gallery & Slices
+    // =========================================================================
+    const cgPhrase = document.getElementById("cg-phrase");
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    function buildSlices() {
+      const SLICES = 10;
+      const imgW = Math.min(Math.max(120, vw * 0.14), 210);
+      const imgH = (imgW * 2) / 3;
+      const orbitR = (vw * 0.34 + 500) / 2;
+      const bendRad = imgW / orbitR;
+      const cylR = orbitR;
+      const sliceW = imgW / SLICES;
+      const totalBendDeg = (bendRad * 180) / Math.PI;
+      const stepDeg = totalBendDeg / SLICES;
+
+      document.querySelectorAll(".cg-img").forEach((img) => {
+        if (img.tagName.toLowerCase() !== "img") return;
+        const src = img.getAttribute("src") || "";
+        const wrapper = document.createElement("div");
+        wrapper.className = "cg-img";
+
+        for (let s = 0; s < SLICES; s++) {
+          const sl = document.createElement("div");
+          sl.className = "cg-slice";
+          const displayW = sliceW + 1.5;
+          sl.style.width = displayW.toFixed(1) + "px";
+          sl.style.left = "50%";
+          sl.style.marginLeft = (-displayW / 2).toFixed(1) + "px";
+          sl.style.backgroundImage = "url(" + src + ")";
+          sl.style.backgroundSize = imgW.toFixed(1) + "px " + imgH.toFixed(1) + "px";
+          sl.style.backgroundPosition = (-s * sliceW).toFixed(1) + "px 0";
+          sl.style.transformOrigin = "50% 50% " + (-cylR).toFixed(1) + "px";
+          const angle = (s - (SLICES - 1) / 2) * stepDeg;
+          sl.style.transform = "rotateY(" + angle.toFixed(2) + "deg)";
+          wrapper.appendChild(sl);
+        }
+        img.parentNode?.replaceChild(wrapper, img);
+      });
+    }
+
+    buildSlices();
+
+    const cgImgs = Array.from(document.querySelectorAll<HTMLElement>(".cg-img"));
+    const count = cgImgs.length;
+
+    wrapWords(cgPhrase);
+    const cgPhraseWords = Array.from(document.querySelectorAll<HTMLElement>("#cg-phrase .word"));
+
+    const rx = vw * 0.34;
+    const rz = 500;
+    const tiltY = vw <= 768 ? 80 : 180;
+    const entryAngle = Math.PI / 2;
+    const offX = vw * 0.85;
+
+    function getPos(t: number) {
+      if (t <= 0.12) {
+        const p = t / 0.12;
+        return {
+          x: -offX * (1 - p),
+          y: tiltY,
+          z: rz * p,
+          rotY: 0,
+        };
+      }
+      if (t <= 0.88) {
+        const p = (t - 0.12) / 0.76;
+        const angle = entryAngle - p * Math.PI * 2;
+        const x = Math.cos(angle) * rx;
+        const z = Math.sin(angle) * rz;
+        const ry = p * Math.PI * 2;
+        return {
+          x,
+          y: (z / rz) * tiltY,
+          z,
+          rotY: ry,
+        };
+      }
+      const p = (t - 0.88) / 0.12;
+      return {
+        x: offX * p,
+        y: tiltY,
+        z: rz * (1 - p),
+        rotY: Math.PI * 2,
+      };
+    }
+
+    const stagger = 0.09;
+    const totalRange = 1 + stagger * (count - 1);
+
+    cgImgs.forEach((img) => {
+      img.style.opacity = "0";
+    });
+
+    ScrollTrigger.create({
+      trigger: "#circle-gallery",
+      start: "top top",
+      end: "bottom bottom",
+      pin: "#circle-gallery-pin",
+      onUpdate: (self) => {
+        const progress = self.progress;
+
+        cgImgs.forEach((img, i) => {
+          const imgT = progress * totalRange - i * stagger;
+          if (imgT <= 0 || imgT >= 1) {
+            img.style.opacity = "0";
+            return;
+          }
+          let alpha = 1;
+          if (imgT < 0.06) alpha = imgT / 0.06;
+          else if (imgT > 0.94) alpha = (1 - imgT) / 0.06;
+
+          const pos = getPos(imgT);
+          const rotDeg = ((pos.rotY * 180) / Math.PI).toFixed(1);
+
+          img.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, ${pos.z.toFixed(1)}px) rotateY(${rotDeg}deg)`;
+          img.style.opacity = String(alpha);
+          img.style.zIndex = String(Math.round(pos.z + 600));
+        });
+
+        const phraseStart = 0.25;
+        const phraseEnd = 0.75;
+        const travelY = 200;
+
+        if (cgPhrase) {
+          if (progress < phraseStart || progress > phraseEnd) {
+            cgPhrase.style.opacity = "0";
+          } else {
+            const globalP = (progress - phraseStart) / (phraseEnd - phraseStart);
+            const yOffset = travelY * (0.5 - globalP);
+            cgPhrase.style.transform = `translateY(${yOffset.toFixed(1)}px)`;
+
+            const revealEnd = 0.4;
+            cgPhraseWords.forEach((w, wi) => {
+              if (globalP < revealEnd) {
+                const revealP = globalP / revealEnd;
+                const wordT = revealP * (cgPhraseWords.length + 4) - wi;
+                const wP = Math.max(0, Math.min(1, wordT / 3));
+                w.style.opacity = String(wP);
+                w.style.filter = `blur(${(8 * (1 - wP)).toFixed(1)}px)`;
+              } else {
+                w.style.opacity = "1";
+                w.style.filter = "blur(0px)";
+              }
+            });
+
+            let alpha = 1;
+            if (globalP < 0.1) alpha = globalP / 0.1;
+            else if (globalP > 0.75) alpha = (1 - globalP) / 0.25;
+            cgPhrase.style.opacity = String(alpha);
+          }
+        }
+      },
+    });
+
+    // =========================================================================
+    // 9. Awards Radar Scanner
+    // =========================================================================
     const awardItems = document.querySelectorAll(".award-item");
     awardItems.forEach((item) => {
       ScrollTrigger.create({
@@ -444,58 +1278,127 @@ export default function LukeBaffaitPortfolio() {
       });
     });
 
-    // 8. Contact Section Pinned Blob Animation
-    const contactSection = document.getElementById("contact");
-    const contactBlob = document.getElementById("contact-blob");
-    const contactBlobWrap = document.getElementById("contact-blob-wrap");
+    // =========================================================================
+    // 10. Contact Section: White Blob, Title Slide, & Dual Parallax Frames
+    // =========================================================================
+    const blobWrap = document.getElementById("contact-blob-wrap");
+    const blob = document.getElementById("contact-blob");
     const contactBg = document.getElementById("contact-bg");
+    const contactSection = document.getElementById("contact");
+    const contactPin = document.getElementById("contact-pin");
+    const ctTitle = document.getElementById("contact-title");
+    const ctSocials = document.getElementById("contact-socials");
+    const ctMail = document.getElementById("contact-mail");
+    const dispo = document.getElementById("contact-dispo");
+    const frame = document.getElementById("contact-frame");
+    const frameImg = document.getElementById("contact-frame-img");
+    const dispo2 = document.getElementById("contact-dispo-2");
+    const frame2 = document.getElementById("contact-frame-2");
+    const frameImg2 = document.getElementById("contact-frame-img-2");
 
-    if (contactSection && contactBlob) {
+    if (blobWrap && blob && ctTitle) {
       ScrollTrigger.create({
         trigger: "#contact",
         start: "top bottom",
         endTrigger: "#footer-transition",
         end: "bottom bottom",
         onEnter: () => {
-          if (contactBlobWrap) contactBlobWrap.style.visibility = "visible";
+          blobWrap.style.visibility = "visible";
           if (contactBg) contactBg.style.display = "block";
         },
         onLeave: () => {
-          if (contactBlobWrap) contactBlobWrap.style.visibility = "hidden";
+          blobWrap.style.visibility = "hidden";
+          if (contactBg) contactBg.style.display = "none";
+        },
+        onLeaveBack: () => {
+          blobWrap.style.visibility = "hidden";
           if (contactBg) contactBg.style.display = "none";
         },
         onEnterBack: () => {
-          if (contactBlobWrap) contactBlobWrap.style.visibility = "visible";
+          blobWrap.style.visibility = "visible";
           if (contactBg) contactBg.style.display = "block";
         },
-        onLeaveBack: () => {
-          if (contactBlobWrap) contactBlobWrap.style.visibility = "hidden";
-          if (contactBg) contactBg.style.display = "none";
+      });
+      blobWrap.style.visibility = "hidden";
+
+      const cTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#contact",
+          start: "top bottom",
+          end: "bottom bottom",
+          scrub: true,
         },
       });
 
-      gsap.fromTo(
-        contactBlob,
-        { scale: 0.2, opacity: 0 },
-        {
-          scale: 1,
-          opacity: 1,
-          scrollTrigger: {
-            trigger: "#contact",
-            start: "top bottom",
-            end: "bottom bottom",
-            scrub: true,
-          },
-        }
+      cTl.fromTo(blob, { scale: 0 }, { scale: 1, duration: 0.6, ease: "none" }, 0);
+
+      gsap.set(ctTitle, { yPercent: 0, x: () => window.innerWidth * 1.1 });
+      cTl.to(ctTitle, { x: 0, duration: 0.3, ease: "power3.out" }, 0.18);
+
+      cTl.fromTo(
+        ctSocials,
+        { clipPath: "inset(0 0 100% 0)" },
+        { clipPath: "inset(0 0 0% 0)", duration: 0.2, ease: "none" },
+        0.28
       );
+
+      cTl.fromTo(
+        ctMail,
+        { clipPath: "inset(0 0 100% 0)" },
+        { clipPath: "inset(0 0 0% 0)", duration: 0.2, ease: "none" },
+        0.36
+      );
+
+      const pairStart = 0.22;
+      const frameDur = 0.65;
+      const frameY = () => window.innerHeight * 1.1;
+      const frameYEnd = () => -window.innerHeight * 1.4;
+      const dispoY = () => window.innerHeight * 1.1;
+      const dispoYEnd = () => -window.innerHeight * 1.65;
+
+      if (frame && frameImg) {
+        gsap.set(frame, { yPercent: -50, y: frameY });
+        gsap.set(frameImg, { yPercent: -30 });
+        cTl.to(frame, { y: frameYEnd, duration: frameDur, ease: "none" }, pairStart);
+        cTl.to(frameImg, { yPercent: 30, duration: frameDur, ease: "none" }, pairStart);
+      }
+
+      if (dispo) {
+        gsap.set(dispo, { yPercent: -50, y: dispoY, opacity: 1, clipPath: "inset(0% 0 0% 0)" });
+        cTl.to(dispo, { y: dispoYEnd, duration: frameDur, ease: "none" }, pairStart);
+        cTl.to(
+          dispo,
+          { opacity: 0, clipPath: "inset(100% 0 0% 0)", duration: 0.15, ease: "power2.in" },
+          pairStart + 0.45
+        );
+      }
+
+      if (frame2 && frameImg2) {
+        gsap.set(frame2, { yPercent: -50, y: () => window.innerHeight * 1.3 });
+        gsap.set(frameImg2, { yPercent: -30 });
+        cTl.to(frame2, { y: frameYEnd, duration: frameDur, ease: "none" }, pairStart + 0.07);
+        cTl.to(frameImg2, { yPercent: 30, duration: frameDur, ease: "none" }, pairStart + 0.07);
+      }
+
+      if (dispo2) {
+        gsap.set(dispo2, { yPercent: -50, y: frameY, opacity: 1, clipPath: "inset(0% 0 0% 0)" });
+        cTl.to(dispo2, { y: frameYEnd, duration: frameDur, ease: "none" }, pairStart);
+        cTl.to(
+          dispo2,
+          { opacity: 0, clipPath: "inset(100% 0 0% 0)", duration: 0.15, ease: "power2.in" },
+          pairStart + 0.45
+        );
+      }
     }
 
-    // 9. Parallax Footer Loop
+    // =========================================================================
+    // 11. Curtain Footer Lift & Interactive ASCII Art
+    // =========================================================================
     const footerEl = document.getElementById("footer");
     if (footerEl) {
       ScrollTrigger.create({
         trigger: "#footer-transition",
-        start: "top bottom+=400",
+        start: "top bottom+=500",
         end: "bottom bottom",
         onEnter: () => {
           footerEl.style.visibility = "visible";
@@ -506,10 +1409,228 @@ export default function LukeBaffaitPortfolio() {
       });
     }
 
-    // 10. Scroll Percentage & Timeline HUD Tracker
+    if (blobWrap && contactPin && contactSection) {
+      const ftl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#footer-transition",
+          start: "top bottom+=550",
+          end: "bottom bottom",
+          scrub: true,
+          onUpdate: (self) => {
+            const p = self.progress;
+            if (p > 0.2) {
+              if (contactBg) contactBg.style.display = "none";
+              contactSection.style.pointerEvents = "none";
+            } else {
+              if (contactBg) contactBg.style.display = "block";
+              contactSection.style.pointerEvents = "";
+            }
+          },
+        },
+      });
+
+      ftl.set(blobWrap, { height: "110vh", overflow: "hidden", borderRadius: "0 0 0px 0px" }, 0);
+      ftl.to(blobWrap, { borderRadius: "0 0 50px 50px", duration: 0.15, ease: "power2.out" }, 0);
+      ftl.to(
+        blobWrap,
+        {
+          y: () => -(window.innerHeight * 1.8 + 400),
+          immediateRender: false,
+          duration: 1.0,
+          ease: "none",
+        },
+        0
+      );
+      ftl.to(
+        contactPin,
+        {
+          y: "-40vh",
+          pointerEvents: "none",
+          immediateRender: false,
+          duration: 1.0,
+          ease: "none",
+        },
+        0
+      );
+      ftl.fromTo(
+        [ctSocials, ctMail],
+        { clipPath: "inset(0 0 0% 0)" },
+        { clipPath: "inset(0 0 100% 0)", duration: 0.2, ease: "none" },
+        0
+      );
+    }
+
+    // ASCII Art Generator for Left & Right Panels
+    const ASCII_POOLS = [
+      " ",
+      "·.,",
+      ":;`-~^",
+      "=+<>?!:;",
+      "|/\\()[]{}«»",
+      "÷×±≈≠≤≥∞∑∏√∫",
+      "¤†‡§¶©®™°¬",
+      "%&#$@¥€£¢",
+    ];
+
+    let asciiSeed = 42;
+    function asciiRand() {
+      asciiSeed = (asciiSeed * 16807 + 0) % 2147483647;
+      return asciiSeed / 2147483647;
+    }
+
+    function imageToAscii(img: HTMLImageElement, cols: number) {
+      asciiSeed = 42;
+      const c = document.createElement("canvas");
+      const ctx = c.getContext("2d");
+      if (!ctx) return { text: "", poolGrid: [] };
+      const aspect = img.height / img.width;
+      const rows = Math.round(cols * aspect);
+      c.width = cols;
+      c.height = rows;
+      ctx.drawImage(img, 0, 0, cols, rows);
+      const data = ctx.getImageData(0, 0, cols, rows).data;
+      const lines: string[] = [];
+      const poolGrid: number[][] = [];
+
+      for (let y = 0; y < rows; y++) {
+        let line = "";
+        const poolRow: number[] = [];
+        for (let x = 0; x < cols; x++) {
+          const i = (y * cols + x) * 4;
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const a = data[i + 3];
+          if (a < 15) {
+            line += " ";
+            poolRow.push(-1);
+            continue;
+          }
+          let brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          brightness *= a / 255;
+          let pi = Math.floor(brightness * (ASCII_POOLS.length - 1) * 0.8);
+          pi = Math.min(pi, ASCII_POOLS.length - 1);
+          const pool = ASCII_POOLS[pi];
+          line += pool[Math.floor(asciiRand() * pool.length)];
+          poolRow.push(pi);
+        }
+        lines.push(line);
+        poolGrid.push(poolRow);
+      }
+      return { text: lines.join("\n"), poolGrid };
+    }
+
+    function setupAsciiHover(preEl: HTMLElement, poolGrid: number[][]) {
+      let origLines: string[] | null = null;
+      let origGrid: string[][] | null = null;
+      let mxC = -1000;
+      let myC = -1000;
+      const radius = 2.5;
+      const cols = poolGrid[0] ? poolGrid[0].length : 1;
+      const rows = poolGrid.length;
+      let hitTime: number[][] = [];
+      let cellDuration: number[][] = [];
+
+      for (let ny = 0; ny < rows; ny++) {
+        const ht: number[] = [];
+        const cd: number[] = [];
+        for (let nx = 0; nx < cols; nx++) {
+          const h = (Math.sin(nx * 12.9898 + ny * 78.233) * 43758.5453 % 1 + 1) % 1;
+          ht.push(0);
+          cd.push(h > 0.5 ? 200 : 100);
+        }
+        hitTime.push(ht);
+        cellDuration.push(cd);
+      }
+
+      function initOrig() {
+        origLines = (preEl.textContent || "").split("\n");
+        origGrid = origLines.map((l) => l.split(""));
+      }
+
+      preEl.addEventListener("mousemove", (e) => {
+        if (!origGrid) initOrig();
+        const rect = preEl.getBoundingClientRect();
+        const charW = rect.width / cols;
+        const charH = rect.height / rows;
+        mxC = (e.clientX - rect.left) / charW;
+        myC = (e.clientY - rect.top) / charH;
+
+        const now = performance.now();
+        const minX = Math.max(0, Math.floor(mxC - radius));
+        const maxX = Math.min(cols - 1, Math.ceil(mxC + radius));
+        const minY = Math.max(0, Math.floor(myC - radius));
+        const maxY = Math.min(rows - 1, Math.ceil(myC + radius));
+
+        for (let y = minY; y <= maxY; y++) {
+          for (let x = minX; x <= maxX; x++) {
+            const dx = x - mxC;
+            const dy = y - myC;
+            if (dx * dx + dy * dy <= radius * radius && poolGrid[y] && poolGrid[y][x] >= 0) {
+              hitTime[y][x] = now;
+            }
+          }
+        }
+      });
+    }
+
+    function loadAndRenderAscii(src: string, targetId: string, cols: number) {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const el = document.getElementById(targetId);
+        if (el) {
+          const res = imageToAscii(img, cols);
+          el.textContent = res.text;
+          setupAsciiHover(el, res.poolGrid);
+        }
+      };
+      img.src = src;
+    }
+
+    loadAndRenderAscii("/footer/left.png", "ascii-left", 80);
+    loadAndRenderAscii("/footer/right.png", "ascii-right", 80);
+
+    const asciiLeftWrap = document.querySelector(".footer-ascii.left");
+    const asciiRightWrap = document.querySelector(".footer-ascii.right");
+    if (asciiLeftWrap && asciiRightWrap) {
+      gsap.fromTo(
+        asciiLeftWrap,
+        { xPercent: -100 },
+        {
+          xPercent: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#footer-transition",
+            start: "top bottom+=500",
+            end: "bottom bottom",
+            scrub: true,
+          },
+        }
+      );
+      gsap.fromTo(
+        asciiRightWrap,
+        { xPercent: 100 },
+        {
+          xPercent: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#footer-transition",
+            start: "top bottom+=500",
+            end: "bottom bottom",
+            scrub: true,
+          },
+        }
+      );
+    }
+
+    // =========================================================================
+    // 12. Scroll Timeline HUD & Percentage Indicator
+    // =========================================================================
+    const timeline = document.getElementById("scroll-timeline");
+    const bar = document.getElementById("st-bar");
+    const label = document.getElementById("st-label");
     const pctEl = document.getElementById("scroll-pct");
-    const stLabel = document.getElementById("st-label");
-    const stBar = document.getElementById("st-bar");
 
     const sections = [
       { id: "about", name: "About" },
@@ -520,43 +1641,62 @@ export default function LukeBaffaitPortfolio() {
       { id: "contact", name: "Contact" },
     ];
 
-    const updateHUD = () => {
+    if (bar && bar.children.length === 0) {
+      sections.forEach((sec) => {
+        const seg = document.createElement("div");
+        seg.className = "st-seg";
+        seg.style.flex = "1";
+        seg.title = sec.name;
+        const fill = document.createElement("div");
+        fill.className = "st-seg-fill";
+        seg.appendChild(fill);
+        bar.appendChild(seg);
+
+        seg.addEventListener("click", () => {
+          const target = document.getElementById(sec.id);
+          if (!target) return;
+          if (scrollTo) scrollTo(target, { offset: 0, duration: 1.2 });
+          else target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    }
+
+    const onScrollHUD = () => {
       const scrollY = window.scrollY;
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const pct = maxScroll > 0 ? Math.round((scrollY / maxScroll) * 100) : 0;
+      const p = maxScroll > 0 ? scrollY / maxScroll : 0;
+      const pct = Math.round(p * 100);
+
       if (pctEl) {
         pctEl.textContent = `(${pct})`;
         pctEl.style.opacity = scrollY > 200 ? "1" : "0";
       }
 
-      const stTimeline = document.getElementById("scroll-timeline");
-      if (stTimeline) {
-        stTimeline.style.opacity = scrollY > 200 ? "1" : "0";
+      if (timeline) {
+        timeline.style.opacity = scrollY > 200 ? "1" : "0";
       }
 
-      if (stBar) {
-        stBar.style.transform = `scaleY(${pct / 100})`;
-      }
-
-      // Check current section
       const focalY = scrollY + window.innerHeight * 0.45;
       for (let i = sections.length - 1; i >= 0; i--) {
-        const secEl = document.getElementById(sections[i].id);
-        if (secEl && secEl.offsetTop <= focalY) {
-          if (stLabel) stLabel.textContent = sections[i].name;
+        const sec = document.getElementById(sections[i].id);
+        if (sec && sec.offsetTop <= focalY) {
+          if (label) label.textContent = sections[i].name;
           break;
         }
       }
     };
 
-    window.addEventListener("scroll", updateHUD, { passive: true });
+    window.addEventListener("scroll", onScrollHUD, { passive: true });
 
+    // Cleanup
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("scroll", updateHUD);
+      window.removeEventListener("scroll", onProjectsScroll);
+      window.removeEventListener("scroll", onScrollHUD);
+      cancelAnimationFrame(rafTilt);
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
-  }, [lenis]);
+  }, [lenis, scrollTo]);
 
   return (
     <>
@@ -567,7 +1707,7 @@ export default function LukeBaffaitPortfolio() {
         <div className="preloader-content" id="preloader-content">
           <div id="preloader-logo">S</div>
           <span id="preloader-luke">arosh</span>
-          <span id="preloader-baffait"> Kumar</span>
+          <span id="preloader-baffait">Kumar</span>
           <span id="preloader-dot">.</span>
         </div>
       </div>
@@ -578,17 +1718,17 @@ export default function LukeBaffaitPortfolio() {
       </div>
 
       {/* Main Scroll Wrap: Hero Section with Canvas Scrubbing */}
-      <div className="scroll-wrap" id="scroll-wrap" style={{ height: "350vh" }}>
+      <div className="scroll-wrap" id="scroll-wrap">
         <section className="hero" id="hero">
           <h1 className="sr-only">
             Sarosh Kumar — AI Systems Engineer, deep learning, audio AI, and low-latency backends.
           </h1>
-          <canvas className="hero-canvas" id="hero-canvas" />
+          <div className="hero-canvas" id="hero-canvas" />
 
           <div className="hero-content">
             <div className="hero-tagline" id="hero-tagline">
               Computer Science undergrad, <span className="other-accent">architecting neural systems</span>,<br />
-              between deep learning, audio AI, and low-latency backends.
+              between deep learning, audio AI, and low-latency streaming inference pipelines.
             </div>
 
             <div className="hero-line" id="hero-line" />
@@ -658,7 +1798,7 @@ export default function LukeBaffaitPortfolio() {
         {/* About */}
         <div className="about" id="about">
           <div className="about-text" id="about-text">
-            As an <span className="other-accent">AI systems engineer</span>, I build production deep learning architectures and low-latency streaming inference pipelines, blending technical rigor with <span className="other-accent">scientific discovery</span>.
+            As an <span className="other-accent">AI systems engineer</span>, I build production deep learning architectures and low-latency streaming inference pipelines, blending technical precision with <span className="other-accent">scientific discovery</span>.
           </div>
           <div className="about-sub" id="about-sub">
             My name is Sarosh. Computer Science undergrad at KLE Technological University (CGPA 8.06/10), Lead of the Data Science Club (500+ members), and open-source contributor across research organizations (BrainGlobe, ML-LAM, ML4SCI).
@@ -683,7 +1823,7 @@ export default function LukeBaffaitPortfolio() {
           </div>
         </div>
 
-        {/* Projects with Drawing S-Line & Floating Cursor Preview */}
+        {/* Projects Section with Drawing S-Line & Fixed Preview Card */}
         <div className="projects" id="projects">
           <svg className="fluid-line-svg" id="fluid-line-svg" viewBox="0 0 1400 1400" preserveAspectRatio="xMidYMid slice">
             <path
@@ -722,7 +1862,7 @@ export default function LukeBaffaitPortfolio() {
                 data-img="/About/img_00020.jpg"
                 data-date="11 2025"
               >
-                AQI Forecasting & Attribution
+                Air Quality Forecasting
               </div>
               <div
                 className="proj-item"
@@ -730,7 +1870,7 @@ export default function LukeBaffaitPortfolio() {
                 data-img="/About/img_00030.jpg"
                 data-date="08 2025"
               >
-                BrainGlobe Initiative (cellfinder)
+                BrainGlobe Initiative
               </div>
               <div
                 className="proj-item"
@@ -738,7 +1878,7 @@ export default function LukeBaffaitPortfolio() {
                 data-img="/About/img_00040.jpg"
                 data-date="06 2025"
               >
-                ML-LAM (neural-lam GNNs)
+                ML-LAM Weather Modeling
               </div>
               <div
                 className="proj-item"
@@ -746,14 +1886,14 @@ export default function LukeBaffaitPortfolio() {
                 data-img="/About/img_00050.jpg"
                 data-date="04 2025"
               >
-                ML4SCI (DeepLense Transformers)
+                ML4SCI DeepLense
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Pinned 3D Circular Orbit Gallery */}
+      {/* 3D Circular Orbit Gallery with Slices */}
       <section className="circle-gallery" id="circle-gallery">
         <div className="circle-gallery-pin" id="circle-gallery-pin">
           <img className="cg-img" src="/Projects/img_00001.jpg" alt="Voice Integrity" width={3000} height={2250} />
@@ -789,10 +1929,10 @@ export default function LukeBaffaitPortfolio() {
 
           <div className="skills-right" id="skills-right">
             {/* Group 1: Deep Learning */}
-            <div className={`skill-group ${openSkillsGroup === "dl" ? "open" : ""}`}>
+            <div className={`skill-group ${openGroup === "dl" ? "open" : ""}`}>
               <div
                 className="skill-header"
-                onClick={() => setOpenSkillsGroup(openSkillsGroup === "dl" ? "" : "dl")}
+                onClick={() => setOpenGroup(openGroup === "dl" ? "" : "dl")}
               >
                 <span className="skill-header-title">Deep Learning & Audio AI</span>
                 <span className="skill-header-icon" />
@@ -812,10 +1952,10 @@ export default function LukeBaffaitPortfolio() {
             </div>
 
             {/* Group 2: ML & Data */}
-            <div className={`skill-group ${openSkillsGroup === "ml" ? "open" : ""}`}>
+            <div className={`skill-group ${openGroup === "ml" ? "open" : ""}`}>
               <div
                 className="skill-header"
-                onClick={() => setOpenSkillsGroup(openSkillsGroup === "ml" ? "" : "ml")}
+                onClick={() => setOpenGroup(openGroup === "ml" ? "" : "ml")}
               >
                 <span className="skill-header-title">Machine Learning & Data</span>
                 <span className="skill-header-icon" />
@@ -836,10 +1976,10 @@ export default function LukeBaffaitPortfolio() {
             </div>
 
             {/* Group 3: Languages */}
-            <div className={`skill-group ${openSkillsGroup === "lang" ? "open" : ""}`}>
+            <div className={`skill-group ${openGroup === "lang" ? "open" : ""}`}>
               <div
                 className="skill-header"
-                onClick={() => setOpenSkillsGroup(openSkillsGroup === "lang" ? "" : "lang")}
+                onClick={() => setOpenGroup(openGroup === "lang" ? "" : "lang")}
               >
                 <span className="skill-header-title">Languages</span>
                 <span className="skill-header-icon" />
@@ -858,10 +1998,10 @@ export default function LukeBaffaitPortfolio() {
             </div>
 
             {/* Group 4: Systems & Tools */}
-            <div className={`skill-group ${openSkillsGroup === "sys" ? "open" : ""}`}>
+            <div className={`skill-group ${openGroup === "sys" ? "open" : ""}`}>
               <div
                 className="skill-header"
-                onClick={() => setOpenSkillsGroup(openSkillsGroup === "sys" ? "" : "sys")}
+                onClick={() => setOpenGroup(openGroup === "sys" ? "" : "sys")}
               >
                 <span className="skill-header-title">Systems & Tools</span>
                 <span className="skill-header-icon" />
@@ -882,10 +2022,10 @@ export default function LukeBaffaitPortfolio() {
             </div>
 
             {/* Group 5: Core CS Fundamentals */}
-            <div className={`skill-group ${openSkillsGroup === "cs" ? "open" : ""}`}>
+            <div className={`skill-group ${openGroup === "cs" ? "open" : ""}`}>
               <div
                 className="skill-header"
-                onClick={() => setOpenSkillsGroup(openSkillsGroup === "cs" ? "" : "cs")}
+                onClick={() => setOpenGroup(openGroup === "cs" ? "" : "cs")}
               >
                 <span className="skill-header-title">Core CS Fundamentals</span>
                 <span className="skill-header-icon" />
@@ -949,7 +2089,7 @@ export default function LukeBaffaitPortfolio() {
         </div>
       </section>
 
-      {/* Contact Section with Pinned Blob & Framed Brackets */}
+      {/* Contact Section with Pinned Blob & Dual Framed Brackets */}
       <div className="contact-bg" id="contact-bg" />
       <div className="contact-blob-wrap" id="contact-blob-wrap">
         <div className="contact-blob" id="contact-blob" />
@@ -966,7 +2106,7 @@ export default function LukeBaffaitPortfolio() {
           </div>
 
           <div className="contact-frame" id="contact-frame">
-            <img className="contact-frame-img" id="contact-frame-img" src="/About/img_00010.jpg" alt="" />
+            <img className="contact-frame-img" id="contact-frame-img" src="/art/Untitled2.png" alt="" />
             <span className="frame-corner tl" />
             <span className="frame-corner tr" />
             <span className="frame-corner bl" />
@@ -980,7 +2120,7 @@ export default function LukeBaffaitPortfolio() {
           </div>
 
           <div className="contact-frame" id="contact-frame-2">
-            <img className="contact-frame-img" id="contact-frame-img-2" src="/About/img_00030.jpg" alt="" />
+            <img className="contact-frame-img" id="contact-frame-img-2" src="/art/Untitled1.png" alt="" />
             <span className="frame-corner tl" />
             <span className="frame-corner tr" />
             <span className="frame-corner bl" />
@@ -991,21 +2131,21 @@ export default function LukeBaffaitPortfolio() {
             <nav className="contact-socials" id="contact-socials" aria-label="Socials">
               <a
                 className="chr-hover"
-                data-chr="GitHub"
+                data-chr-contact="GitHub"
                 href={PORTFOLIO_DATA.personal.links.github}
                 target="_blank"
                 rel="noopener noreferrer"
               />
               <a
                 className="chr-hover"
-                data-chr="LinkedIn"
+                data-chr-contact="LinkedIn"
                 href={PORTFOLIO_DATA.personal.links.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
               />
               <a
                 className="chr-hover"
-                data-chr="HuggingFace"
+                data-chr-contact="HuggingFace"
                 href={PORTFOLIO_DATA.personal.links.huggingface}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -1026,46 +2166,55 @@ export default function LukeBaffaitPortfolio() {
             <div className="footer-top-col">
               <a
                 className="chr-hover footer-mail"
-                data-chr={PORTFOLIO_DATA.personal.email}
+                data-chr-footer={PORTFOLIO_DATA.personal.email}
                 href={`mailto:${PORTFOLIO_DATA.personal.email}`}
               />
-              <span className="chr-hover footer-date" data-chr="© 2026" />
+              <span className="chr-hover footer-date" data-chr-footer="© 2026" />
             </div>
             <nav className="footer-top-col" aria-label="Socials">
               <a
                 className="chr-hover"
-                data-chr="GitHub"
+                data-chr-footer="GitHub"
                 href={PORTFOLIO_DATA.personal.links.github}
                 target="_blank"
                 rel="noopener noreferrer"
               />
               <a
                 className="chr-hover"
-                data-chr="LinkedIn"
+                data-chr-footer="LinkedIn"
                 href={PORTFOLIO_DATA.personal.links.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
               />
               <a
                 className="chr-hover"
-                data-chr="HuggingFace"
+                data-chr-footer="HuggingFace"
                 href={PORTFOLIO_DATA.personal.links.huggingface}
                 target="_blank"
                 rel="noopener noreferrer"
               />
             </nav>
             <nav className="footer-top-col" aria-label="Page Nav">
-              <a className="chr-hover" data-chr="Work" href="#projects" />
-              <a className="chr-hover" data-chr="Info" href="#about" />
-              <a className="chr-hover" data-chr="Contact" href="#contact" />
+              <a className="chr-hover" data-chr-footer="Work" href="#projects" />
+              <a className="chr-hover" data-chr-footer="Info" href="#about" />
+              <a className="chr-hover" data-chr-footer="Contact" href="#contact" />
               <a
                 className="chr-hover"
-                data-chr="Resume"
+                data-chr-footer="Resume"
                 href="/resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
               />
             </nav>
+          </div>
+
+          <div className="footer-ascii-wrap">
+            <div className="footer-ascii left">
+              <pre id="ascii-left" />
+            </div>
+            <div className="footer-ascii right">
+              <pre id="ascii-right" />
+            </div>
           </div>
 
           <div className="footer-name">
@@ -1093,41 +2242,43 @@ export default function LukeBaffaitPortfolio() {
       <div className="proj-cursor" id="proj-cursor">See project</div>
 
       {/* Project Detail Modal Overlay */}
-      {activeProject && PROJECTS_DATA[activeProject] && (
-        <section className="project-detail" id="project-detail" style={{ opacity: 1, pointerEvents: "auto" }}>
-          <div
-            className="detail-back chr-hover"
-            id="detail-back"
-            data-chr="🡼RETOUR"
-            onClick={() => setActiveProject(null)}
+      <div className="page-fade" id="page-fade" />
+      <div className="flying-title" id="flying-title" />
+      <div className="work-transition-overlay" id="work-transition-overlay" />
+      <div className="work-flying-text" id="work-flying-text">Work</div>
+
+      <section className="project-detail" id="project-detail">
+        <div
+          className="detail-back chr-hover"
+          id="detail-back"
+          data-chr="🡼RETOUR"
+        >
+          🡼 RETOUR
+        </div>
+        <div className="detail-info">
+          <div className="detail-title-wrap" id="detail-title-wrap">
+            <h1 className="detail-title" id="detail-title" />
+            <span className="detail-year" id="detail-year" />
+          </div>
+          <p className="detail-desc" id="detail-desc" />
+          <div className="detail-tags" id="detail-tags" />
+          <a
+            className="detail-visit chr-hover"
+            id="detail-visit"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-chr="VISITER 🡲"
           >
-            🡼 RETOUR
+            VISITER 🡲
+          </a>
+        </div>
+        <div className="detail-gallery-wrap" id="detail-gallery-wrap">
+          <div className="detail-thumbs" id="detail-thumbs">
+            <div className="detail-thumbs-inner" id="detail-thumbs-inner" />
           </div>
-          <div className="detail-info">
-            <div className="detail-title-wrap">
-              <h1 className="detail-title">{PROJECTS_DATA[activeProject].title}</h1>
-              <span className="detail-year">{PROJECTS_DATA[activeProject].year}</span>
-            </div>
-            <p className="detail-desc">{PROJECTS_DATA[activeProject].desc}</p>
-            <div className="detail-tags">
-              {PROJECTS_DATA[activeProject].tags.map((t) => (
-                <span key={t} className="px-2 py-1 rounded bg-white/10 text-xs font-mono">
-                  {t}
-                </span>
-              ))}
-            </div>
-            <a
-              className="detail-visit chr-hover"
-              href={PROJECTS_DATA[activeProject].link}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-chr="VISITER 🡲"
-            >
-              VISITER 🡲
-            </a>
-          </div>
-        </section>
-      )}
+          <div className="detail-selected" id="detail-selected" />
+        </div>
+      </section>
 
       {/* Fixed HUD Timeline & Scroll Percentage */}
       <div className="scroll-pct" id="scroll-pct">(0)</div>
