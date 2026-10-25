@@ -2407,12 +2407,14 @@ export default function LukeBaffaitPortfolio() {
       {/* 3D Circular Orbit Gallery with Slices */}
       <section className="circle-gallery" id="circle-gallery">
         <div className="circle-gallery-pin" id="circle-gallery-pin">
-          <img className="cg-img" src="/Projects/img_00001.jpg" alt="Voice Integrity" width={3000} height={2250} />
-          <img className="cg-img" src="/Projects/img_00010.jpg" alt="ExoTerra" width={4000} height={3000} />
-          <img className="cg-img" src="/Projects/img_00020.jpg" alt="AQI Engine" width={3000} height={2250} />
-          <img className="cg-img" src="/Projects/img_00030.jpg" alt="BrainGlobe" width={3000} height={2250} />
-          <img className="cg-img" src="/Projects/img_00040.jpg" alt="ML-LAM" width={2667} height={2000} />
-          <img className="cg-img" src="/Projects/img_00050.jpg" alt="ML4SCI" width={2667} height={2000} />
+          <img className="cg-img" src="/gallery/mlh-hacktu-finalist.jpg" alt="HackTU 7.0 MLH Top Finalist" width={1920} height={1080} />
+          <img className="cg-img" src="/gallery/scaler-anvil-finalist.jpg" alt="Scaler Anvil Hackathon Premier Finalist" width={1920} height={1080} />
+          <img className="cg-img" src="/gallery/hack-nocturne-smvit.jpg" alt="Hack-Nocturne 2.0 Premier Finalist" width={1920} height={1080} />
+          <img className="cg-img" src="/gallery/mlh-hacktu-stage.jpg" alt="HackTU 7.0 Pitch Stage" width={1920} height={1080} />
+          <img className="cg-img" src="/gallery/scaler-anvil-pitch.jpg" alt="Scaler Anvil Project Showcase" width={1920} height={1080} />
+          <img className="cg-img" src="/gallery/mlh-hacktu-team.jpg" alt="HackTU 7.0 Team" width={1920} height={1080} />
+          <img className="cg-img" src="/gallery/gate-smashers-community.jpg" alt="Gate Smashers Community Collaboration" width={1920} height={1080} />
+          <img className="cg-img" src="/gallery/mlh-trophy.jpg" alt="Major League Hacking Recognition" width={1920} height={1080} />
           <p className="cg-phrase" id="cg-phrase">
             Every project is an opportunity to <span className="other-accent">learn</span>, <span className="other-accent">experiment</span>, and push boundaries.
           </p>
