@@ -229,6 +229,22 @@ export default function LukeBaffaitPortfolio() {
   }, [openGroups]);
 
   useEffect(() => {
+    // 0. Manual Scroll Restoration & Lock during Intro
+    if (typeof window !== "undefined") {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual";
+      }
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+
+    document.documentElement.style.overflow = "hidden";
+    if (lenis) {
+      lenis.stop();
+      lenis.scrollTo(0, { immediate: true });
+    }
+
     // =========================================================================
     // 1. Character Roll Effect (.chr-hover)
     // =========================================================================
@@ -343,6 +359,22 @@ export default function LukeBaffaitPortfolio() {
       );
     }
 
+    let keepIntroNameAnchored = false;
+
+    function centerIntroName() {
+      if (!pContent || !pLogo) return;
+      layoutNames();
+      const totalW = getTotalWidth();
+      const offsetX = -(totalW / 2 - pLogo.offsetWidth / 2);
+      gsap.set(pContent, {
+        x: offsetX,
+        y: 0,
+        scale: 1,
+        transformOrigin: "50% 50%",
+      });
+      if (pLuke) gsap.set(pLuke, { x: 0 });
+    }
+
     function placeIntroNameAtBottom() {
       if (!pContent || !pLogo) return;
       layoutNames();
@@ -362,40 +394,31 @@ export default function LukeBaffaitPortfolio() {
       });
     }
 
-    layoutNames();
-    if (typeof document !== "undefined" && document.fonts) {
-      document.fonts.ready.then(() => {
-        layoutNames();
+    // Handle responsive resize re-anchoring
+    const onWindowResize = () => {
+      layoutNames();
+      if (keepIntroNameAnchored) {
         placeIntroNameAtBottom();
-      });
-    }
+      } else {
+        centerIntroName();
+      }
+    };
+    window.addEventListener("resize", onWindowResize);
 
+    centerIntroName();
     gsap.set([pLogo, pLuke, pBaffait], { opacity: 1 });
     gsap.set(allRevealEls, { yPercent: 110 });
     gsap.set(pDot, { opacity: 0 });
     gsap.set([pContent, tPanelRed, tPanelDark], { willChange: "transform" });
 
-    // Handle responsive resize re-anchoring
-    const onWindowResize = () => {
-      layoutNames();
-      placeIntroNameAtBottom();
-    };
-    window.addEventListener("resize", onWindowResize);
-
     // =========================================================================
     // 3. Master Intro Sequence Timeline
     // =========================================================================
-    const master = gsap.timeline({ delay: 0.2 });
+    const master = gsap.timeline({ paused: true });
 
     master
       .add(() => {
-        layoutNames();
-        if (pContent && pLogo) {
-          gsap.set(pContent, {
-            x: -(getTotalWidth() / 2 - pLogo.offsetWidth / 2),
-          });
-        }
-        if (pLuke) gsap.set(pLuke, { x: 0 });
+        centerIntroName();
       })
       .to(allRevealEls, {
         yPercent: 0,
@@ -403,13 +426,12 @@ export default function LukeBaffaitPortfolio() {
         ease: "power3.out",
         stagger: { each: 0.025, from: "center" },
       })
-      .add(() => layoutNames())
       .to(pDot, {
         opacity: 1,
         duration: 0.25,
         ease: "power2.out",
       })
-      .to({}, { duration: 0.25 })
+      .to({}, { duration: 0.2 })
       .add(() => {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
@@ -438,7 +460,6 @@ export default function LukeBaffaitPortfolio() {
           const newFontSize = baseFontSize * scale;
 
           const applyFinalState = () => {
-            pContent.style.visibility = "hidden";
             gsap.set(pContent, { scale: 1, x: 0, y: 0 });
             if (nameLayer) gsap.set(nameLayer, { mixBlendMode: "difference" });
             const vwSize = (newFontSize / vw) * 100;
@@ -446,8 +467,8 @@ export default function LukeBaffaitPortfolio() {
               if (el) el.style.fontSize = `${vwSize}vw`;
             });
             void pContent.offsetWidth;
+            keepIntroNameAnchored = true;
             placeIntroNameAtBottom();
-            pContent.style.visibility = "visible";
           };
 
           gsap.to(pContent, {
@@ -524,7 +545,29 @@ export default function LukeBaffaitPortfolio() {
         { opacity: 1, scaleX: 0 },
         { scaleX: 1, duration: 1.0, ease: "power3.inOut" },
         "<"
-      );
+      )
+      .add(() => {
+        document.documentElement.style.overflow = "";
+        window.scrollTo(0, 0);
+        if (lenis) {
+          lenis.start();
+          lenis.scrollTo(0, { immediate: true });
+        }
+        ScrollTrigger.refresh();
+      }, "-=0.3");
+
+    const startIntro = () => {
+      centerIntroName();
+      master.play();
+    };
+
+    if (typeof document !== "undefined" && document.fonts) {
+      document.fonts.ready.then(() => {
+        requestAnimationFrame(startIntro);
+      });
+    } else {
+      setTimeout(startIntro, 100);
+    }
 
     // =========================================================================
     // 4. Hero Neural Particles Canvas (Subtle ambient AI architecture)
@@ -655,6 +698,16 @@ export default function LukeBaffaitPortfolio() {
           }
         }
       };
+      if (img.complete && img.naturalWidth > 0) {
+        frames[i - 1] = img;
+        if (i === 1 && canvas && drawnIdx === -1) {
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            drawFrameToCanvas(ctx, canvas, img);
+            drawnIdx = 0;
+          }
+        }
+      }
       if (i % 2 === 1) frames[i - 1] = img;
     }
 
@@ -2107,6 +2160,8 @@ export default function LukeBaffaitPortfolio() {
 
     // Cleanup
     return () => {
+      document.documentElement.style.overflow = "";
+      master.kill();
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("scroll", onProjectsScroll);
       window.removeEventListener("scroll", onScrollHUD);
