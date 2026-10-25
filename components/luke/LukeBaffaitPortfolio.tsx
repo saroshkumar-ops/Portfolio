@@ -233,6 +233,13 @@ export default function LukeBaffaitPortfolio() {
     gsap.set(pDot, { opacity: 0 });
     gsap.set([pContent, tPanelRed, tPanelDark], { willChange: "transform" });
 
+    // Handle responsive resize re-anchoring
+    const onWindowResize = () => {
+      layoutNames();
+      placeIntroNameAtBottom();
+    };
+    window.addEventListener("resize", onWindowResize);
+
     // =========================================================================
     // 3. Master Intro Sequence Timeline
     // =========================================================================
@@ -378,7 +385,93 @@ export default function LukeBaffaitPortfolio() {
       );
 
     // =========================================================================
-    // 4. Hero Sequence Canvas Scrubber
+    // 4. Hero Neural Particles Canvas (Subtle ambient AI architecture)
+    // =========================================================================
+    const heroCanvas = document.getElementById("hero-canvas") as HTMLCanvasElement | null;
+    let heroRaf = 0;
+    if (heroCanvas) {
+      const hCtx = heroCanvas.getContext("2d");
+      let hW = (heroCanvas.width = window.innerWidth);
+      let hH = (heroCanvas.height = window.innerHeight);
+
+      const resizeHC = () => {
+        if (!heroCanvas) return;
+        hW = heroCanvas.width = window.innerWidth;
+        hH = heroCanvas.height = window.innerHeight;
+      };
+      window.addEventListener("resize", resizeHC);
+
+      const numNodes = Math.min(Math.round(window.innerWidth * 0.04), 45);
+      const nodes: { x: number; y: number; vx: number; vy: number; r: number }[] = [];
+      for (let n = 0; n < numNodes; n++) {
+        nodes.push({
+          x: Math.random() * hW,
+          y: Math.random() * hH,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          r: Math.random() * 1.5 + 1,
+        });
+      }
+
+      let hMouseX = -1000, hMouseY = -1000;
+      window.addEventListener("mousemove", (e) => {
+        hMouseX = e.clientX;
+        hMouseY = e.clientY;
+      });
+
+      const drawHeroCanvas = () => {
+        if (!hCtx || !heroCanvas) return;
+        if (window.scrollY > window.innerHeight) {
+          heroRaf = requestAnimationFrame(drawHeroCanvas);
+          return;
+        }
+        hCtx.clearRect(0, 0, hW, hH);
+
+        for (let i = 0; i < nodes.length; i++) {
+          const nd = nodes[i];
+          nd.x += nd.vx;
+          nd.y += nd.vy;
+          if (nd.x < 0) nd.x = hW;
+          else if (nd.x > hW) nd.x = 0;
+          if (nd.y < 0) nd.y = hH;
+          else if (nd.y > hH) nd.y = 0;
+
+          const dmx = nd.x - hMouseX;
+          const dmy = nd.y - hMouseY;
+          const distM = Math.sqrt(dmx * dmx + dmy * dmy);
+          if (distM < 120 && distM > 0) {
+            nd.x += (dmx / distM) * 1.5;
+            nd.y += (dmy / distM) * 1.5;
+          }
+
+          hCtx.fillStyle = "rgba(240, 240, 240, 0.25)";
+          hCtx.beginPath();
+          hCtx.arc(nd.x, nd.y, nd.r, 0, Math.PI * 2);
+          hCtx.fill();
+
+          for (let j = i + 1; j < nodes.length; j++) {
+            const nd2 = nodes[j];
+            const dx = nd.x - nd2.x;
+            const dy = nd.y - nd2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 110) {
+              const alpha = (1 - dist / 110) * 0.12;
+              hCtx.strokeStyle = `rgba(240, 240, 240, ${alpha})`;
+              hCtx.lineWidth = 0.8;
+              hCtx.beginPath();
+              hCtx.moveTo(nd.x, nd.y);
+              hCtx.lineTo(nd2.x, nd2.y);
+              hCtx.stroke();
+            }
+          }
+        }
+        heroRaf = requestAnimationFrame(drawHeroCanvas);
+      };
+      heroRaf = requestAnimationFrame(drawHeroCanvas);
+    }
+
+    // =========================================================================
+    // 5. Hero Sequence Scrubber Canvas
     // =========================================================================
     const canvas = document.getElementById("reveal-canvas") as HTMLCanvasElement | null;
     const revealWrap = document.getElementById("reveal-image-wrap");
@@ -388,20 +481,6 @@ export default function LukeBaffaitPortfolio() {
     const TOTAL_FRAMES = 200;
     const frames: HTMLImageElement[] = new Array(TOTAL_FRAMES);
     let drawnIdx = -1;
-
-    for (let i = 1; i <= TOTAL_FRAMES; i++) {
-      const img = new Image();
-      const pad = String(i).padStart(3, "0");
-      img.src = `/Landing/ezgif-frame-${pad}.jpg`;
-      img.onload = () => {
-        frames[i - 1] = img;
-        if (drawnIdx === i - 1 && canvas) {
-          const ctx = canvas.getContext("2d");
-          if (ctx) drawFrameToCanvas(ctx, canvas, img);
-        }
-      };
-      if (i % 2 === 1) frames[i - 1] = img;
-    }
 
     function drawFrameToCanvas(
       ctx: CanvasRenderingContext2D,
@@ -418,6 +497,23 @@ export default function LukeBaffaitPortfolio() {
       const dh = ih * s;
       ctx.clearRect(0, 0, cw, ch);
       ctx.drawImage(img, (cw - dw) * 0.5, (ch - dh) * 0.5, dw, dh);
+    }
+
+    for (let i = 1; i <= TOTAL_FRAMES; i++) {
+      const img = new Image();
+      const pad = String(i).padStart(3, "0");
+      img.src = `/Landing/ezgif-frame-${pad}.jpg`;
+      img.onload = () => {
+        frames[i - 1] = img;
+        if (i === 1 && canvas && drawnIdx === -1) {
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            drawFrameToCanvas(ctx, canvas, img);
+            drawnIdx = 0;
+          }
+        }
+      };
+      if (i % 2 === 1) frames[i - 1] = img;
     }
 
     if (canvas) {
@@ -554,7 +650,7 @@ export default function LukeBaffaitPortfolio() {
     }
 
     // =========================================================================
-    // 5. About Section: Word Unblur & Photo Parallax
+    // 6. About Section: Word Unblur & Photo Parallax
     // =========================================================================
     function wrapWords(el: HTMLElement | null) {
       if (!el) return;
@@ -661,11 +757,11 @@ export default function LukeBaffaitPortfolio() {
     }
 
     // =========================================================================
-    // 6. Projects Section: Drawing Red Fluid Line & Fixed Card Preview
+    // 7. Projects Section: Drawing Red Fluid Line & Fixed Card Preview
     // =========================================================================
     const linePath = document.getElementById("fluid-line") as SVGPathElement | null;
     if (linePath && linePath.getTotalLength) {
-      const lineLen = linePath.getTotalLength();
+      const lineLen = linePath.getTotalLength() || 3000;
       gsap.set(linePath, { strokeDasharray: lineLen, strokeDashoffset: lineLen });
       gsap.to(linePath, {
         strokeDashoffset: 0,
@@ -804,6 +900,10 @@ export default function LukeBaffaitPortfolio() {
     let tiltTargetRX = 0;
     let tiltRY = 0;
     let tiltRX = 0;
+    let detTiltTargetRY = 0;
+    let detTiltTargetRX = 0;
+    let detTiltRY = 0;
+    let detTiltRX = 0;
 
     const onMouseMove = (e: MouseEvent) => {
       if (projectsVisible) {
@@ -819,6 +919,15 @@ export default function LukeBaffaitPortfolio() {
           tiltTargetRX = -rx * 5;
         }
       }
+      if (projectOpen && cachedSelImg) {
+        const sr = cachedSelImg.getBoundingClientRect();
+        const scx = sr.left + sr.width / 2;
+        const scy = sr.top + sr.height / 2;
+        const sry = Math.max(-1, Math.min(1, (e.clientX - scx) / (sr.width / 2)));
+        const srx = Math.max(-1, Math.min(1, (e.clientY - scy) / (sr.height / 2)));
+        detTiltTargetRY = sry * 5;
+        detTiltTargetRX = -srx * 4;
+      }
     };
     window.addEventListener("mousemove", onMouseMove);
 
@@ -828,6 +937,11 @@ export default function LukeBaffaitPortfolio() {
       tiltRX += (tiltTargetRX - tiltRX) * 0.1;
       if (card && projectsVisible) {
         card.style.transform = `rotateX(${tiltRX.toFixed(2)}deg) rotateY(${tiltRY.toFixed(2)}deg)`;
+      }
+      if (cachedSelImg && projectOpen) {
+        detTiltRY += (detTiltTargetRY - detTiltRY) * 0.1;
+        detTiltRX += (detTiltTargetRX - detTiltRX) * 0.1;
+        cachedSelImg.style.transform = `rotateX(${detTiltRX.toFixed(2)}deg) rotateY(${detTiltRY.toFixed(2)}deg)`;
       }
       rafTilt = requestAnimationFrame(tickTilt);
     };
@@ -839,7 +953,7 @@ export default function LukeBaffaitPortfolio() {
     }
 
     // =========================================================================
-    // 7. Full Project Detail Modal Overlay & Transition
+    // 8. Full Project Detail Modal Overlay & Transition
     // =========================================================================
     const pageFade = document.getElementById("page-fade");
     const flyingTitle = document.getElementById("flying-title");
@@ -1094,6 +1208,11 @@ export default function LukeBaffaitPortfolio() {
 
     if (detailBack) detailBack.addEventListener("click", closeProject);
 
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && projectOpen) closeProject();
+    };
+    window.addEventListener("keydown", onKeyDown);
+
     if (detailEl) {
       detailEl.addEventListener(
         "wheel",
@@ -1109,166 +1228,182 @@ export default function LukeBaffaitPortfolio() {
     }
 
     // =========================================================================
-    // 8. 3D Elliptical Orbit Gallery & Slices
+    // 9. 3D Elliptical Orbit Gallery & Curved Slices
     // =========================================================================
     const cgPhrase = document.getElementById("cg-phrase");
     const vw = window.innerWidth;
-    const vh = window.innerHeight;
 
-    function buildSlices() {
-      const SLICES = 10;
-      const imgW = Math.min(Math.max(120, vw * 0.14), 210);
-      const imgH = (imgW * 2) / 3;
-      const orbitR = (vw * 0.34 + 500) / 2;
-      const bendRad = imgW / orbitR;
-      const cylR = orbitR;
-      const sliceW = imgW / SLICES;
-      const totalBendDeg = (bendRad * 180) / Math.PI;
-      const stepDeg = totalBendDeg / SLICES;
+    if (vw > 768) {
+      function buildSlices() {
+        const SLICES = 10;
+        const imgW = Math.min(Math.max(120, vw * 0.14), 210);
+        const imgH = (imgW * 2) / 3;
+        const orbitR = (vw * 0.34 + 500) / 2;
+        const bendRad = imgW / orbitR;
+        const cylR = orbitR;
+        const sliceW = imgW / SLICES;
+        const totalBendDeg = (bendRad * 180) / Math.PI;
+        const stepDeg = totalBendDeg / SLICES;
 
-      document.querySelectorAll(".cg-img").forEach((img) => {
-        if (img.tagName.toLowerCase() !== "img") return;
-        const src = img.getAttribute("src") || "";
-        const wrapper = document.createElement("div");
-        wrapper.className = "cg-img";
+        document.querySelectorAll(".cg-img").forEach((img) => {
+          if (img.tagName.toLowerCase() !== "img") return;
+          const src = img.getAttribute("src") || "";
+          const wrapper = document.createElement("div");
+          wrapper.className = "cg-img";
 
-        for (let s = 0; s < SLICES; s++) {
-          const sl = document.createElement("div");
-          sl.className = "cg-slice";
-          const displayW = sliceW + 1.5;
-          sl.style.width = displayW.toFixed(1) + "px";
-          sl.style.left = "50%";
-          sl.style.marginLeft = (-displayW / 2).toFixed(1) + "px";
-          sl.style.backgroundImage = "url(" + src + ")";
-          sl.style.backgroundSize = imgW.toFixed(1) + "px " + imgH.toFixed(1) + "px";
-          sl.style.backgroundPosition = (-s * sliceW).toFixed(1) + "px 0";
-          sl.style.transformOrigin = "50% 50% " + (-cylR).toFixed(1) + "px";
-          const angle = (s - (SLICES - 1) / 2) * stepDeg;
-          sl.style.transform = "rotateY(" + angle.toFixed(2) + "deg)";
-          wrapper.appendChild(sl);
+          for (let s = 0; s < SLICES; s++) {
+            const sl = document.createElement("div");
+            sl.className = "cg-slice";
+            const displayW = sliceW + 1.5;
+            sl.style.width = displayW.toFixed(1) + "px";
+            sl.style.left = "50%";
+            sl.style.marginLeft = (-displayW / 2).toFixed(1) + "px";
+            sl.style.backgroundImage = "url(" + src + ")";
+            sl.style.backgroundSize = imgW.toFixed(1) + "px " + imgH.toFixed(1) + "px";
+            sl.style.backgroundPosition = (-s * sliceW).toFixed(1) + "px 0";
+            sl.style.transformOrigin = "50% 50% " + (-cylR).toFixed(1) + "px";
+            const angle = (s - (SLICES - 1) / 2) * stepDeg;
+            sl.style.transform = "rotateY(" + angle.toFixed(2) + "deg)";
+            wrapper.appendChild(sl);
+          }
+          img.parentNode?.replaceChild(wrapper, img);
+        });
+      }
+
+      buildSlices();
+
+      const cgImgs = Array.from(document.querySelectorAll<HTMLElement>(".cg-img"));
+      const count = cgImgs.length;
+
+      wrapWords(cgPhrase);
+      const cgPhraseWords = Array.from(
+        document.querySelectorAll<HTMLElement>("#cg-phrase .word")
+      );
+
+      const rx = vw * 0.34;
+      const rz = 500;
+      const tiltY = 180;
+      const entryAngle = Math.PI / 2;
+      const offX = vw * 0.85;
+
+      function getPos(t: number) {
+        if (t <= 0.12) {
+          const p = t / 0.12;
+          return {
+            x: -offX * (1 - p),
+            y: tiltY,
+            z: rz * p,
+            rotY: 0,
+          };
         }
-        img.parentNode?.replaceChild(wrapper, img);
+        if (t <= 0.88) {
+          const p = (t - 0.12) / 0.76;
+          const angle = entryAngle - p * Math.PI * 2;
+          const x = Math.cos(angle) * rx;
+          const z = Math.sin(angle) * rz;
+          const ry = p * Math.PI * 2;
+          return {
+            x,
+            y: (z / rz) * tiltY,
+            z,
+            rotY: ry,
+          };
+        }
+        const p = (t - 0.88) / 0.12;
+        return {
+          x: offX * p,
+          y: tiltY,
+          z: rz * (1 - p),
+          rotY: Math.PI * 2,
+        };
+      }
+
+      const stagger = 0.09;
+      const totalRange = 1 + stagger * (count - 1);
+
+      cgImgs.forEach((img) => {
+        img.style.opacity = "0";
+      });
+
+      ScrollTrigger.create({
+        trigger: "#circle-gallery",
+        start: "top top",
+        end: "bottom bottom",
+        pin: "#circle-gallery-pin",
+        onUpdate: (self) => {
+          const progress = self.progress;
+
+          cgImgs.forEach((img, i) => {
+            const imgT = progress * totalRange - i * stagger;
+            if (imgT <= 0 || imgT >= 1) {
+              img.style.opacity = "0";
+              return;
+            }
+            let alpha = 1;
+            if (imgT < 0.06) alpha = imgT / 0.06;
+            else if (imgT > 0.94) alpha = (1 - imgT) / 0.06;
+
+            const pos = getPos(imgT);
+            const rotDeg = ((pos.rotY * 180) / Math.PI).toFixed(1);
+
+            img.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, ${pos.z.toFixed(1)}px) rotateY(${rotDeg}deg)`;
+            img.style.opacity = String(alpha);
+            img.style.zIndex = String(Math.round(pos.z + 600));
+          });
+
+          const phraseStart = 0.25;
+          const phraseEnd = 0.75;
+          const travelY = 200;
+
+          if (cgPhrase) {
+            if (progress < phraseStart || progress > phraseEnd) {
+              cgPhrase.style.opacity = "0";
+            } else {
+              const globalP = (progress - phraseStart) / (phraseEnd - phraseStart);
+              const yOffset = travelY * (0.5 - globalP);
+              cgPhrase.style.transform = `translateY(${yOffset.toFixed(1)}px)`;
+
+              const revealEnd = 0.4;
+              cgPhraseWords.forEach((w, wi) => {
+                if (globalP < revealEnd) {
+                  const revealP = globalP / revealEnd;
+                  const wordT = revealP * (cgPhraseWords.length + 4) - wi;
+                  const wP = Math.max(0, Math.min(1, wordT / 3));
+                  w.style.opacity = String(wP);
+                  w.style.filter = `blur(${(8 * (1 - wP)).toFixed(1)}px)`;
+                } else {
+                  w.style.opacity = "1";
+                  w.style.filter = "blur(0px)";
+                }
+              });
+
+              let alpha = 1;
+              if (globalP < 0.1) alpha = globalP / 0.1;
+              else if (globalP > 0.75) alpha = (1 - globalP) / 0.25;
+              cgPhrase.style.opacity = String(alpha);
+            }
+          }
+        },
       });
     }
 
-    buildSlices();
-
-    const cgImgs = Array.from(document.querySelectorAll<HTMLElement>(".cg-img"));
-    const count = cgImgs.length;
-
-    wrapWords(cgPhrase);
-    const cgPhraseWords = Array.from(document.querySelectorAll<HTMLElement>("#cg-phrase .word"));
-
-    const rx = vw * 0.34;
-    const rz = 500;
-    const tiltY = vw <= 768 ? 80 : 180;
-    const entryAngle = Math.PI / 2;
-    const offX = vw * 0.85;
-
-    function getPos(t: number) {
-      if (t <= 0.12) {
-        const p = t / 0.12;
-        return {
-          x: -offX * (1 - p),
-          y: tiltY,
-          z: rz * p,
-          rotY: 0,
-        };
-      }
-      if (t <= 0.88) {
-        const p = (t - 0.12) / 0.76;
-        const angle = entryAngle - p * Math.PI * 2;
-        const x = Math.cos(angle) * rx;
-        const z = Math.sin(angle) * rz;
-        const ry = p * Math.PI * 2;
-        return {
-          x,
-          y: (z / rz) * tiltY,
-          z,
-          rotY: ry,
-        };
-      }
-      const p = (t - 0.88) / 0.12;
-      return {
-        x: offX * p,
-        y: tiltY,
-        z: rz * (1 - p),
-        rotY: Math.PI * 2,
-      };
-    }
-
-    const stagger = 0.09;
-    const totalRange = 1 + stagger * (count - 1);
-
-    cgImgs.forEach((img) => {
-      img.style.opacity = "0";
-    });
-
-    ScrollTrigger.create({
-      trigger: "#circle-gallery",
-      start: "top top",
-      end: "bottom bottom",
-      pin: "#circle-gallery-pin",
-      onUpdate: (self) => {
-        const progress = self.progress;
-
-        cgImgs.forEach((img, i) => {
-          const imgT = progress * totalRange - i * stagger;
-          if (imgT <= 0 || imgT >= 1) {
-            img.style.opacity = "0";
-            return;
-          }
-          let alpha = 1;
-          if (imgT < 0.06) alpha = imgT / 0.06;
-          else if (imgT > 0.94) alpha = (1 - imgT) / 0.06;
-
-          const pos = getPos(imgT);
-          const rotDeg = ((pos.rotY * 180) / Math.PI).toFixed(1);
-
-          img.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, ${pos.z.toFixed(1)}px) rotateY(${rotDeg}deg)`;
-          img.style.opacity = String(alpha);
-          img.style.zIndex = String(Math.round(pos.z + 600));
-        });
-
-        const phraseStart = 0.25;
-        const phraseEnd = 0.75;
-        const travelY = 200;
-
-        if (cgPhrase) {
-          if (progress < phraseStart || progress > phraseEnd) {
-            cgPhrase.style.opacity = "0";
-          } else {
-            const globalP = (progress - phraseStart) / (phraseEnd - phraseStart);
-            const yOffset = travelY * (0.5 - globalP);
-            cgPhrase.style.transform = `translateY(${yOffset.toFixed(1)}px)`;
-
-            const revealEnd = 0.4;
-            cgPhraseWords.forEach((w, wi) => {
-              if (globalP < revealEnd) {
-                const revealP = globalP / revealEnd;
-                const wordT = revealP * (cgPhraseWords.length + 4) - wi;
-                const wP = Math.max(0, Math.min(1, wordT / 3));
-                w.style.opacity = String(wP);
-                w.style.filter = `blur(${(8 * (1 - wP)).toFixed(1)}px)`;
-              } else {
-                w.style.opacity = "1";
-                w.style.filter = "blur(0px)";
-              }
-            });
-
-            let alpha = 1;
-            if (globalP < 0.1) alpha = globalP / 0.1;
-            else if (globalP > 0.75) alpha = (1 - globalP) / 0.25;
-            cgPhrase.style.opacity = String(alpha);
-          }
-        }
-      },
-    });
-
     // =========================================================================
-    // 9. Awards Radar Scanner
+    // 10. Awards Radar Scanner & Interactive Hover Cursor Card
     // =========================================================================
     const awardItems = document.querySelectorAll(".award-item");
+    const awardCursor = document.createElement("img");
+    awardCursor.style.cssText =
+      "position:fixed;top:0;left:0;width:240px;height:auto;border-radius:6px;pointer-events:none;z-index:99999;box-shadow:0 12px 30px rgba(0,0,0,0.5);";
+    document.body.appendChild(awardCursor);
+    gsap.set(awardCursor, { xPercent: -50, yPercent: -50, scale: 0.8, opacity: 0 });
+
+    let isAwardHovered = false;
+    window.addEventListener("mousemove", (e) => {
+      if (isAwardHovered) {
+        gsap.set(awardCursor, { x: e.clientX, y: e.clientY });
+      }
+    });
+
     awardItems.forEach((item) => {
       ScrollTrigger.create({
         trigger: item,
@@ -1276,10 +1411,24 @@ export default function LukeBaffaitPortfolio() {
         end: "bottom center-=15%",
         toggleClass: { targets: item, className: "active-award" },
       });
+
+      item.addEventListener("mouseenter", (e) => {
+        isAwardHovered = true;
+        const imgSrc = item.getAttribute("data-cursor-img");
+        if (imgSrc) awardCursor.src = imgSrc;
+        const me = e as MouseEvent;
+        gsap.set(awardCursor, { x: me.clientX, y: me.clientY });
+        gsap.to(awardCursor, { opacity: 1, scale: 1, duration: 0.3, overwrite: "auto" });
+      });
+
+      item.addEventListener("mouseleave", () => {
+        isAwardHovered = false;
+        gsap.to(awardCursor, { opacity: 0, scale: 0.8, duration: 0.3, overwrite: "auto" });
+      });
     });
 
     // =========================================================================
-    // 10. Contact Section: White Blob, Title Slide, & Dual Parallax Frames
+    // 11. Contact Section: White Blob, Title Slide, & Dual Parallax Frames
     // =========================================================================
     const blobWrap = document.getElementById("contact-blob-wrap");
     const blob = document.getElementById("contact-blob");
@@ -1332,8 +1481,14 @@ export default function LukeBaffaitPortfolio() {
 
       cTl.fromTo(blob, { scale: 0 }, { scale: 1, duration: 0.6, ease: "none" }, 0);
 
-      gsap.set(ctTitle, { yPercent: 0, x: () => window.innerWidth * 1.1 });
-      cTl.to(ctTitle, { x: 0, duration: 0.3, ease: "power3.out" }, 0.18);
+      const isMobile = window.innerWidth <= 768;
+      if (!isMobile) {
+        gsap.set(ctTitle, { yPercent: 0, x: () => window.innerWidth * 1.1 });
+        cTl.to(ctTitle, { x: 0, duration: 0.3, ease: "power3.out" }, 0.18);
+      } else {
+        gsap.set(ctTitle, { opacity: 0, y: 30 });
+        cTl.to(ctTitle, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 0.18);
+      }
 
       cTl.fromTo(
         ctSocials,
@@ -1392,7 +1547,7 @@ export default function LukeBaffaitPortfolio() {
     }
 
     // =========================================================================
-    // 11. Curtain Footer Lift & Interactive ASCII Art
+    // 12. Curtain Footer Lift & Interactive Hover ASCII Art
     // =========================================================================
     const footerEl = document.getElementById("footer");
     if (footerEl) {
@@ -1478,6 +1633,10 @@ export default function LukeBaffaitPortfolio() {
       return asciiSeed / 2147483647;
     }
 
+    function esc(s: string) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
     function imageToAscii(img: HTMLImageElement, cols: number) {
       asciiSeed = 42;
       const c = document.createElement("canvas");
@@ -1520,6 +1679,7 @@ export default function LukeBaffaitPortfolio() {
       return { text: lines.join("\n"), poolGrid };
     }
 
+    let asciiHoverRaf = 0;
     function setupAsciiHover(preEl: HTMLElement, poolGrid: number[][]) {
       let origLines: string[] | null = null;
       let origGrid: string[][] | null = null;
@@ -1528,17 +1688,22 @@ export default function LukeBaffaitPortfolio() {
       const radius = 2.5;
       const cols = poolGrid[0] ? poolGrid[0].length : 1;
       const rows = poolGrid.length;
-      let hitTime: number[][] = [];
-      let cellDuration: number[][] = [];
+      const noise: number[][] = [];
+      const hitTime: number[][] = [];
+      const cellDuration: number[][] = [];
+      let animating = false;
 
       for (let ny = 0; ny < rows; ny++) {
+        const nr: number[] = [];
         const ht: number[] = [];
         const cd: number[] = [];
         for (let nx = 0; nx < cols; nx++) {
           const h = (Math.sin(nx * 12.9898 + ny * 78.233) * 43758.5453 % 1 + 1) % 1;
+          nr.push(h * 5 - 2.5);
           ht.push(0);
           cd.push(h > 0.5 ? 200 : 100);
         }
+        noise.push(nr);
         hitTime.push(ht);
         cellDuration.push(cd);
       }
@@ -1546,6 +1711,39 @@ export default function LukeBaffaitPortfolio() {
       function initOrig() {
         origLines = (preEl.textContent || "").split("\n");
         origGrid = origLines.map((l) => l.split(""));
+      }
+
+      function tick() {
+        const now = performance.now();
+        let anyActive = false;
+        let html = "";
+        for (let y = 0; y < rows; y++) {
+          for (let x = 0; x < cols; x++) {
+            const pi = poolGrid[y] ? poolGrid[y][x] : -1;
+            if (pi <= 0) {
+              html += " ";
+              continue;
+            }
+            const elapsed = now - (hitTime[y] ? hitTime[y][x] : 0);
+            if (hitTime[y] && hitTime[y][x] > 0 && elapsed < (cellDuration[y] ? cellDuration[y][x] : 150)) {
+              anyActive = true;
+              const idx = ASCII_POOLS.length - 1 - pi;
+              const pool = ASCII_POOLS[Math.max(0, idx)];
+              const ch = pool[Math.floor(Math.random() * pool.length)];
+              html += `<span style="color:#0a0a0a;background:#ff3b14">${esc(ch)}</span>`;
+            } else {
+              html += esc(origGrid && origGrid[y] ? origGrid[y][x] : " ");
+            }
+          }
+          html += "\n";
+        }
+        preEl.innerHTML = html;
+        if (anyActive) {
+          asciiHoverRaf = requestAnimationFrame(tick);
+        } else {
+          animating = false;
+          if (origLines) preEl.textContent = origLines.join("\n");
+        }
       }
 
       preEl.addEventListener("mousemove", (e) => {
@@ -1557,20 +1755,31 @@ export default function LukeBaffaitPortfolio() {
         myC = (e.clientY - rect.top) / charH;
 
         const now = performance.now();
-        const minX = Math.max(0, Math.floor(mxC - radius));
-        const maxX = Math.min(cols - 1, Math.ceil(mxC + radius));
-        const minY = Math.max(0, Math.floor(myC - radius));
-        const maxY = Math.min(rows - 1, Math.ceil(myC + radius));
+        const maxR = radius + 3;
+        const yMin = Math.max(0, Math.floor(myC - maxR));
+        const yMax = Math.min(rows - 1, Math.ceil(myC + maxR));
+        const xMin = Math.max(0, Math.floor(mxC - maxR));
+        const xMax = Math.min(cols - 1, Math.ceil(mxC + maxR));
 
-        for (let y = minY; y <= maxY; y++) {
-          for (let x = minX; x <= maxX; x++) {
+        for (let y = yMin; y <= yMax; y++) {
+          for (let x = xMin; x <= xMax; x++) {
             const dx = x - mxC;
             const dy = y - myC;
-            if (dx * dx + dy * dy <= radius * radius && poolGrid[y] && poolGrid[y][x] >= 0) {
-              hitTime[y][x] = now;
+            const rN = radius + (noise[y] ? noise[y][x] : 0);
+            if (dx * dx + dy * dy < rN * rN && poolGrid[y] && poolGrid[y][x] >= 0) {
+              if (hitTime[y]) hitTime[y][x] = now;
             }
           }
         }
+        if (!animating) {
+          animating = true;
+          tick();
+        }
+      });
+
+      preEl.addEventListener("mouseleave", () => {
+        mxC = -1000;
+        myC = -1000;
       });
     }
 
@@ -1625,7 +1834,7 @@ export default function LukeBaffaitPortfolio() {
     }
 
     // =========================================================================
-    // 12. Scroll Timeline HUD & Percentage Indicator
+    // 13. Scroll Timeline HUD & Percentage Indicator
     // =========================================================================
     const timeline = document.getElementById("scroll-timeline");
     const bar = document.getElementById("st-bar");
@@ -1639,7 +1848,10 @@ export default function LukeBaffaitPortfolio() {
       { id: "skills", name: "Skills" },
       { id: "awards", name: "Awards" },
       { id: "contact", name: "Contact" },
-    ];
+    ].filter((sec) => {
+      if (sec.id === "circle-gallery" && window.innerWidth <= 768) return false;
+      return true;
+    });
 
     if (bar && bar.children.length === 0) {
       sections.forEach((sec) => {
@@ -1688,12 +1900,36 @@ export default function LukeBaffaitPortfolio() {
 
     window.addEventListener("scroll", onScrollHUD, { passive: true });
 
+    // Smooth Anchor Scroll Interception for in-page navigation links
+    const onAnchorClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement)?.closest("a");
+      if (!target) return;
+      const href = target.getAttribute("href");
+      if (href && href.startsWith("#") && href.length > 1) {
+        const el = document.getElementById(href.slice(1));
+        if (el) {
+          e.preventDefault();
+          if (scrollTo) scrollTo(el, { offset: 0, duration: 1.2 });
+          else el.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    };
+    document.addEventListener("click", onAnchorClick);
+
     // Cleanup
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("scroll", onProjectsScroll);
       window.removeEventListener("scroll", onScrollHUD);
+      window.removeEventListener("resize", onWindowResize);
+      window.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("click", onAnchorClick);
       cancelAnimationFrame(rafTilt);
+      cancelAnimationFrame(heroRaf);
+      cancelAnimationFrame(asciiHoverRaf);
+      if (awardCursor && awardCursor.parentNode) {
+        awardCursor.parentNode.removeChild(awardCursor);
+      }
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, [lenis, scrollTo]);
@@ -1723,7 +1959,7 @@ export default function LukeBaffaitPortfolio() {
           <h1 className="sr-only">
             Sarosh Kumar — AI Systems Engineer, deep learning, audio AI, and low-latency backends.
           </h1>
-          <div className="hero-canvas" id="hero-canvas" />
+          <canvas className="hero-canvas" id="hero-canvas" />
 
           <div className="hero-content">
             <div className="hero-tagline" id="hero-tagline">
@@ -2049,37 +2285,37 @@ export default function LukeBaffaitPortfolio() {
         <div className="awards-inner">
           <div className="skills-subtitle awards-title">Awards & Misc</div>
           <div className="awards-list" id="awards-list">
-            <div className="award-item">
+            <div className="award-item" data-cursor-img="/Projects/img_00001.jpg">
               <div className="award-org">HackTU 7.0</div>
               <div className="award-site">MLH / Thapar</div>
               <div className="award-prize">Top Finalist (out of 6,000+ teams)</div>
               <div className="award-date">2026</div>
             </div>
-            <div className="award-item">
+            <div className="award-item" data-cursor-img="/Projects/img_00010.jpg">
               <div className="award-org">HACK4SOC 3.0</div>
               <div className="award-site">RVCE Bengaluru</div>
               <div className="award-prize">4th Place Finalist</div>
               <div className="award-date">2025</div>
             </div>
-            <div className="award-item">
+            <div className="award-item" data-cursor-img="/Projects/img_00020.jpg">
               <div className="award-org">IGNITRIX</div>
               <div className="award-site">Agentic AI Hackathon</div>
               <div className="award-prize">Consolation Prize (Agent System)</div>
               <div className="award-date">2025</div>
             </div>
-            <div className="award-item">
+            <div className="award-item" data-cursor-img="/Projects/img_00030.jpg">
               <div className="award-org">Hack-Nocturne 2.0</div>
               <div className="award-site">SMVIT Bengaluru</div>
               <div className="award-prize">Premier Finalist</div>
               <div className="award-date">2025</div>
             </div>
-            <div className="award-item">
+            <div className="award-item" data-cursor-img="/Projects/img_00040.jpg">
               <div className="award-org">Anvil Hackathon</div>
               <div className="award-site">Scaler Bengaluru</div>
               <div className="award-prize">Premier Finalist</div>
               <div className="award-date">2025</div>
             </div>
-            <div className="award-item">
+            <div className="award-item" data-cursor-img="/Projects/img_00050.jpg">
               <div className="award-org">Data Science Club</div>
               <div className="award-site">KLE Tech Hubli</div>
               <div className="award-prize">Lead (500+ student community)</div>
