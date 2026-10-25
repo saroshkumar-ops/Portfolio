@@ -920,6 +920,8 @@ export default function LukeBaffaitPortfolio() {
     const items = document.querySelectorAll(".proj-item");
     const card = document.getElementById("proj-card");
     const cover = document.getElementById("proj-cover") as HTMLImageElement | null;
+    const coverNext = document.getElementById("proj-cover-next") as HTMLImageElement | null;
+    const coverWrap = document.getElementById("proj-img-wrap");
     const dateEl = document.getElementById("proj-date");
     const preview = document.getElementById("proj-preview");
     const projCursor = document.getElementById("proj-cursor");
@@ -930,7 +932,7 @@ export default function LukeBaffaitPortfolio() {
     if (card) gsap.set(card, { opacity: 0 });
 
     const itemQuickX = Array.from(items).map((item) =>
-      gsap.quickTo(item, "x", { duration: 0.6, ease: "power2.out" })
+      gsap.quickTo(item, "x", { duration: 0.75, ease: "power3.out" })
     );
 
     if (projectsEl && preview) {
@@ -966,7 +968,16 @@ export default function LukeBaffaitPortfolio() {
         items[currentIdx].classList.remove("active");
       }
       currentIdx = -1;
-      if (card) gsap.to(card, { opacity: 0, duration: 0.25, ease: "power2.in" });
+      if (card) {
+        gsap.killTweensOf(card);
+        gsap.to(card, {
+          opacity: 0,
+          scale: 0.94,
+          filter: "blur(8px)",
+          duration: 0.35,
+          ease: "power2.in",
+        });
+      }
     }
 
     function activateProject(i: number) {
@@ -980,22 +991,57 @@ export default function LukeBaffaitPortfolio() {
       const imgSrc = itemEl.dataset.img || "/About/img_00001.jpg";
       const dateText = itemEl.dataset.date || "";
 
+      // Smooth date roll
+      if (dateEl) {
+        gsap.to(dateEl, {
+          opacity: 0,
+          y: -4,
+          duration: 0.15,
+          ease: "power2.in",
+          onComplete: () => {
+            if (dateEl) {
+              dateEl.textContent = dateText;
+              gsap.to(dateEl, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" });
+            }
+          },
+        });
+      }
+
       if (currentIdx === -1) {
+        // Initial entrance into projects
         if (cover) cover.src = imgSrc;
-        if (dateEl) dateEl.textContent = dateText;
-        if (card) gsap.to(card, { opacity: 1, duration: 0.4, ease: "power2.out" });
-      } else {
         if (card) {
-          gsap.to(card, {
-            opacity: 0,
-            duration: 0.18,
-            ease: "power2.in",
-            onComplete: () => {
-              if (cover) cover.src = imgSrc;
-              if (dateEl) dateEl.textContent = dateText;
-              gsap.to(card, { opacity: 1, duration: 0.3, ease: "power2.out" });
-            },
-          });
+          gsap.killTweensOf(card);
+          gsap.fromTo(
+            card,
+            { opacity: 0, scale: 0.94, filter: "blur(10px)" },
+            { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.55, ease: "power3.out" }
+          );
+        }
+      } else {
+        // Filmic crossfade between project images - card frame never flickers
+        if (cover && coverNext) {
+          coverNext.src = imgSrc;
+          gsap.killTweensOf([cover, coverNext]);
+          gsap.fromTo(
+            coverNext,
+            { opacity: 0, scale: 1.05 },
+            {
+              opacity: 1,
+              scale: 1,
+              duration: 0.45,
+              ease: "power2.out",
+              onComplete: () => {
+                if (cover) {
+                  cover.src = imgSrc;
+                  gsap.set(cover, { scale: 1 });
+                }
+                if (coverNext) gsap.set(coverNext, { opacity: 0 });
+              },
+            }
+          );
+        } else if (cover) {
+          cover.src = imgSrc;
         }
       }
       currentIdx = i;
@@ -1010,6 +1056,7 @@ export default function LukeBaffaitPortfolio() {
       const halfH = window.innerHeight / 2;
       let closestIdx = -1;
       let closestDist = Infinity;
+      let currentDist = Infinity;
 
       items.forEach((item, i) => {
         const rect = item.getBoundingClientRect();
@@ -1018,15 +1065,25 @@ export default function LukeBaffaitPortfolio() {
 
         itemQuickX[i](Math.min(dist / halfH, 1) * 80);
 
+        if (i === currentIdx) {
+          currentDist = dist;
+        }
+
         if (dist < closestDist) {
           closestDist = dist;
           closestIdx = i;
         }
       });
 
-      if (closestIdx >= 0 && closestDist < window.innerHeight * 0.38) {
+      // Hysteresis threshold to prevent oscillation on boundary
+      const shouldSwitch =
+        currentIdx === -1 ||
+        closestIdx === currentIdx ||
+        closestDist < currentDist - 20;
+
+      if (shouldSwitch && closestIdx >= 0 && closestDist < window.innerHeight * 0.40) {
         activateProject(closestIdx);
-      } else {
+      } else if (closestDist >= window.innerHeight * 0.45) {
         deactivateAll();
       }
     }
@@ -1050,6 +1107,17 @@ export default function LukeBaffaitPortfolio() {
     let detTiltTargetRX = 0;
     let detTiltRY = 0;
     let detTiltRX = 0;
+
+    let lastScrollY = typeof window !== "undefined" ? window.scrollY : 0;
+    let scrollVel = 0;
+    let floatY = 0;
+
+    const onScrollVel = () => {
+      const sy = window.scrollY;
+      scrollVel = (sy - lastScrollY) * 0.12;
+      lastScrollY = sy;
+    };
+    window.addEventListener("scroll", onScrollVel, { passive: true });
 
     const onMouseMove = (e: MouseEvent) => {
       if (projectsVisible) {
@@ -1079,10 +1147,13 @@ export default function LukeBaffaitPortfolio() {
 
     let rafTilt = 0;
     const tickTilt = () => {
-      tiltRY += (tiltTargetRY - tiltRY) * 0.1;
-      tiltRX += (tiltTargetRX - tiltRX) * 0.1;
+      tiltRY += (tiltTargetRY - tiltRY) * 0.08;
+      tiltRX += (tiltTargetRX - tiltRX) * 0.08;
+      scrollVel *= 0.90;
+      floatY += (scrollVel - floatY) * 0.1;
+
       if (card && projectsVisible) {
-        card.style.transform = `rotateX(${tiltRX.toFixed(2)}deg) rotateY(${tiltRY.toFixed(2)}deg)`;
+        card.style.transform = `translate3d(0, ${(-floatY).toFixed(1)}px, 0) rotateX(${tiltRX.toFixed(2)}deg) rotateY(${tiltRY.toFixed(2)}deg)`;
       }
       if (cachedSelImg && projectOpen) {
         detTiltRY += (detTiltTargetRY - detTiltRY) * 0.1;
@@ -1093,9 +1164,18 @@ export default function LukeBaffaitPortfolio() {
     };
     rafTilt = requestAnimationFrame(tickTilt);
 
-    if (cover && projCursor) {
-      cover.addEventListener("mouseenter", () => projCursor.classList.add("active"));
-      cover.addEventListener("mouseleave", () => projCursor.classList.remove("active"));
+    if (coverWrap) {
+      coverWrap.addEventListener("click", () => {
+        if (currentIdx >= 0 && items[currentIdx]) {
+          const itemEl = items[currentIdx] as HTMLElement;
+          const id = itemEl.dataset.id;
+          if (id) openProject(id, itemEl);
+        }
+      });
+      if (projCursor) {
+        coverWrap.addEventListener("mouseenter", () => projCursor.classList.add("active"));
+        coverWrap.addEventListener("mouseleave", () => projCursor.classList.remove("active"));
+      }
     }
 
     // =========================================================================
@@ -1341,16 +1421,6 @@ export default function LukeBaffaitPortfolio() {
         }
       });
     });
-
-    if (cover) {
-      cover.addEventListener("click", () => {
-        if (currentIdx >= 0 && items[currentIdx]) {
-          const itemEl = items[currentIdx] as HTMLElement;
-          const id = itemEl.dataset.id;
-          if (id) openProject(id, itemEl);
-        }
-      });
-    }
 
     if (detailBack) detailBack.addEventListener("click", closeProject);
 
@@ -2195,6 +2265,7 @@ export default function LukeBaffaitPortfolio() {
               <div
                 className="proj-item"
                 data-id="voice-integrity"
+                data-idx="01"
                 data-img="/About/img_00001.jpg"
                 data-date="03 2026"
               >
@@ -2203,6 +2274,7 @@ export default function LukeBaffaitPortfolio() {
               <div
                 className="proj-item"
                 data-id="exoterra"
+                data-idx="02"
                 data-img="/About/img_00010.jpg"
                 data-date="01 2026"
               >
@@ -2211,6 +2283,7 @@ export default function LukeBaffaitPortfolio() {
               <div
                 className="proj-item"
                 data-id="aqi-forecaster"
+                data-idx="03"
                 data-img="/About/img_00020.jpg"
                 data-date="11 2025"
               >
@@ -2219,6 +2292,7 @@ export default function LukeBaffaitPortfolio() {
               <div
                 className="proj-item"
                 data-id="brainglobe"
+                data-idx="04"
                 data-img="/About/img_00030.jpg"
                 data-date="08 2025"
               >
@@ -2227,6 +2301,7 @@ export default function LukeBaffaitPortfolio() {
               <div
                 className="proj-item"
                 data-id="neural-lam"
+                data-idx="05"
                 data-img="/About/img_00040.jpg"
                 data-date="06 2025"
               >
@@ -2235,6 +2310,7 @@ export default function LukeBaffaitPortfolio() {
               <div
                 className="proj-item"
                 data-id="deeplense"
+                data-idx="06"
                 data-img="/About/img_00050.jpg"
                 data-date="04 2025"
               >
@@ -2249,7 +2325,24 @@ export default function LukeBaffaitPortfolio() {
                   <span className="proj-date" id="proj-date">03 2026</span>
                   <span className="proj-label">Preview</span>
                 </div>
-                <img id="proj-cover" src="/About/img_00001.jpg" alt="Project Preview" width={1333} height={1000} />
+                <div className="proj-img-wrap" id="proj-img-wrap">
+                  <img
+                    id="proj-cover"
+                    className="proj-cover base"
+                    src="/About/img_00001.jpg"
+                    alt="Project Preview"
+                    width={1333}
+                    height={1000}
+                  />
+                  <img
+                    id="proj-cover-next"
+                    className="proj-cover next"
+                    src="/About/img_00001.jpg"
+                    alt=""
+                    width={1333}
+                    height={1000}
+                  />
+                </div>
               </div>
             </div>
           </div>
