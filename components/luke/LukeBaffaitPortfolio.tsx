@@ -211,6 +211,17 @@ function getSegmentItems(items: string[]): string[] {
   return res;
 }
 
+const GALLERY_ITEMS = [
+  { src: "/gallery/mlh-hacktu-finalist.jpg", title: "HackTU 7.0 MLH Top Finalist" },
+  { src: "/gallery/scaler-anvil-finalist.jpg", title: "Scaler Anvil Hackathon Premier Finalist" },
+  { src: "/gallery/hack-nocturne-smvit.jpg", title: "Hack-Nocturne 2.0 Premier Finalist" },
+  { src: "/gallery/mlh-hacktu-stage.jpg", title: "HackTU 7.0 Pitch Stage" },
+  { src: "/gallery/scaler-anvil-pitch.jpg", title: "Scaler Anvil Project Showcase" },
+  { src: "/gallery/mlh-hacktu-team.jpg", title: "HackTU 7.0 Team" },
+  { src: "/gallery/gate-smashers-community.jpg", title: "Gate Smashers Community Collaboration" },
+  { src: "/gallery/mlh-trophy.jpg", title: "Major League Hacking Recognition" },
+];
+
 export default function LukeBaffaitPortfolio() {
   const { lenis, scrollTo } = useLenis();
   const [openGroups, setOpenGroups] = useState<string[]>(["all"]);
@@ -1477,7 +1488,187 @@ export default function LukeBaffaitPortfolio() {
 
     if (detailBack) detailBack.addEventListener("click", closeProject);
 
+    // =========================================================================
+    // Lightbox / Interactive Image Viewer
+    // =========================================================================
+    const lightboxOverlay = document.getElementById("lightbox-overlay");
+    const lightboxBackdrop = document.getElementById("lightbox-backdrop");
+    const lightboxClose = document.getElementById("lightbox-close");
+    const lightboxPrev = document.getElementById("lightbox-prev");
+    const lightboxNext = document.getElementById("lightbox-next");
+    const lightboxImg = document.getElementById("lightbox-img") as HTMLImageElement | null;
+    const lightboxTitle = document.getElementById("lightbox-title");
+    const lightboxCounter = document.getElementById("lightbox-counter");
+
+    let isLightboxOpen = false;
+    let currentGalleryIndex = 0;
+    let activeGalleryList: { src: string; title: string }[] = [];
+
+    function updateLightboxContent(index: number, animateChange = true) {
+      if (!lightboxImg || activeGalleryList.length === 0) return;
+      currentGalleryIndex = (index + activeGalleryList.length) % activeGalleryList.length;
+      const item = activeGalleryList[currentGalleryIndex];
+
+      if (lightboxCounter) {
+        const cur = String(currentGalleryIndex + 1).padStart(2, "0");
+        const tot = String(activeGalleryList.length).padStart(2, "0");
+        lightboxCounter.textContent = `${cur} / ${tot}`;
+      }
+      if (lightboxTitle) {
+        lightboxTitle.textContent = item.title;
+      }
+
+      if (animateChange) {
+        gsap.to(lightboxImg, {
+          opacity: 0.2,
+          scale: 0.96,
+          duration: 0.15,
+          ease: "power2.in",
+          onComplete: () => {
+            if (!lightboxImg) return;
+            lightboxImg.src = item.src;
+            lightboxImg.alt = item.title;
+            gsap.to(lightboxImg, {
+              opacity: 1,
+              scale: 1,
+              duration: 0.25,
+              ease: "power2.out",
+            });
+          },
+        });
+      } else {
+        lightboxImg.src = item.src;
+        lightboxImg.alt = item.title;
+      }
+    }
+
+    function openLightbox(list: { src: string; title: string }[], startIndex = 0) {
+      if (!lightboxOverlay || list.length === 0) return;
+      activeGalleryList = list;
+      currentGalleryIndex = startIndex;
+      isLightboxOpen = true;
+
+      if (lenis) lenis.stop();
+
+      const isMulti = list.length > 1;
+      if (lightboxPrev) lightboxPrev.style.display = isMulti ? "flex" : "none";
+      if (lightboxNext) lightboxNext.style.display = isMulti ? "flex" : "none";
+
+      updateLightboxContent(startIndex, false);
+
+      lightboxOverlay.classList.add("active");
+      lightboxOverlay.setAttribute("aria-hidden", "false");
+
+      gsap.fromTo(
+        lightboxOverlay,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.3, ease: "power2.out" }
+      );
+      if (lightboxImg) {
+        gsap.fromTo(
+          lightboxImg,
+          { scale: 0.94, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.35, ease: "cubic-bezier(0.16, 1, 0.3, 1)", delay: 0.04 }
+        );
+      }
+    }
+
+    function closeLightbox() {
+      if (!lightboxOverlay || !isLightboxOpen) return;
+      isLightboxOpen = false;
+
+      gsap.to(lightboxOverlay, {
+        opacity: 0,
+        duration: 0.25,
+        ease: "power2.in",
+        onComplete: () => {
+          lightboxOverlay.classList.remove("active");
+          lightboxOverlay.setAttribute("aria-hidden", "true");
+          if (lightboxImg) lightboxImg.src = "";
+          if (lenis) lenis.start();
+        },
+      });
+    }
+
+    function nextLightbox() {
+      if (!isLightboxOpen || activeGalleryList.length <= 1) return;
+      updateLightboxContent(currentGalleryIndex + 1);
+    }
+
+    function prevLightbox() {
+      if (!isLightboxOpen || activeGalleryList.length <= 1) return;
+      updateLightboxContent(currentGalleryIndex - 1);
+    }
+
+    lightboxClose?.addEventListener("click", closeLightbox);
+    lightboxBackdrop?.addEventListener("click", closeLightbox);
+    lightboxNext?.addEventListener("click", nextLightbox);
+    lightboxPrev?.addEventListener("click", prevLightbox);
+
+    let touchStartX = 0;
+    lightboxOverlay?.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].clientX;
+    }, { passive: true });
+    lightboxOverlay?.addEventListener("touchend", (e) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      const diff = touchEndX - touchStartX;
+      if (Math.abs(diff) > 50) {
+        if (diff < 0) nextLightbox();
+        else prevLightbox();
+      }
+    }, { passive: true });
+
+    // Click to open other portfolio images
+    const apImg = document.getElementById("ap-img");
+    if (apImg) {
+      apImg.style.cursor = "zoom-in";
+      apImg.title = "Click to enlarge";
+      apImg.addEventListener("click", () => {
+        openLightbox([{ src: "/sarosh.png", title: "Sarosh Kumar" }], 0);
+      });
+    }
+
+    const contactFrame1 = document.getElementById("contact-frame-img");
+    if (contactFrame1) {
+      contactFrame1.style.cursor = "zoom-in";
+      contactFrame1.title = "Click to enlarge";
+      contactFrame1.addEventListener("click", () => {
+        openLightbox([{ src: "/art/Untitled2.png", title: "Creative Art" }], 0);
+      });
+    }
+    const contactFrame2 = document.getElementById("contact-frame-img-2");
+    if (contactFrame2) {
+      contactFrame2.style.cursor = "zoom-in";
+      contactFrame2.title = "Click to enlarge";
+      contactFrame2.addEventListener("click", () => {
+        openLightbox([{ src: "/art/Untitled1.png", title: "Creative Art" }], 0);
+      });
+    }
+
+    if (detailSelected) {
+      detailSelected.style.cursor = "zoom-in";
+      detailSelected.title = "Click to enlarge";
+      detailSelected.addEventListener("click", () => {
+        if (cachedSelImg && cachedSelImg.src) {
+          openLightbox([{ src: cachedSelImg.src, title: detailTitle?.textContent || "Project Showcase" }], 0);
+        }
+      });
+    }
+
     const onKeyDown = (e: KeyboardEvent) => {
+      if (isLightboxOpen) {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          closeLightbox();
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          nextLightbox();
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          prevLightbox();
+        }
+        return;
+      }
       if (e.key === "Escape" && projectOpen) closeProject();
     };
     window.addEventListener("keydown", onKeyDown);
@@ -1514,11 +1705,18 @@ export default function LukeBaffaitPortfolio() {
         const totalBendDeg = (bendRad * 180) / Math.PI;
         const stepDeg = totalBendDeg / SLICES;
 
-        document.querySelectorAll(".cg-img").forEach((img) => {
+        document.querySelectorAll(".cg-img").forEach((img, index) => {
           if (img.tagName.toLowerCase() !== "img") return;
           const src = img.getAttribute("src") || "";
+          const alt = img.getAttribute("alt") || "";
           const wrapper = document.createElement("div");
           wrapper.className = "cg-img";
+          wrapper.dataset.src = src;
+          wrapper.dataset.alt = alt;
+          wrapper.dataset.index = String(index);
+          wrapper.setAttribute("role", "button");
+          wrapper.setAttribute("tabindex", "0");
+          wrapper.setAttribute("aria-label", `View ${alt || "gallery photo"}`);
 
           for (let s = 0; s < SLICES; s++) {
             const sl = document.createElement("div");
@@ -1535,6 +1733,14 @@ export default function LukeBaffaitPortfolio() {
             sl.style.transform = "rotateY(" + angle.toFixed(2) + "deg)";
             wrapper.appendChild(sl);
           }
+
+          wrapper.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const opacity = parseFloat(getComputedStyle(wrapper).opacity || "1");
+            if (opacity < 0.2) return;
+            openLightbox(GALLERY_ITEMS, index);
+          });
+
           img.parentNode?.replaceChild(wrapper, img);
         });
       }
@@ -1592,6 +1798,7 @@ export default function LukeBaffaitPortfolio() {
 
       cgImgs.forEach((img) => {
         img.style.opacity = "0";
+        img.style.pointerEvents = "none";
       });
 
       ScrollTrigger.create({
@@ -1606,6 +1813,7 @@ export default function LukeBaffaitPortfolio() {
             const imgT = progress * totalRange - i * stagger;
             if (imgT <= 0 || imgT >= 1) {
               img.style.opacity = "0";
+              img.style.pointerEvents = "none";
               return;
             }
             let alpha = 1;
@@ -1617,6 +1825,7 @@ export default function LukeBaffaitPortfolio() {
 
             img.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, ${pos.z.toFixed(1)}px) rotateY(${rotDeg}deg)`;
             img.style.opacity = String(alpha);
+            img.style.pointerEvents = alpha > 0.15 ? "auto" : "none";
             img.style.zIndex = String(Math.round(pos.z + 600));
           });
 
@@ -1654,7 +1863,24 @@ export default function LukeBaffaitPortfolio() {
           }
         },
       });
+    } else {
+      document.querySelectorAll<HTMLElement>(".cg-img").forEach((img, index) => {
+        img.style.cursor = "pointer";
+        img.addEventListener("click", () => {
+          openLightbox(GALLERY_ITEMS, index);
+        });
+      });
     }
+
+    const circleGallery = document.getElementById("circle-gallery");
+    circleGallery?.addEventListener("click", (e) => {
+      const target = (e.target as HTMLElement).closest(".cg-img") as HTMLElement | null;
+      if (!target) return;
+      const opacity = parseFloat(getComputedStyle(target).opacity || "1");
+      if (opacity < 0.2) return;
+      const idx = parseInt(target.dataset.index || "0", 10);
+      openLightbox(GALLERY_ITEMS, isNaN(idx) ? 0 : idx);
+    });
 
     // =========================================================================
     // 10. Awards Radar Scanner
@@ -2407,14 +2633,17 @@ export default function LukeBaffaitPortfolio() {
       {/* 3D Circular Orbit Gallery with Slices */}
       <section className="circle-gallery" id="circle-gallery">
         <div className="circle-gallery-pin" id="circle-gallery-pin">
-          <img className="cg-img" src="/gallery/mlh-hacktu-finalist.jpg" alt="HackTU 7.0 MLH Top Finalist" width={1920} height={1080} />
-          <img className="cg-img" src="/gallery/scaler-anvil-finalist.jpg" alt="Scaler Anvil Hackathon Premier Finalist" width={1920} height={1080} />
-          <img className="cg-img" src="/gallery/hack-nocturne-smvit.jpg" alt="Hack-Nocturne 2.0 Premier Finalist" width={1920} height={1080} />
-          <img className="cg-img" src="/gallery/mlh-hacktu-stage.jpg" alt="HackTU 7.0 Pitch Stage" width={1920} height={1080} />
-          <img className="cg-img" src="/gallery/scaler-anvil-pitch.jpg" alt="Scaler Anvil Project Showcase" width={1920} height={1080} />
-          <img className="cg-img" src="/gallery/mlh-hacktu-team.jpg" alt="HackTU 7.0 Team" width={1920} height={1080} />
-          <img className="cg-img" src="/gallery/gate-smashers-community.jpg" alt="Gate Smashers Community Collaboration" width={1920} height={1080} />
-          <img className="cg-img" src="/gallery/mlh-trophy.jpg" alt="Major League Hacking Recognition" width={1920} height={1080} />
+          {GALLERY_ITEMS.map((item, idx) => (
+            <img
+              key={item.src}
+              className="cg-img"
+              src={item.src}
+              alt={item.title}
+              data-index={idx}
+              width={1920}
+              height={1080}
+            />
+          ))}
           <p className="cg-phrase" id="cg-phrase">
             Every project is an opportunity to <span className="other-accent">learn</span>, <span className="other-accent">experiment</span>, and push boundaries.
           </p>
@@ -2740,6 +2969,49 @@ export default function LukeBaffaitPortfolio() {
       <div className="scroll-timeline" id="scroll-timeline">
         <span className="st-label" id="st-label" />
         <div className="st-bar" id="st-bar" />
+      </div>
+
+      {/* Interactive Image Lightbox Modal */}
+      <div className="lightbox-overlay" id="lightbox-overlay" aria-hidden="true" role="dialog" aria-modal="true">
+        <div className="lightbox-backdrop" id="lightbox-backdrop" />
+        <div className="lightbox-container" id="lightbox-container">
+          <div className="lightbox-header">
+            <div className="lightbox-meta">
+              <span className="lightbox-counter" id="lightbox-counter">01 / 08</span>
+              <span className="lightbox-title" id="lightbox-title">HackTU 7.0 MLH Top Finalist</span>
+            </div>
+            <button className="lightbox-close" id="lightbox-close" aria-label="Close image modal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="lightbox-main">
+            <button className="lightbox-nav prev" id="lightbox-prev" aria-label="Previous image">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+
+            <div className="lightbox-figure-wrap" id="lightbox-figure-wrap">
+              <img className="lightbox-img" id="lightbox-img" src="" alt="" />
+            </div>
+
+            <button className="lightbox-nav next" id="lightbox-next" aria-label="Next image">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="lightbox-footer">
+            <div className="lightbox-hint">
+              <span>Use <kbd>←</kbd> <kbd>→</kbd> to navigate, <kbd>ESC</kbd> or click outside to close</span>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );
