@@ -82,9 +82,138 @@ const PROJECTS_MAP: Record<string, ProjectItem> = {
   },
 };
 
+interface SkillGroupItem {
+  id: string;
+  idx: string;
+  title: string;
+  count: number;
+  rows: string[][];
+}
+
+const SKILL_GROUPS: SkillGroupItem[] = [
+  {
+    id: "all",
+    idx: "00",
+    title: "All Technologies",
+    count: 49,
+    rows: [
+      [
+        "PyTorch",
+        "WavLM Base+",
+        "Torchaudio",
+        "Transformers",
+        "LFCC-LCNN",
+        "librosa",
+        "Faster-Whisper",
+        "PyG (GNNs)",
+        "Platt Scaling",
+        "Voice Activity Detection",
+        "Spectral Filtering",
+        "FastAPI",
+        "WebSockets",
+        "Docker",
+        "Linux",
+        "Groq API",
+      ],
+      [
+        "Python",
+        "C++",
+        "Java",
+        "C",
+        "SQL",
+        "JavaScript",
+        "TypeScript",
+        "Scikit-Learn",
+        "XGBoost",
+        "Prophet",
+        "NumPy",
+        "Pandas",
+        "SciPy",
+        "Streamlit",
+        "Plotly",
+        "OpenAQ API",
+        "NASA TAP API",
+      ],
+      [
+        "Data Structures & Algorithms",
+        "Operating Systems",
+        "DBMS",
+        "Concurrency & Multi-threading",
+        "System Design",
+        "Computer Networks",
+        "Object-Oriented Design",
+        "Git & GitHub",
+        "Hugging Face",
+        "PyAutoGUI",
+        "Postman",
+        "3D PCA",
+        "Parquet",
+      ],
+    ],
+  },
+  {
+    id: "dl",
+    idx: "01",
+    title: "Deep Learning & Audio AI",
+    count: 11,
+    rows: [
+      ["PyTorch", "WavLM Base+", "Torchaudio", "Transformers", "LFCC-LCNN", "Faster-Whisper"],
+      ["librosa", "PyG (GNNs)", "Platt Scaling", "Voice Activity Detection", "Spectral Filtering"],
+    ],
+  },
+  {
+    id: "ml",
+    idx: "02",
+    title: "Machine Learning & Data",
+    count: 12,
+    rows: [
+      ["Scikit-Learn", "XGBoost", "Prophet", "NumPy", "Pandas", "SciPy"],
+      ["Streamlit", "Plotly", "Parquet", "OpenAQ API", "NASA TAP API", "3D PCA"],
+    ],
+  },
+  {
+    id: "lang",
+    idx: "03",
+    title: "Languages",
+    count: 9,
+    rows: [
+      ["Python", "C++", "Java", "C", "SQL"],
+      ["JavaScript", "TypeScript", "Bash / Shell", "HTML / CSS"],
+    ],
+  },
+  {
+    id: "sys",
+    idx: "04",
+    title: "Systems & Tools",
+    count: 10,
+    rows: [
+      ["FastAPI", "WebSockets", "RESTful APIs", "Docker", "Linux"],
+      ["Git & GitHub", "Groq API", "Hugging Face", "PyAutoGUI", "Postman"],
+    ],
+  },
+  {
+    id: "cs",
+    idx: "05",
+    title: "Core CS Fundamentals",
+    count: 7,
+    rows: [
+      ["Data Structures & Algorithms", "Operating Systems", "DBMS", "System Design"],
+      ["Concurrency & Multi-threading", "Computer Networks", "Object-Oriented Design"],
+    ],
+  },
+];
+
+function getSegmentItems(items: string[]): string[] {
+  let res: string[] = [];
+  while (res.length < 12) {
+    res = res.concat(items);
+  }
+  return res;
+}
+
 export default function LukeBaffaitPortfolio() {
   const { lenis, scrollTo } = useLenis();
-  const [openGroups, setOpenGroups] = useState<string[]>(["dl"]);
+  const [openGroups, setOpenGroups] = useState<string[]>(["all"]);
 
   const toggleGroup = (id: string) => {
     setOpenGroups((prev) =>
@@ -2147,139 +2276,69 @@ export default function LukeBaffaitPortfolio() {
           </div>
 
           <div className="skills-right" id="skills-right">
-            {/* Group 1: Deep Learning */}
-            <div className={`skill-group ${openGroups.includes("dl") ? "open" : ""}`}>
-              <div
-                className="skill-header"
-                onClick={() => toggleGroup("dl")}
-              >
-                <span className="skill-header-title">Deep Learning & Audio AI</span>
-                <span className="skill-header-icon" />
-              </div>
-              <div className="skill-body">
-                <div className="skill-body-wrapper">
-                  <ul className="skill-body-inner">
-                    <li>PyTorch</li>
-                    <li>Torchaudio</li>
-                    <li>Transformers</li>
-                    <li>WavLM Base+</li>
-                    <li>LFCC-LCNN</li>
-                    <li>librosa</li>
-                    <li>Faster-Whisper</li>
-                    <li>PyG (GNNs)</li>
-                    <li>Platt Scaling</li>
-                    <li>Voice Activity Detection</li>
-                    <li>Spectral Filtering</li>
-                  </ul>
+            {SKILL_GROUPS.map((grp) => {
+              const isOpen = openGroups.includes(grp.id);
+              return (
+                <div key={grp.id} className={`skill-group ${isOpen ? "open" : ""}`}>
+                  <div className="skill-header" onClick={() => toggleGroup(grp.id)}>
+                    <div className="skill-header-left">
+                      <span className="skill-header-idx">{grp.idx} //</span>
+                      <span className="skill-header-title">
+                        {grp.title}
+                        <span className="skill-header-count">[{String(grp.count).padStart(2, "0")}]</span>
+                      </span>
+                    </div>
+                    <span className="skill-header-icon" />
+                  </div>
+                  <div className="skill-body">
+                    <div className="skill-body-wrapper">
+                      <div className="skill-flow-container">
+                        {grp.rows.map((rowItems, rIdx) => {
+                          const segItems = getSegmentItems(rowItems);
+                          const isLeft = rIdx % 2 === 0;
+                          const animClass =
+                            rIdx === 2
+                              ? "scroll-left-fast"
+                              : isLeft
+                              ? "scroll-left"
+                              : "scroll-right";
+                          return (
+                            <div key={rIdx} className="skill-flow-row">
+                              <div className={`skill-flow-track ${animClass}`}>
+                                <div className="skill-flow-segment">
+                                  {segItems.map((tech, i) => (
+                                    <div key={`seg1-${i}`} className="skill-flow-pill">
+                                      <span className="skill-pill-num">
+                                        {String((i % rowItems.length) + 1).padStart(2, "0")}
+                                      </span>
+                                      <span className="skill-pill-sep">//</span>
+                                      <span className="skill-pill-name">{tech}</span>
+                                      <span className="skill-pill-dot" />
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className="skill-flow-segment" aria-hidden="true">
+                                  {segItems.map((tech, i) => (
+                                    <div key={`seg2-${i}`} className="skill-flow-pill">
+                                      <span className="skill-pill-num">
+                                        {String((i % rowItems.length) + 1).padStart(2, "0")}
+                                      </span>
+                                      <span className="skill-pill-sep">//</span>
+                                      <span className="skill-pill-name">{tech}</span>
+                                      <span className="skill-pill-dot" />
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Group 2: ML & Data */}
-            <div className={`skill-group ${openGroups.includes("ml") ? "open" : ""}`}>
-              <div
-                className="skill-header"
-                onClick={() => toggleGroup("ml")}
-              >
-                <span className="skill-header-title">Machine Learning & Data</span>
-                <span className="skill-header-icon" />
-              </div>
-              <div className="skill-body">
-                <div className="skill-body-wrapper">
-                  <ul className="skill-body-inner">
-                    <li>Scikit-Learn</li>
-                    <li>XGBoost</li>
-                    <li>Prophet</li>
-                    <li>NumPy</li>
-                    <li>Pandas</li>
-                    <li>SciPy</li>
-                    <li>Streamlit</li>
-                    <li>Plotly</li>
-                    <li>Parquet</li>
-                    <li>OpenAQ API</li>
-                    <li>NASA TAP API</li>
-                    <li>3D PCA</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Group 3: Languages */}
-            <div className={`skill-group ${openGroups.includes("lang") ? "open" : ""}`}>
-              <div
-                className="skill-header"
-                onClick={() => toggleGroup("lang")}
-              >
-                <span className="skill-header-title">Languages</span>
-                <span className="skill-header-icon" />
-              </div>
-              <div className="skill-body">
-                <div className="skill-body-wrapper">
-                  <ul className="skill-body-inner">
-                    <li>Python</li>
-                    <li>C++</li>
-                    <li>Java</li>
-                    <li>C</li>
-                    <li>SQL</li>
-                    <li>JavaScript</li>
-                    <li>TypeScript</li>
-                    <li>Bash / Shell</li>
-                    <li>HTML / CSS</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Group 4: Systems & Tools */}
-            <div className={`skill-group ${openGroups.includes("sys") ? "open" : ""}`}>
-              <div
-                className="skill-header"
-                onClick={() => toggleGroup("sys")}
-              >
-                <span className="skill-header-title">Systems & Tools</span>
-                <span className="skill-header-icon" />
-              </div>
-              <div className="skill-body">
-                <div className="skill-body-wrapper">
-                  <ul className="skill-body-inner">
-                    <li>FastAPI</li>
-                    <li>WebSockets</li>
-                    <li>RESTful APIs</li>
-                    <li>Docker</li>
-                    <li>Linux</li>
-                    <li>Git & GitHub</li>
-                    <li>Groq API</li>
-                    <li>Hugging Face</li>
-                    <li>PyAutoGUI</li>
-                    <li>Postman</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Group 5: Core CS Fundamentals */}
-            <div className={`skill-group ${openGroups.includes("cs") ? "open" : ""}`}>
-              <div
-                className="skill-header"
-                onClick={() => toggleGroup("cs")}
-              >
-                <span className="skill-header-title">Core CS Fundamentals</span>
-                <span className="skill-header-icon" />
-              </div>
-              <div className="skill-body">
-                <div className="skill-body-wrapper">
-                  <ul className="skill-body-inner">
-                    <li>Data Structures & Algorithms</li>
-                    <li>Operating Systems</li>
-                    <li>DBMS</li>
-                    <li>Concurrency & Multi-threading</li>
-                    <li>System Design</li>
-                    <li>Computer Networks</li>
-                    <li>Object-Oriented Design</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>
