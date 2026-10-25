@@ -936,23 +936,27 @@ export default function LukeBaffaitPortfolio() {
     if (projectsEl && preview) {
       ScrollTrigger.create({
         trigger: projectsEl,
-        start: "top 80%",
-        end: "bottom 20%",
+        start: "top 35%",
+        end: "bottom 65%",
         onEnter: () => {
           preview.classList.add("visible");
           projectsVisible = true;
+          onProjectsScroll();
         },
         onLeave: () => {
           preview.classList.remove("visible");
           projectsVisible = false;
+          deactivateAll();
         },
         onEnterBack: () => {
           preview.classList.add("visible");
           projectsVisible = true;
+          onProjectsScroll();
         },
         onLeaveBack: () => {
           preview.classList.remove("visible");
           projectsVisible = false;
+          deactivateAll();
         },
       });
     }
@@ -1020,7 +1024,7 @@ export default function LukeBaffaitPortfolio() {
         }
       });
 
-      if (closestIdx >= 0 && closestDist < window.innerHeight * 0.45) {
+      if (closestIdx >= 0 && closestDist < window.innerHeight * 0.38) {
         activateProject(closestIdx);
       } else {
         deactivateAll();
@@ -2237,6 +2241,17 @@ export default function LukeBaffaitPortfolio() {
                 ML4SCI DeepLense
               </div>
             </div>
+
+            {/* Project Preview Card — strictly bounded within .projects-inner */}
+            <div className="proj-preview" id="proj-preview">
+              <div className="proj-card" id="proj-card">
+                <div className="proj-meta">
+                  <span className="proj-date" id="proj-date">03 2026</span>
+                  <span className="proj-label">Preview</span>
+                </div>
+                <img id="proj-cover" src="/About/img_00001.jpg" alt="Project Preview" width={1333} height={1000} />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -2528,16 +2543,7 @@ export default function LukeBaffaitPortfolio() {
         </div>
       </footer>
 
-      {/* Floating Hover Project Preview Card */}
-      <div className="proj-preview" id="proj-preview">
-        <div className="proj-card" id="proj-card">
-          <div className="proj-meta">
-            <span className="proj-date" id="proj-date">03 2026</span>
-            <span className="proj-label">Preview</span>
-          </div>
-          <img id="proj-cover" src="/About/img_00001.jpg" alt="" width={1333} height={1000} />
-        </div>
-      </div>
+      {/* Floating Cursor Follower */}
       <div className="proj-cursor" id="proj-cursor">See project</div>
 
       {/* Project Detail Modal Overlay */}
