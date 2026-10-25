@@ -1923,7 +1923,7 @@ a.chr-hover {
   position: relative;
   background: #0a0a0a;
   z-index: 30010;
-  padding: 0 4rem 15vh;
+  padding: 10vh 4rem 20vh;
 }
 .awards-inner {
   max-width: 100%;
@@ -1943,7 +1943,7 @@ a.chr-hover {
   font-size: clamp(1rem, 2vw, 1.5rem);
   color: rgba(255, 255, 255, 0.3);
   transition: color 0.4s ease;
-  cursor: none;
+  cursor: default;
   z-index: 1;
 }
 .award-item::before {
@@ -1992,6 +1992,7 @@ a.chr-hover {
 .awards-title {
   padding: 0;
   margin-bottom: 2rem;
+  font-size: clamp(2rem, 3vw, 2.4rem) !important;
 }
 
 .active-award {
@@ -1999,14 +2000,4 @@ a.chr-hover {
 }
 .active-award::before {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-}
-
-.awards {
-  margin-top: -15vh;
-  margin-bottom: 0;
-  padding-bottom: 45vh;
-}
-
-.awards-title {
-  font-size: clamp(2rem, 3vw, 2.4rem) !important;
 }

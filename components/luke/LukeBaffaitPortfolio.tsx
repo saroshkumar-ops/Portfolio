@@ -1388,42 +1388,15 @@ export default function LukeBaffaitPortfolio() {
     }
 
     // =========================================================================
-    // 10. Awards Radar Scanner & Interactive Hover Cursor Card
+    // 10. Awards Radar Scanner
     // =========================================================================
     const awardItems = document.querySelectorAll(".award-item");
-    const awardCursor = document.createElement("img");
-    awardCursor.style.cssText =
-      "position:fixed;top:0;left:0;width:240px;height:auto;border-radius:6px;pointer-events:none;z-index:99999;box-shadow:0 12px 30px rgba(0,0,0,0.5);";
-    document.body.appendChild(awardCursor);
-    gsap.set(awardCursor, { xPercent: -50, yPercent: -50, scale: 0.8, opacity: 0 });
-
-    let isAwardHovered = false;
-    window.addEventListener("mousemove", (e) => {
-      if (isAwardHovered) {
-        gsap.set(awardCursor, { x: e.clientX, y: e.clientY });
-      }
-    });
-
     awardItems.forEach((item) => {
       ScrollTrigger.create({
         trigger: item,
         start: "top center+=15%",
         end: "bottom center-=15%",
         toggleClass: { targets: item, className: "active-award" },
-      });
-
-      item.addEventListener("mouseenter", (e) => {
-        isAwardHovered = true;
-        const imgSrc = item.getAttribute("data-cursor-img");
-        if (imgSrc) awardCursor.src = imgSrc;
-        const me = e as MouseEvent;
-        gsap.set(awardCursor, { x: me.clientX, y: me.clientY });
-        gsap.to(awardCursor, { opacity: 1, scale: 1, duration: 0.3, overwrite: "auto" });
-      });
-
-      item.addEventListener("mouseleave", () => {
-        isAwardHovered = false;
-        gsap.to(awardCursor, { opacity: 0, scale: 0.8, duration: 0.3, overwrite: "auto" });
       });
     });
 
@@ -1927,9 +1900,6 @@ export default function LukeBaffaitPortfolio() {
       cancelAnimationFrame(rafTilt);
       cancelAnimationFrame(heroRaf);
       cancelAnimationFrame(asciiHoverRaf);
-      if (awardCursor && awardCursor.parentNode) {
-        awardCursor.parentNode.removeChild(awardCursor);
-      }
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, [lenis, scrollTo]);
@@ -2285,37 +2255,37 @@ export default function LukeBaffaitPortfolio() {
         <div className="awards-inner">
           <div className="skills-subtitle awards-title">Awards & Misc</div>
           <div className="awards-list" id="awards-list">
-            <div className="award-item" data-cursor-img="/Projects/img_00001.jpg">
+            <div className="award-item">
               <div className="award-org">HackTU 7.0</div>
               <div className="award-site">MLH / Thapar</div>
               <div className="award-prize">Top Finalist (out of 6,000+ teams)</div>
               <div className="award-date">2026</div>
             </div>
-            <div className="award-item" data-cursor-img="/Projects/img_00010.jpg">
+            <div className="award-item">
               <div className="award-org">HACK4SOC 3.0</div>
               <div className="award-site">RVCE Bengaluru</div>
               <div className="award-prize">4th Place Finalist</div>
               <div className="award-date">2025</div>
             </div>
-            <div className="award-item" data-cursor-img="/Projects/img_00020.jpg">
+            <div className="award-item">
               <div className="award-org">IGNITRIX</div>
               <div className="award-site">Agentic AI Hackathon</div>
               <div className="award-prize">Consolation Prize (Agent System)</div>
               <div className="award-date">2025</div>
             </div>
-            <div className="award-item" data-cursor-img="/Projects/img_00030.jpg">
+            <div className="award-item">
               <div className="award-org">Hack-Nocturne 2.0</div>
               <div className="award-site">SMVIT Bengaluru</div>
               <div className="award-prize">Premier Finalist</div>
               <div className="award-date">2025</div>
             </div>
-            <div className="award-item" data-cursor-img="/Projects/img_00040.jpg">
+            <div className="award-item">
               <div className="award-org">Anvil Hackathon</div>
               <div className="award-site">Scaler Bengaluru</div>
               <div className="award-prize">Premier Finalist</div>
               <div className="award-date">2025</div>
             </div>
-            <div className="award-item" data-cursor-img="/Projects/img_00050.jpg">
+            <div className="award-item">
               <div className="award-org">Data Science Club</div>
               <div className="award-site">KLE Tech Hubli</div>
               <div className="award-prize">Lead (500+ student community)</div>
