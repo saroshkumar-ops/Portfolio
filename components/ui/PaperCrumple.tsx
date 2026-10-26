@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import * as THREE from 'three';
 import './PaperCrumple.css';
 
@@ -298,6 +299,8 @@ export interface PaperCrumpleProps {
   onError?: (error: Error) => void;
   className?: string;
   style?: CSSProperties;
+  fullscreen?: boolean;
+  anchorRef?: React.RefObject<HTMLElement | null>;
 }
 
 export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
@@ -335,7 +338,9 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
   onStateChange,
   onError,
   className = '',
-  style
+  style,
+  fullscreen = false,
+  anchorRef
 }) => {
   const pathCache = useRef<{ key: string; value: { samples: Float32Array[]; creased: Float32Array } } | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -357,7 +362,9 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
     returnToOrigin,
     disabled,
     onStateChange,
-    onError
+    onError,
+    fullscreen,
+    anchorRef
   });
   options.current = {
     releaseBehavior,
@@ -371,7 +378,9 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
     returnToOrigin,
     disabled,
     onStateChange,
-    onError
+    onError,
+    fullscreen,
+    anchorRef
   };
 
   useEffect(() => {
@@ -583,9 +592,11 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
       memory = spring(),
       posX = spring(),
       posY = spring(),
+      basePosX = spring(),
+      basePosY = spring(),
       tiltX = spring(),
       tiltY = spring();
-    const springs = [amount, memory, posX, posY, tiltX, tiltY];
+    const springs = [amount, memory, posX, posY, basePosX, basePosY, tiltX, tiltY];
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
     const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -734,6 +745,21 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
       lastTime = time;
       const opts = options.current;
       let moving = false;
+
+      if (opts.fullscreen && opts.anchorRef?.current) {
+        const anchorEl = opts.anchorRef.current;
+        const aRect = anchorEl.getBoundingClientRect();
+        const cx = aRect.left + aRect.width / 2;
+        const cy = aRect.top + aRect.height / 2;
+        const targetX = cx - viewportWidth / 2;
+        const targetY = -(cy - viewportHeight / 2);
+        if (Math.abs(targetX - basePosX.value) > 0.5 || Math.abs(targetY - basePosY.value) > 0.5) {
+          moving = true;
+        }
+        basePosX.value = basePosX.target = targetX;
+        basePosY.value = basePosY.target = targetY;
+      }
+
       const duration = held ? finite(opts.crumpleDuration, 0.55) : finite(opts.releaseDuration, 0.4);
       for (const s of springs)
         moving = advance(s, dt, s === amount || s === memory ? duration : 0.42, reduceMotion || keyboard) || moving;
@@ -751,12 +777,16 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
         plane.constant = -anchor.z;
         setPointer(pointerX, pointerY);
         if (raycaster.ray.intersectPlane(plane, world)) {
-          posX.value = posX.target = world.x - anchor.x;
-          posY.value = posY.target = world.y - anchor.y;
+          posX.value = posX.target = world.x - anchor.x - (opts.fullscreen ? basePosX.value : 0);
+          posY.value = posY.target = world.y - anchor.y - (opts.fullscreen ? basePosY.value : 0);
           posX.velocity = posY.velocity = 0;
         }
       }
-      sheet.position.set(posX.value, posY.value, 0);
+      sheet.position.set(
+        (opts.fullscreen ? basePosX.value : 0) + posX.value,
+        (opts.fullscreen ? basePosY.value : 0) + posY.value,
+        0
+      );
       sheet.updateMatrixWorld(true);
       const shadowBounds = geometry.boundingBox;
       if (shadowBounds) {
@@ -785,11 +815,24 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
     function resize() {
       if (!elRoot) return;
       const rect = elRoot.getBoundingClientRect();
-      viewportWidth = Math.max(1, rect.width);
-      viewportHeight = Math.max(1, rect.height);
-      scale =
-        paperWidth *
-        Math.min(1, Math.max(1, viewportWidth - 48) / paperWidth, Math.max(1, viewportHeight - 48) / paperHeight);
+      const isFs = Boolean(options.current.fullscreen);
+      viewportWidth = isFs ? Math.max(1, window.innerWidth) : Math.max(1, rect.width);
+      viewportHeight = isFs ? Math.max(1, window.innerHeight) : Math.max(1, rect.height);
+      if (isFs) {
+        scale = Math.min(paperWidth, viewportWidth - 32);
+        if (options.current.anchorRef?.current) {
+          const anchorEl = options.current.anchorRef.current;
+          const aRect = anchorEl.getBoundingClientRect();
+          const cx = aRect.left + aRect.width / 2;
+          const cy = aRect.top + aRect.height / 2;
+          basePosX.value = basePosX.target = cx - viewportWidth / 2;
+          basePosY.value = basePosY.target = -(cy - viewportHeight / 2);
+        }
+      } else {
+        scale =
+          paperWidth *
+          Math.min(1, Math.max(1, viewportWidth - 48) / paperWidth, Math.max(1, viewportHeight - 48) / paperHeight);
+      }
       sheet.scale.setScalar(scale);
       camera.aspect = viewportWidth / viewportHeight;
       camera.position.z = viewportHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
@@ -809,7 +852,7 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
       floor.scale.set(viewportWidth * 4, viewportHeight * 4, 1);
       elRoot.style.setProperty('--pc-image-width', `${scale}px`);
       elRoot.style.setProperty('--pc-image-height', `${scale * aspect}px`);
-      if (!held) {
+      if (!held && !isFs) {
         const limitX = Math.max(0, (viewportWidth - scale) / 2 - 16);
         const limitY = Math.max(0, (viewportHeight - scale * aspect) / 2 - 16);
         posX.value = posX.target = clamp(posX.value, -limitX, limitX);
@@ -841,24 +884,31 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
       if (opts.returnToOrigin && opts.releaseBehavior !== 'stay') {
         posX.target = posY.target = 0;
       } else {
-        const bounds = geometry.boundingBox;
-        const spanX = opts.releaseBehavior === 'stay' && bounds ? bounds.max.x - bounds.min.x : 1;
-        const spanY = opts.releaseBehavior === 'stay' && bounds ? bounds.max.y - bounds.min.y : aspect;
-        const halfWidth =
-          ((Math.abs(Math.cos(baseRotation)) * spanX + Math.abs(Math.sin(baseRotation)) * spanY) * scale) / 2;
-        const halfHeight =
-          ((Math.abs(Math.sin(baseRotation)) * spanX + Math.abs(Math.cos(baseRotation)) * spanY) * scale) / 2;
-        const limitX = Math.min(
-          Math.max(0, finite(opts.dragRadius, 180)),
-          Math.max(0, viewportWidth / 2 - halfWidth - 16)
-        );
-        const limitY = Math.min(
-          Math.max(0, finite(opts.dragRadius, 180)),
-          Math.max(0, viewportHeight / 2 - halfHeight - 16)
-        );
-        const coast = !reduceMotion && !keyboard && performance.now() - lastMove < 90 ? 0.06 : 0;
-        posX.target = clamp(posX.value + speedX * coast, -limitX, limitX);
-        posY.target = clamp(posY.value - speedY * coast, -limitY, limitY);
+        if (!opts.fullscreen) {
+          const bounds = geometry.boundingBox;
+          const spanX = opts.releaseBehavior === 'stay' && bounds ? bounds.max.x - bounds.min.x : 1;
+          const spanY = opts.releaseBehavior === 'stay' && bounds ? bounds.max.y - bounds.min.y : aspect;
+          const halfWidth =
+            ((Math.abs(Math.cos(baseRotation)) * spanX + Math.abs(Math.sin(baseRotation)) * spanY) * scale) / 2;
+          const halfHeight =
+            ((Math.abs(Math.sin(baseRotation)) * spanX + Math.abs(Math.cos(baseRotation)) * spanY) * scale) / 2;
+          const limitX = Math.min(
+            Math.max(0, finite(opts.dragRadius, 180)),
+            Math.max(0, viewportWidth / 2 - halfWidth - 16)
+          );
+          const limitY = Math.min(
+            Math.max(0, finite(opts.dragRadius, 180)),
+            Math.max(0, viewportHeight / 2 - halfHeight - 16)
+          );
+          const coast = !reduceMotion && !keyboard && performance.now() - lastMove < 90 ? 0.06 : 0;
+          posX.target = clamp(posX.value + speedX * coast, -limitX, limitX);
+          posY.target = clamp(posY.value - speedY * coast, -limitY, limitY);
+        } else {
+          // In fullscreen mode: allow completely free movement without confining boundaries!
+          const coast = !reduceMotion && !keyboard && performance.now() - lastMove < 90 ? 0.06 : 0;
+          posX.target = posX.value + speedX * coast;
+          posY.target = posY.value - speedY * coast;
+        }
       }
       if (instant || keyboard || reduceMotion) for (const s of springs) advance(s, 0, 0, true);
       keyboard = false;
@@ -882,6 +932,16 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
     resetRef.current = reset;
     cancelRef.current = () => finish(true);
 
+    function onDblClick() {
+      reset();
+    }
+    elHit.addEventListener('dblclick', onDblClick);
+
+    function onScroll() {
+      if (options.current.fullscreen) wake();
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+
     function start() {
       if (!elHit) return;
       held = true;
@@ -896,8 +956,9 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
     function pointerDown(event: PointerEvent) {
       if (!ready || options.current.disabled || held || event.button !== 0 || !event.isPrimary || !elRoot || !elHit) return;
       const rect = elRoot.getBoundingClientRect();
-      pointerX = lastX = event.clientX - rect.left;
-      pointerY = lastY = event.clientY - rect.top;
+      const isFs = Boolean(options.current.fullscreen);
+      pointerX = lastX = isFs ? event.clientX : event.clientX - rect.left;
+      pointerY = lastY = isFs ? event.clientY : event.clientY - rect.top;
       setPointer(pointerX, pointerY);
       sheet.updateMatrixWorld(true);
       const intersection = raycaster.intersectObjects([front, back], false)[0];
@@ -923,17 +984,18 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
     function pointerMove(event: PointerEvent) {
       if (!held || event.pointerId !== pointerId || !options.current.draggable || !elRoot) return;
       const rect = elRoot.getBoundingClientRect();
+      const isFs = Boolean(options.current.fullscreen);
       const now = performance.now();
-      const x = event.clientX - rect.left,
-        y = event.clientY - rect.top;
+      const x = isFs ? event.clientX : event.clientX - rect.left,
+        y = isFs ? event.clientY : event.clientY - rect.top;
       const dt = Math.max(0.008, (now - lastMove) / 1000);
       speedX = (x - lastX) / dt;
       speedY = (y - lastY) / dt;
       lastX = x;
       lastY = y;
       lastMove = now;
-      pointerX = clamp(x, 12, viewportWidth - 12);
-      pointerY = clamp(y, 12, viewportHeight - 12);
+      pointerX = clamp(x, 4, viewportWidth - 4);
+      pointerY = clamp(y, 4, viewportHeight - 4);
       const maxTilt = reduceMotion
         ? 0
         : THREE.MathUtils.degToRad(clamp(finite(options.current.dragRotation, 10), 0, 60));
@@ -1050,13 +1112,22 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
 
     const observer = new ResizeObserver(resize);
     observer.observe(elRoot);
-    const intersectionObserver = new IntersectionObserver(entries => {
-      inView = entries[0].isIntersecting;
-      lastTime = 0;
-      if (!inView) cancel();
-      else wake();
-    });
-    intersectionObserver.observe(elRoot);
+    const targetElement = (fullscreen && options.current.anchorRef?.current) || elRoot;
+    let intersectionObserver: IntersectionObserver | null = null;
+    if (fullscreen) {
+      inView = true;
+    } else {
+      intersectionObserver = new IntersectionObserver(
+        entries => {
+          inView = entries[0].isIntersecting;
+          lastTime = 0;
+          if (!inView) cancel();
+          else wake();
+        },
+        { rootMargin: '600px 0px 600px 0px' }
+      );
+      intersectionObserver.observe(targetElement);
+    }
 
     deform();
     resize();
@@ -1132,7 +1203,7 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
       if (pointerId !== null && elHit.hasPointerCapture(pointerId)) elHit.releasePointerCapture(pointerId);
       resetRef.current = cancelRef.current = null;
       observer.disconnect();
-      intersectionObserver.disconnect();
+      intersectionObserver?.disconnect();
       elHit.removeEventListener('pointerdown', pointerDown);
       elHit.removeEventListener('pointermove', pointerMove);
       elHit.removeEventListener('pointerup', pointerUp);
@@ -1141,6 +1212,8 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
       elHit.removeEventListener('keydown', keyDown);
       elHit.removeEventListener('keyup', keyUp);
       elHit.removeEventListener('blur', blur);
+      elHit.removeEventListener('dblclick', onDblClick);
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('blur', cancel);
       document.removeEventListener('visibilitychange', visibility);
       media.removeEventListener('change', motionChange);
@@ -1190,11 +1263,14 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
     ? `drop-shadow(0 6px 10px rgb(0 0 0 / ${clamp(finite(shadowOpacity, 0.08), 0, 1)}))`
     : undefined;
 
-  return (
+  const node = (
     <div
       ref={rootRef}
-      className={`paper-crumple ${className}`}
-      style={{ height: sceneHeight, ...style }}
+      className={`paper-crumple ${fullscreen ? 'paper-crumple--fullscreen' : ''} ${className}`}
+      style={{
+        ...(fullscreen ? {} : { height: sceneHeight }),
+        ...style
+      }}
       data-status={status}
     >
       <canvas
@@ -1203,7 +1279,7 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
         aria-hidden="true"
         style={{ visibility: status === 'ready' ? 'visible' : 'hidden', filter: shadowFilter }}
       />
-      {status !== 'ready' && (
+      {status !== 'ready' && !fullscreen && (
         <img
           className="paper-crumple-fallback"
           src={src || undefined}
@@ -1221,7 +1297,7 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
         type="button"
         className="paper-crumple-hit"
         disabled={disabled || status !== 'ready'}
-        aria-label={`${alt}. Hold to crumple and drag. Keyboard: hold Space or Enter, arrow keys to move, Escape to reset.`}
+        aria-label={`${alt}. Hold to crumple and drag. Double-click or Escape to reset.`}
         aria-pressed="false"
         style={{ visibility: status === 'ready' ? 'visible' : 'hidden' }}
       />
@@ -1230,11 +1306,17 @@ export const PaperCrumple: React.FC<PaperCrumpleProps> = ({
         {status === 'loading'
           ? 'Loading interactive paper.'
           : status === 'error'
-            ? 'Interactive paper unavailable. Showing the original image.'
+            ? 'Interactive paper unavailable.'
             : ''}
       </span>
     </div>
   );
+
+  if (fullscreen && typeof document !== 'undefined') {
+    return createPortal(node, document.body);
+  }
+
+  return node;
 };
 
 export default PaperCrumple;

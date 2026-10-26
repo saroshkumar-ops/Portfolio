@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PaperCrumple from './PaperCrumple';
 
 export default function BioPaperCrumple() {
+  const anchorRef = useRef<HTMLDivElement>(null);
   const [dataUrl, setDataUrl] = useState<string>('/About/bio-paper.svg');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     let active = true;
 
     const renderTextToCanvas = () => {
@@ -20,8 +23,16 @@ export default function BioPaperCrumple() {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // 100% TRANSPARENT background - absolutely NO fill, NO box, NO border
-        ctx.clearRect(0, 0, w, h);
+        // Clean dark tactile paper background (seamless with site palette, solid for 3D paper folds)
+        // ABSOLUTELY NO UGLY BORDER, NO STROKE, NO TACKY OUTLINES
+        ctx.fillStyle = '#141418';
+        if (typeof ctx.roundRect === 'function') {
+          ctx.beginPath();
+          ctx.roundRect(0, 0, w, h, 16);
+          ctx.fill();
+        } else {
+          ctx.fillRect(0, 0, w, h);
+        }
 
         // Clean editorial typography matching site styles exactly
         ctx.textAlign = 'left';
@@ -39,10 +50,10 @@ export default function BioPaperCrumple() {
           'ML-LAM, ML4SCI).'
         ];
 
-        let y = 16;
-        const lineHeight = 64;
+        let y = 48;
+        const lineHeight = 66;
         for (const line of lines) {
-          ctx.fillText(line, 8, y);
+          ctx.fillText(line, 44, y);
           y += lineHeight;
         }
 
@@ -70,32 +81,43 @@ export default function BioPaperCrumple() {
   }, []);
 
   return (
-    <div className="bio-paper-wrapper">
-      <PaperCrumple
-        src={dataUrl}
-        alt="Sarosh Kumar Bio"
-        width={460}
-        height={268}
-        sceneHeight={300}
-        imageFit="contain"
-        releaseBehavior="restore"
-        crumpleAmount={0.85}
-        crumpleDuration={0.55}
-        releaseDuration={0.4}
-        foldCount={6}
-        foldSharpness={0.65}
-        wrinkleDepth={0.7}
-        creaseStrength={0.2}
-        paperColor="#222226"
-        roughness={0.92}
-        paperTexture={0.04}
-        lightIntensity={1.8}
-        lightAngle={-35}
-        shadow={false}
-        draggable={true}
-        returnToOrigin={true}
-        rotation={0}
+    <div className="bio-paper-wrapper" style={{ position: 'relative', width: '100%', minHeight: '268px' }}>
+      {/* Anchor element reserving exact space in document layout */}
+      <div
+        ref={anchorRef}
+        className="bio-paper-anchor"
+        style={{ width: '100%', minHeight: '268px', pointerEvents: 'none' }}
       />
+
+      {/* Fullscreen unconstrained PaperCrumple movable anywhere across the entire window */}
+      {mounted && (
+        <PaperCrumple
+          src={dataUrl}
+          alt="Sarosh Kumar Bio"
+          width={460}
+          height={268}
+          fullscreen={true}
+          anchorRef={anchorRef}
+          imageFit="contain"
+          releaseBehavior="restore"
+          crumpleAmount={0.88}
+          crumpleDuration={0.5}
+          releaseDuration={0.42}
+          foldCount={7}
+          foldSharpness={0.7}
+          wrinkleDepth={0.8}
+          creaseStrength={0.2}
+          paperColor="#1a1a20"
+          roughness={0.9}
+          paperTexture={0.06}
+          lightIntensity={1.8}
+          lightAngle={-35}
+          shadow={true}
+          shadowOpacity={0.16}
+          draggable={true}
+          returnToOrigin={false}
+        />
+      )}
     </div>
   );
 }

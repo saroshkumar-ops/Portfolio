@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "@/components/ScrollProvider";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
-import BioTiltedCard from "@/components/ui/BioTiltedCard";
+import BioPaperCrumple from "@/components/ui/BioPaperCrumple";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -2505,7 +2505,7 @@ export default function LukeBaffaitPortfolio() {
             As an <span className="other-accent">AI systems engineer</span>, I build production deep learning architectures and low-latency streaming inference pipelines, blending technical precision with <span className="other-accent">scientific discovery</span>.
           </div>
           <div className="about-sub" id="about-sub">
-            <BioTiltedCard />
+            <BioPaperCrumple />
           </div>
           <div className="about-btn">
             <a className="chr-hover" data-chr="Skills" href="#skills" />
