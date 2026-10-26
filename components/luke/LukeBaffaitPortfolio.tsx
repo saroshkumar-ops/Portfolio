@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "@/components/ScrollProvider";
 import { PORTFOLIO_DATA } from "@/lib/portfolio-data";
+import BioPaperCrumple from "@/components/ui/BioPaperCrumple";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -925,15 +926,15 @@ export default function LukeBaffaitPortfolio() {
     if (aboutSub) {
       gsap.fromTo(
         aboutSub,
-        { opacity: 0, filter: "blur(12px)" },
+        { opacity: 0, y: 30 },
         {
           opacity: 1,
-          filter: "blur(0px)",
+          y: 0,
           ease: "none",
           scrollTrigger: {
             trigger: aboutSub,
-            start: "top 80%",
-            end: "top 60%",
+            start: "top 85%",
+            end: "top 65%",
             scrub: true,
           },
         }
@@ -2504,7 +2505,7 @@ export default function LukeBaffaitPortfolio() {
             As an <span className="other-accent">AI systems engineer</span>, I build production deep learning architectures and low-latency streaming inference pipelines, blending technical precision with <span className="other-accent">scientific discovery</span>.
           </div>
           <div className="about-sub" id="about-sub">
-            My name is Sarosh. Computer Science undergrad at KLE Technological University (CGPA 8.06/10), Lead of the Data Science Club (500+ members), and open-source contributor across research organizations (BrainGlobe, ML-LAM, ML4SCI).
+            <BioPaperCrumple />
           </div>
           <div className="about-btn">
             <a className="chr-hover" data-chr="Skills" href="#skills" />

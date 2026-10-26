@@ -539,14 +539,14 @@ a.chr-hover {
 .about-sub {
   position: relative;
   z-index: 20;
-  width: 28%;
-  margin-top: 12vh;
+  width: clamp(340px, 32vw, 500px);
+  margin-top: 6vh;
   margin-left: 20%;
-  font-family: 'Breton', sans-serif;
-  font-size: clamp(0.9rem, 1.8vw, 1.7rem);
-  line-height: 1.6;
-  letter-spacing: -0.005em;
-  color: #f0f0f0;
+}
+
+.bio-paper-wrapper {
+  position: relative;
+  width: 100%;
 }
 
 .about-btn {
