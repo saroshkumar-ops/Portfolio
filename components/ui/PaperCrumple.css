@@ -40,15 +40,15 @@
   left: 0;
   padding: 0;
   margin: 0;
-  border: 0;
-  background: transparent;
-  border-radius: 2px;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
   cursor: grab;
-  outline: none !important;
   box-shadow: none !important;
 }
 
@@ -57,25 +57,19 @@
 }
 
 .paper-crumple-hit:focus,
-.paper-crumple-hit:focus-visible {
+.paper-crumple-hit:focus-visible,
+.paper-crumple-hit:active,
+.paper-crumple-hit:hover {
   outline: none !important;
+  border: none !important;
   box-shadow: none !important;
 }
 
 .paper-crumple-focus {
-  position: absolute;
-  bottom: 24px;
-  left: calc(50% - 2px);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
   pointer-events: none;
-}
-
-.paper-crumple-hit:not([data-pointer='true']):focus-visible + .paper-crumple-focus {
-  opacity: 0.55;
 }
 
 .paper-crumple-hit:disabled {
