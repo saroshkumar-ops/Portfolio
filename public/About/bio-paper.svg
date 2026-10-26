@@ -1,48 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="760" viewBox="0 0 960 760">
-  <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#141418"/>
-      <stop offset="50%" stop-color="#0f0f13"/>
-      <stop offset="100%" stop-color="#09090b"/>
-    </linearGradient>
-    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="rgba(255,255,255,0.22)"/>
-      <stop offset="50%" stop-color="rgba(255,255,255,0.08)"/>
-      <stop offset="100%" stop-color="rgba(255,255,255,0.16)"/>
-    </linearGradient>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600">
+  <!-- Seamless borderless dark background matching #0a0a0a -->
+  <rect width="960" height="600" fill="#0a0a0a"/>
 
-  <!-- Paper Card Background -->
-  <rect x="16" y="16" width="928" height="728" rx="16" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="1.5"/>
-
-  <!-- Top Subtle Meta -->
-  <circle cx="56" cy="56" r="4" fill="#22c55e"/>
-  <text x="72" y="61" font-family="'JetBrains Mono', monospace, -apple-system, sans-serif" font-size="13" font-weight="600" letter-spacing="2" fill="rgba(255,255,255,0.45)">SAROSH KUMAR // PERSPECTIVE</text>
-  <text x="904" y="61" text-anchor="end" font-family="'JetBrains Mono', monospace, -apple-system, sans-serif" font-size="13" letter-spacing="1.5" fill="rgba(255,255,255,0.45)">V3.0 • HOLD TO CRUMPLE</text>
-
-  <!-- Divider Line -->
-  <line x1="56" y1="88" x2="904" y2="88" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-
-  <!-- Main 7-line Bio text matching exact screenshot breaks -->
-  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="28" fill="#f0f0f0" letter-spacing="-0.3">
-    <text x="56" y="170">My name is Sarosh. Computer Science</text>
-    <text x="56" y="224">undergrad at KLE Technological</text>
-    <text x="56" y="278">University (CGPA 8.06/10), Lead of the</text>
-    <text x="56" y="332">Data Science Club (500+ members),</text>
-    <text x="56" y="386">and open-source contributor across</text>
-    <text x="56" y="440">research organizations (BrainGlobe,</text>
-    <text x="56" y="494">ML-LAM, ML4SCI).</text>
+  <!-- Clean Bio Typography without any boxes or borders -->
+  <g font-family="'Breton', Georgia, serif, -apple-system, sans-serif" font-size="33" fill="#f0f0f0" letter-spacing="-0.2">
+    <text x="32" y="70">My name is Sarosh. Computer Science</text>
+    <text x="32" y="132">undergrad at KLE Technological</text>
+    <text x="32" y="194">University (CGPA 8.06/10), Lead of the</text>
+    <text x="32" y="256">Data Science Club (500+ members),</text>
+    <text x="32" y="318">and open-source contributor across</text>
+    <text x="32" y="380">research organizations (BrainGlobe,</text>
+    <text x="32" y="442">ML-LAM, ML4SCI).</text>
   </g>
-
-  <!-- Bottom Divider -->
-  <line x1="56" y1="600" x2="904" y2="600" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-
-  <!-- Bottom CTA: SKILLS Pill -->
-  <g>
-    <rect x="56" y="640" width="160" height="48" rx="24" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
-    <text x="136" y="670" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" letter-spacing="2" fill="#ffffff">SKILLS  🡲</text>
-  </g>
-
-  <!-- Tactile Hint -->
-  <text x="904" y="670" text-anchor="end" font-family="'JetBrains Mono', monospace, -apple-system, sans-serif" font-size="12" letter-spacing="1" fill="rgba(255,255,255,0.35)">CLICK &amp; DRAG TO CRUMPLE • ESC TO RESET</text>
 </svg>
