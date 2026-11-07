@@ -9,7 +9,7 @@ import { Download, ExternalLink, Sparkles, Terminal, ArrowUpRight } from "lucide
 const NAV_LINKS = [
   { label: "Blueprint", href: "#about", num: "01", desc: "Background & Core Thesis" },
   { label: "Flagship Projects", href: "#projects", num: "02", desc: "Voice Integrity, ExoTerra, AQI" },
-  { label: "Research Lab", href: "#research", num: "03", desc: "BrainGlobe, ML-LAM, ML4SCI" },
+  { label: "Research Lab", href: "#research", num: "03", desc: "Neural-LAM Graph Modeling" },
   { label: "Tech Ecosystem", href: "#skills", num: "04", desc: "Deep Learning, Systems, Frameworks" },
   { label: "Honors & Leadership", href: "#hackathons", num: "05", desc: "HackTU 7.0, Data Science Club" },
   { label: "Command Terminal", href: "#contact", num: "06", desc: "Interactive CLI & Direct Contact" },

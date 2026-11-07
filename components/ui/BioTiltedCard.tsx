@@ -18,8 +18,8 @@ export default function BioTiltedCard() {
       <div className="bio-card-body">
         <p className="bio-card-text">
           My name is Sarosh. Computer Science undergrad at KLE Technological University, Lead of the
-          Data Science Club (500+ members), and open-source contributor across research organizations (BrainGlobe,
-          ML-LAM, ML4SCI).
+          Data Science Club (500+ members), and machine learning engineer contributing to Neural-LAM graph
+          weather prediction models.
         </p>
       </div>
 
@@ -59,8 +59,8 @@ export default function BioTiltedCard() {
 
         <div className="bio-card-back-item">
           <span className="bio-card-back-label">Open Source &amp; Research</span>
-          <span className="bio-card-back-value">BrainGlobe • ML-LAM • ML4SCI</span>
-          <span className="bio-card-back-sub">Neuroscience vision pipelines &amp; weather AI models</span>
+          <span className="bio-card-back-value">Neural-LAM</span>
+          <span className="bio-card-back-sub">Graph neural network weather modeling &amp; atmospheric forecasting</span>
         </div>
       </div>
 

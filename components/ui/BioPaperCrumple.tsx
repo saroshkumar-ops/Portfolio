@@ -44,10 +44,9 @@ export default function BioPaperCrumple() {
           'My name is Sarosh. Computer Science',
           'undergrad at KLE Technological',
           'University, Lead of the Data Science',
-          'Club (500+ members), and open-source',
-          'contributor across research',
-          'organizations (BrainGlobe, ML-LAM,',
-          'ML4SCI).'
+          'Club (500+ members), and ML engineer',
+          'contributing to Neural-LAM graph',
+          'weather modeling.'
         ];
 
         let y = 48;

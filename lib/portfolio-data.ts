@@ -39,7 +39,7 @@ export const PORTFOLIO_DATA = {
     name: "Sarosh Kumar",
     role: "AI Systems & Backend Engineer",
     headline: "Architecting Scientific ML, Deep Learning & Low-Latency Streaming Systems",
-    bio: "Computer Science undergraduate (2024–2028) at KLE Technological University with hands-on experience in scientific machine learning, deep learning, audio AI, and low-latency backend systems. Proven track record in training and deploying neural architectures, streaming inference pipelines, and physics-informed discovery engines. Active open-source contributor across research organizations (BrainGlobe, ML-LAM, ML4SCI).",
+    bio: "Computer Science undergraduate (2024–2028) at KLE Technological University with hands-on experience in scientific machine learning, deep learning, audio AI, and low-latency backend systems. Proven track record in training and deploying neural architectures, streaming inference pipelines, and physics-informed discovery engines. Active open-source contributor to Neural-LAM.",
     location: "Hubli, Karnataka, India",
     email: "saroshkumar00@gmail.com",
     phone: "+91-7619562240",
@@ -164,28 +164,13 @@ export const PORTFOLIO_DATA = {
 
   openSource: [
     {
-      organization: "BrainGlobe Initiative",
-      project: "cellfinder",
-      role: "Core Contributor",
-      description:
-        "Enhanced production 3D image processing and classification pipelines in Python/PyTorch, optimizing tensor operations and multi-dimensional array evaluation for computational neuroscience workflows.",
-      tags: ["Python", "PyTorch", "Computer Vision", "Neuroscience"],
-    },
-    {
-      organization: "ML-LAM Collaboration",
+      organization: "Neural-LAM",
       project: "neural-lam",
       role: "Contributor",
       description:
-        "Contributed to graph neural weather prediction framework, working with Graph Neural Network (GNN) architectures and training utilities in PyTorch.",
+        "Contributed to graph neural weather prediction framework, working with Graph Neural Network (GNN) architectures, message-passing layers, and training utilities in PyTorch for high-resolution limited-area atmospheric modeling.",
       tags: ["PyTorch", "GNNs", "PyG", "Weather AI"],
-    },
-    {
-      organization: "ML4SCI",
-      project: "DeepLense",
-      role: "Contributor",
-      description:
-        "Modernized MPS device detection for Apple Silicon acceleration, resolved micro-AUROC metric issues in transformer classification pipelines, and cleaned deprecated scheduler parameters.",
-      tags: ["PyTorch", "Transformers", "MPS / Apple Silicon", "Deep Learning"],
+      link: "https://github.com/saroshkumar-ops/neural-lam",
     },
   ],
 

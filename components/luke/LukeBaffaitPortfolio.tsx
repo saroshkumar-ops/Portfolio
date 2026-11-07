@@ -74,41 +74,17 @@ const PROJECTS_MAP: Record<string, ProjectItem> = {
     cover: "/About/img_00020.jpg",
     images: ["/About/img_00020.jpg", "/About/img_00021.jpg", "/About/img_00022.jpg"],
   },
-  "brainglobe": {
-    id: "brainglobe",
-    title: "BrainGlobe (cellfinder)",
-    year: "08 2025",
-    desc: "Core contribution to computational neuroscience initiative. Enhanced production 3D image processing and classification pipelines in Python/PyTorch, optimizing tensor operations and multi-dimensional array evaluation for high-throughput brain slice analysis.",
-    tags: ["Python", "PyTorch", "Computer Vision", "Neuroscience"],
-    link: "https://github.com/brainglobe/cellfinder",
-    cover: "/About/img_00030.jpg",
-    images: ["/About/img_00030.jpg", "/About/img_00031.jpg", "/About/img_00032.jpg"],
-  },
   "neural-lam": {
     id: "neural-lam",
-    title: "ML-LAM (neural-lam)",
+    title: "Neural-LAM Weather Modeling",
     year: "06 2025",
     desc: "Graph neural weather prediction framework. Worked on Graph Neural Network (GNN) architectures, message-passing layers, and distributed training utilities in PyTorch for high-resolution limited-area atmospheric modeling.",
     tags: ["PyTorch", "GNNs", "PyG", "Weather AI"],
-    link: "https://github.com/saroshkumar-ops",
+    link: "https://github.com/saroshkumar-ops/neural-lam",
     cover: "/project-images/neural-lam/01_neural_lam_header.png",
     images: [
       "/project-images/neural-lam/01_neural_lam_header.png",
       "/project-images/neural-lam/02_neural_lam_setup.png",
-    ],
-  },
-  "deeplense": {
-    id: "deeplense",
-    title: "ML4SCI (DeepLense)",
-    year: "04 2025",
-    desc: "Deep learning for gravitational lensing and dark matter detection. Modernized Apple Silicon MPS device detection, resolved micro-AUROC metric calculations in transformer classification pipelines, and cleaned deprecated scheduler parameters.",
-    tags: ["PyTorch", "Transformers", "MPS Acceleration", "Astrophysics"],
-    link: "https://github.com/saroshkumar-ops",
-    cover: "/project-images/deeplense/01_model_comparison_roc.png",
-    images: [
-      "/project-images/deeplense/01_model_comparison_roc.png",
-      "/project-images/deeplense/02_confusion_matrix.png",
-      "/project-images/deeplense/03_roc_curves.png",
     ],
   },
 };
@@ -2603,39 +2579,21 @@ export default function LukeBaffaitPortfolio() {
               </div>
               <div
                 className="proj-item"
-                data-id="aqi-forecaster"
+                data-id="neural-lam"
                 data-idx="04"
+                data-img="/project-images/neural-lam/01_neural_lam_header.png"
+                data-date="06 2025"
+              >
+                Neural-LAM Weather Modeling
+              </div>
+              <div
+                className="proj-item"
+                data-id="aqi-forecaster"
+                data-idx="05"
                 data-img="/About/img_00020.jpg"
                 data-date="11 2025"
               >
                 Air Quality Forecasting
-              </div>
-              <div
-                className="proj-item"
-                data-id="brainglobe"
-                data-idx="05"
-                data-img="/About/img_00030.jpg"
-                data-date="08 2025"
-              >
-                BrainGlobe Initiative
-              </div>
-              <div
-                className="proj-item"
-                data-id="neural-lam"
-                data-idx="06"
-                data-img="/project-images/neural-lam/01_neural_lam_header.png"
-                data-date="06 2025"
-              >
-                ML-LAM Weather Modeling
-              </div>
-              <div
-                className="proj-item"
-                data-id="deeplense"
-                data-idx="07"
-                data-img="/project-images/deeplense/01_model_comparison_roc.png"
-                data-date="04 2025"
-              >
-                ML4SCI DeepLense
               </div>
             </div>
 

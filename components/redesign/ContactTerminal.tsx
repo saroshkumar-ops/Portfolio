@@ -42,7 +42,7 @@ export default function ContactTerminal() {
         response = "PyTorch, FastAPI, Transformers, WavLM, LFCC-LCNN, GNNs, Scikit-Learn, Docker, WebSockets";
         break;
       case "research":
-        response = "Open Source: BrainGlobe (cellfinder), ML-LAM (neural-lam GNNs), ML4SCI (DeepLense)";
+        response = "Open Source: Neural-LAM (neural-lam GNN weather modeling)";
         break;
       case "contact":
         response = `Email: ${PORTFOLIO_DATA.personal.email} | Phone: ${PORTFOLIO_DATA.personal.phone}`;
