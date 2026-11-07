@@ -17,7 +17,7 @@ export default function BioTiltedCard() {
 
       <div className="bio-card-body">
         <p className="bio-card-text">
-          My name is Sarosh. Computer Science undergrad at KLE Technological University (CGPA 8.06/10), Lead of the
+          My name is Sarosh. Computer Science undergrad at KLE Technological University, Lead of the
           Data Science Club (500+ members), and open-source contributor across research organizations (BrainGlobe,
           ML-LAM, ML4SCI).
         </p>

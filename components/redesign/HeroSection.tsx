@@ -76,7 +76,7 @@ export default function RedesignHero() {
             <span>NEURAL FOUNDRY // SCIENTIFIC ML</span>
           </div>
           <span className="text-zinc-500 font-mono text-xs hidden sm:inline">
-            Hubli, India • KLE Tech (CGPA 8.06)
+            Hubli, India • KLE Tech
           </span>
         </motion.div>
 

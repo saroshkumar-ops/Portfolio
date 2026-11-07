@@ -116,6 +116,30 @@ export const PORTFOLIO_DATA = {
       featured: true,
     },
     {
+      id: "radconformal",
+      title: "RadConformal-AI",
+      subtitle: "High-Stakes Radiology Diagnostic Copilot",
+      description:
+        "Production-grade chest radiograph diagnostic copilot with distribution-free conformal prediction and Grad-CAM explainability. DenseNet-121 backbone optimized via Asymmetric Loss (ASL) with post-hoc temperature scaling (74.3% ECE reduction). Provides 95% finite-sample coverage guarantees with automated clinical escalation for ambiguous scans. Asynchronous FastAPI microservice with dynamic ONNX export and INT8 quantization achieving <24ms P95 latency.",
+      tags: ["PyTorch", "DenseNet-121", "Conformal Prediction", "Grad-CAM", "FastAPI", "ONNX Runtime"],
+      metrics: [
+        { label: "Coverage Guarantee", value: "95.0%" },
+        { label: "ECE Calibration Drop", value: "74.3%" },
+        { label: "CPU Inference Latency", value: "< 24ms" },
+        { label: "Model Quantization", value: "INT8 (74% drop)" },
+      ],
+      bulletPoints: [
+        "Architected and deployed Split Conformal Prediction engine on a multi-label DenseNet-121 backbone, providing distribution-free finite-sample coverage guarantees (1 - α = 95%) and reducing Expected Calibration Error (ECE) by 74.3% via post-hoc Temperature Scaling.",
+        "Designed automated clinical referral triage flagging degenerate and high-entropy prediction sets, routing ambiguous cases directly to board-certified radiologists.",
+        "Built hook-based Grad-CAM diagnostic attribution with morphological contouring and quadrant mapping without graph modification.",
+        "Engineered an asynchronous FastAPI microservice with dynamic-batch ONNX export and INT8 quantization, slashing model footprint by 74% and driving CPU P95 latency down to 23.5ms.",
+      ],
+      links: {
+        github: "https://github.com/saroshkumar-ops/radconformal-ai",
+      },
+      featured: true,
+    },
+    {
       id: "aqi-forecasting",
       title: "Air Quality Forecasting & Source Attribution",
       subtitle: "Autoregressive Predictive & Heuristic Attribution Engine",

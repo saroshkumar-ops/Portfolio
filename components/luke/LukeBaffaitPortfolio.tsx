@@ -28,18 +28,41 @@ const PROJECTS_MAP: Record<string, ProjectItem> = {
     desc: "Real-time deepfake voice detection engine. Engineered 7,000 Hz low-pass parity gate to eliminate resampler spectral bias. Ensembled LFCC-LCNN and WavLM Base+ logits via Platt scaling and EMA smoothing, achieving 91.5% zero-day recall at 1.7% false alarm rate across 25 unseen generators. Sub-250ms streaming FastAPI WebSocket pipeline with RMS Voice Activity Detection.",
     tags: ["PyTorch", "WavLM", "LFCC-LCNN", "FastAPI", "WebSockets", "Hugging Face"],
     link: "https://voicenow.vercel.app/",
-    cover: "/About/img_00001.jpg",
-    images: ["/About/img_00001.jpg", "/About/img_00002.jpg", "/About/img_00003.jpg"],
+    cover: "/project-images/voice-integrity/01_voice_integrity_landing.png",
+    images: [
+      "/project-images/voice-integrity/01_voice_integrity_landing.png",
+      "/project-images/voice-integrity/02_voice_integrity_detection.png",
+      "/project-images/voice-integrity/03_voice_integrity_mobile.jpeg",
+    ],
+  },
+  "radconformal": {
+    id: "radconformal",
+    title: "RadConformal-AI Copilot",
+    year: "02 2026",
+    desc: "Production-grade chest radiograph diagnostic copilot with distribution-free conformal prediction and Grad-CAM explainability. DenseNet-121 backbone optimized via Asymmetric Loss (ASL) with post-hoc temperature scaling (74.3% ECE reduction). Provides 95% finite-sample coverage guarantees with automated clinical escalation for ambiguous scans. Asynchronous FastAPI microservice with dynamic ONNX export and INT8 quantization achieving <24ms P95 latency.",
+    tags: ["PyTorch", "DenseNet-121", "Conformal Prediction", "Grad-CAM", "FastAPI", "ONNX Runtime"],
+    link: "https://github.com/saroshkumar-ops/radconformal-ai",
+    cover: "/project-images/radconformal/01_radconformal_dashboard_overview.png",
+    images: [
+      "/project-images/radconformal/01_radconformal_dashboard_overview.png",
+      "/project-images/radconformal/02_radconformal_diagnostic_attribution.png",
+      "/project-images/radconformal/03_radconformal_clinical_findings_telemetry.png",
+    ],
   },
   "exoterra": {
     id: "exoterra",
-    title: "ExoTerra",
+    title: "ExoTerra NASA Engine",
     year: "01 2026",
     desc: "NASA exoplanet characterization and discovery engine. Ingested and cached 5,800+ confirmed exoplanets via NASA's TAP API with Chen & Kipping empirical mass-radius relations and Stefan-Boltzmann flux modeling. Implemented Kopparapu Habitable Zone polynomial boundaries and Earth Similarity Index. 3D PCA capturing 89.2% cosmological variance.",
     tags: ["Python", "Scikit-Learn", "NASA TAP API", "Streamlit", "NumPy", "Pandas"],
     link: "https://github.com/saroshkumar-ops/NASA-Exoplanet-Engine",
-    cover: "/About/img_00010.jpg",
-    images: ["/About/img_00010.jpg", "/About/img_00011.jpg", "/About/img_00012.jpg"],
+    cover: "/project-images/exoterra/01_habitable_zone_explorer.png",
+    images: [
+      "/project-images/exoterra/01_habitable_zone_explorer.png",
+      "/project-images/exoterra/02_earth_twins_leaderboard.png",
+      "/project-images/exoterra/03_real_time_simulator.png",
+      "/project-images/exoterra/04_ml_latent_space_lab.png",
+    ],
   },
   "aqi-forecaster": {
     id: "aqi-forecaster",
@@ -68,8 +91,11 @@ const PROJECTS_MAP: Record<string, ProjectItem> = {
     desc: "Graph neural weather prediction framework. Worked on Graph Neural Network (GNN) architectures, message-passing layers, and distributed training utilities in PyTorch for high-resolution limited-area atmospheric modeling.",
     tags: ["PyTorch", "GNNs", "PyG", "Weather AI"],
     link: "https://github.com/saroshkumar-ops",
-    cover: "/About/img_00040.jpg",
-    images: ["/About/img_00040.jpg", "/About/img_00041.jpg", "/About/img_00042.jpg"],
+    cover: "/project-images/neural-lam/01_neural_lam_header.png",
+    images: [
+      "/project-images/neural-lam/01_neural_lam_header.png",
+      "/project-images/neural-lam/02_neural_lam_setup.png",
+    ],
   },
   "deeplense": {
     id: "deeplense",
@@ -78,8 +104,12 @@ const PROJECTS_MAP: Record<string, ProjectItem> = {
     desc: "Deep learning for gravitational lensing and dark matter detection. Modernized Apple Silicon MPS device detection, resolved micro-AUROC metric calculations in transformer classification pipelines, and cleaned deprecated scheduler parameters.",
     tags: ["PyTorch", "Transformers", "MPS Acceleration", "Astrophysics"],
     link: "https://github.com/saroshkumar-ops",
-    cover: "/About/img_00050.jpg",
-    images: ["/About/img_00050.jpg", "/About/img_00051.jpg", "/About/img_00052.jpg"],
+    cover: "/project-images/deeplense/01_model_comparison_roc.png",
+    images: [
+      "/project-images/deeplense/01_model_comparison_roc.png",
+      "/project-images/deeplense/02_confusion_matrix.png",
+      "/project-images/deeplense/03_roc_curves.png",
+    ],
   },
 };
 
@@ -2548,16 +2578,25 @@ export default function LukeBaffaitPortfolio() {
                 className="proj-item"
                 data-id="voice-integrity"
                 data-idx="01"
-                data-img="/About/img_00001.jpg"
+                data-img="/project-images/voice-integrity/01_voice_integrity_landing.png"
                 data-date="03 2026"
               >
                 Voice Integrity
               </div>
               <div
                 className="proj-item"
-                data-id="exoterra"
+                data-id="radconformal"
                 data-idx="02"
-                data-img="/About/img_00010.jpg"
+                data-img="/project-images/radconformal/01_radconformal_dashboard_overview.png"
+                data-date="02 2026"
+              >
+                RadConformal-AI Copilot
+              </div>
+              <div
+                className="proj-item"
+                data-id="exoterra"
+                data-idx="03"
+                data-img="/project-images/exoterra/01_habitable_zone_explorer.png"
                 data-date="01 2026"
               >
                 ExoTerra NASA Engine
@@ -2565,7 +2604,7 @@ export default function LukeBaffaitPortfolio() {
               <div
                 className="proj-item"
                 data-id="aqi-forecaster"
-                data-idx="03"
+                data-idx="04"
                 data-img="/About/img_00020.jpg"
                 data-date="11 2025"
               >
@@ -2574,7 +2613,7 @@ export default function LukeBaffaitPortfolio() {
               <div
                 className="proj-item"
                 data-id="brainglobe"
-                data-idx="04"
+                data-idx="05"
                 data-img="/About/img_00030.jpg"
                 data-date="08 2025"
               >
@@ -2583,8 +2622,8 @@ export default function LukeBaffaitPortfolio() {
               <div
                 className="proj-item"
                 data-id="neural-lam"
-                data-idx="05"
-                data-img="/About/img_00040.jpg"
+                data-idx="06"
+                data-img="/project-images/neural-lam/01_neural_lam_header.png"
                 data-date="06 2025"
               >
                 ML-LAM Weather Modeling
@@ -2592,8 +2631,8 @@ export default function LukeBaffaitPortfolio() {
               <div
                 className="proj-item"
                 data-id="deeplense"
-                data-idx="06"
-                data-img="/About/img_00050.jpg"
+                data-idx="07"
+                data-img="/project-images/deeplense/01_model_comparison_roc.png"
                 data-date="04 2025"
               >
                 ML4SCI DeepLense
@@ -2611,7 +2650,7 @@ export default function LukeBaffaitPortfolio() {
                   <img
                     id="proj-cover"
                     className="proj-cover base"
-                    src="/About/img_00001.jpg"
+                    src="/project-images/voice-integrity/01_voice_integrity_landing.png"
                     alt="Project Preview"
                     width={1333}
                     height={1000}
@@ -2619,7 +2658,7 @@ export default function LukeBaffaitPortfolio() {
                   <img
                     id="proj-cover-next"
                     className="proj-cover next"
-                    src="/About/img_00001.jpg"
+                    src="/project-images/voice-integrity/01_voice_integrity_landing.png"
                     alt=""
                     width={1333}
                     height={1000}
@@ -2657,7 +2696,7 @@ export default function LukeBaffaitPortfolio() {
           <div className="skills-left">
             <div className="skills-subtitle">Compétences</div>
             <div className="skills-text">
-              B.E. in Computer Science & Engineering at KLE Technological University (CGPA 8.06/10), specializing in deep learning, audio AI, and low-latency backend systems.
+              B.E. in Computer Science & Engineering at KLE Technological University, specializing in deep learning, audio AI, and low-latency backend systems.
             </div>
             <div className="skills-separator" />
             <div>
